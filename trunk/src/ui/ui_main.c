@@ -7625,6 +7625,12 @@ cvarTable_t cvarTable[] = {
 	{ &ui_isSpectator, "ui_isSpectator", "1", 0 },
 	// -NERVE - SMF
 
+	// OSPx
+	{ NULL, "cg_crosshairPulse", "1", CVAR_ARCHIVE },
+	{ NULL, "cg_showblood", "1", CVAR_ARCHIVE },
+	{ NULL, "cg_bloodFlash", "1.0", CVAR_ARCHIVE },
+	// -OSPx
+
 	{ &ui_hudAlpha, "cg_hudAlpha", "1.0", CVAR_ARCHIVE }
 };
 

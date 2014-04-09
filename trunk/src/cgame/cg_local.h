@@ -1777,6 +1777,12 @@ extern vmCvar_t cg_descriptiveText;
 extern vmCvar_t cg_autoReload;
 extern vmCvar_t cg_antilag;
 
+// OSPx
+extern vmCvar_t cg_crosshairPulse;
+extern vmCvar_t cg_bloodDamageBlend;
+extern vmCvar_t cg_bloodFlash;
+// -OSPx
+
 //
 // cg_main.c
 //
