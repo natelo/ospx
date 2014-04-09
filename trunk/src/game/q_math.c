@@ -34,26 +34,26 @@ vec3_t vec3_origin = {0,0,0};
 vec3_t axisDefault[3] = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
 
-vec4_t colorBlack  = {0, 0, 0, 1};
-vec4_t colorRed    = {1, 0, 0, 1};
-vec4_t colorGreen  = {0, 1, 0, 1};
-vec4_t colorBlue   = {0, 0, 1, 1};
-vec4_t colorYellow = {1, 1, 0, 1};
-vec4_t colorMagenta = {1, 0, 1, 1};
-vec4_t colorCyan   = {0, 1, 1, 1};
-vec4_t colorWhite  = {1, 1, 1, 1};
-vec4_t colorLtGrey = {0.75, 0.75, 0.75, 1};
-vec4_t colorMdGrey = {0.5, 0.5, 0.5, 1};
-vec4_t colorDkGrey = {0.25, 0.25, 0.25, 1};
+vec4_t colorBlack		=	{0, 0, 0, 1};
+vec4_t colorRed			=	{1, 0, 0, 1};
+vec4_t colorGreen		=	{0, 1, 0, 1};
+vec4_t colorBlue		=	{0, 0, 1, 1};
+vec4_t colorYellow		=	{1, 1, 0, 1};
+vec4_t colorMagenta		=	{1, 0, 1, 1};
+vec4_t colorCyan		=	{0, 1, 1, 1};
+vec4_t colorWhite		=	{1, 1, 1, 1};
+vec4_t colorLtGrey		=	{0.75, 0.75, 0.75, 1};
+vec4_t colorMdGrey		=	{0.5, 0.5, 0.5, 1};
+vec4_t colorDkGrey		=	{0.25, 0.25, 0.25, 1};
 // OSPx - Colors
-vec4_t colorOrange = { 1, 0.5, 0, 1 };
-vec4_t colorMdRed = { 0.5, 0, 0, 1 };
-vec4_t colorMdGreen = { 0, 0.5, 0, 1 };
-vec4_t colorDkGreen = { 0, 0.20, 0, 1 };
-vec4_t colorMdCyan = { 0, 0.5, 0.5, 1 };
-vec4_t colorMdYellow = { 0.5, 0.5, 0, 1 };
-vec4_t colorMdOrange = { 0.5, 0.25, 0, 1 };
-vec4_t colorMdBlue = { 0, 0, 0.5, 1 };
+vec4_t colorOrange		=	{ 1, 0.5, 0, 1 };
+vec4_t colorMdRed		=	{ 0.5, 0, 0, 1 };
+vec4_t colorMdGreen		=	{ 0, 0.5, 0, 1 };
+vec4_t colorDkGreen		=	{ 0, 0.20, 0, 1 };
+vec4_t colorMdCyan		=	{ 0, 0.5, 0.5, 1 };
+vec4_t colorMdYellow	=	{ 0.5, 0.5, 0, 1 };
+vec4_t colorMdOrange	=	{ 0.5, 0.25, 0, 1 };
+vec4_t colorMdBlue		=	{ 0, 0, 0.5, 1 };
 
 vec4_t g_color_table[32] =
 {
