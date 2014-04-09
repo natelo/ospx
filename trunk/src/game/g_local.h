@@ -1450,3 +1450,12 @@ typedef enum
 void G_StoreClientPosition( gentity_t* ent );
 void G_HistoricalTrace( gentity_t* ent, trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask );
 void G_ResetMarkers( gentity_t* ent );
+
+// 
+// OSPx - New stuff below 
+//
+
+// Macros
+#define AP( x ) trap_SendServerCommand( -1, x )					// Print to all
+#define CP( x ) trap_SendServerCommand( ent - g_entities, x )	// Print to an ent
+#define CPx( x, y ) trap_SendServerCommand( x, y )				// Print to id = x
