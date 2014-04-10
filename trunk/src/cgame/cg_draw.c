@@ -853,6 +853,78 @@ static float CG_DrawTeamOverlay( float y ) {
 	return y;
 }
 
+/*
+=================
+OSPx 
+Reinforcements Offset
+=================
+*/
+char *CG_CalculateReinfTime( void ) {
+	int msec, mins, seconds, tens;
+	char *s = "0.00";
+
+	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED) {
+		msec = cg_redlimbotime.integer - (cg.time % cg_redlimbotime.integer);
+	}
+	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_BLUE)     {
+		msec = cg_bluelimbotime.integer - (cg.time % cg_bluelimbotime.integer);
+	}
+	else {
+		msec = 0;
+	}
+
+	if (msec) {
+		seconds = msec / 1000;
+		mins = seconds / 60;
+		seconds -= mins * 60;
+		tens = seconds / 10;
+		seconds -= tens * 10;
+
+		s = va("%2.0f:%i%i", (float)mins, tens, seconds + 1);
+	}
+	return s;
+}
+
+/*
+========================
+OSPx 
+Respawn Timer
+========================
+*/
+static float CG_DrawRespawnTimer(float y) {
+	char		*str = { 0 };
+	int			w;
+	float		x;
+
+	if (!cg_drawReinforcementTime.integer)
+		return y;
+
+	// Don't draw timer if client is checking scoreboard
+	if (CG_DrawScoreboard())
+		return y;
+
+	if (cgs.gamestate != GS_PLAYING)
+		str = "";
+	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR)
+		str = "";
+	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED)
+		str = va("Re: %s", CG_CalculateReinfTime());
+	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_BLUE)
+		str = va("Re: %s", CG_CalculateReinfTime());
+
+	w = CG_DrawStrlen(str) * TINYCHAR_WIDTH;
+
+	x = 46 + 3;
+	y = 480 - 245;
+
+	if (cgs.gamestate != GS_PLAYING) {
+		CG_DrawStringExt((x + 4) - w, y, str, colorYellow, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+	}
+	else if (cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR){
+		CG_DrawStringExt(x - w, y, str, colorRed, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+	}
+	return y += TINYCHAR_HEIGHT;
+}
 
 /*
 =====================
@@ -882,6 +954,11 @@ static void CG_DrawUpperRight( void ) {
 //		y = CG_DrawAttacker( y );
 //	}
 //----(SA)	end
+
+	// OSPx - Respawn Timer
+	if (cg_drawReinforcementTime.integer) {
+		y = CG_DrawRespawnTimer(y);
+	}
 }
 
 /*

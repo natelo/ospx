@@ -1796,6 +1796,7 @@ extern vmCvar_t cg_drawWeaponIconFlash;
 extern vmCvar_t cg_printObjectiveInfo;
 extern vmCvar_t cg_muzzleFlash;
 extern vmCvar_t cg_complaintPopUp;
+extern vmCvar_t cg_drawReinforcementTime;
 // -OSPx
 
 //
