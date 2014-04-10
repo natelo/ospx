@@ -2677,6 +2677,11 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		flash.hModel = 0;
 	}
 
+	// OSPx - Disable muzzleFlash if they have it off..	
+	if (!cg_muzzleFlash.integer) {
+		flash.hModel = 0;
+	}
+
 	// weaps with barrel smoke
 	if ( ps || cg.renderingThirdPerson || !isPlayer ) {
 		if ( weaponNum == WP_STEN || weaponNum == WP_VENOM ) {
