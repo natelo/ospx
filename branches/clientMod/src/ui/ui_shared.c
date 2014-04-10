@@ -3544,6 +3544,7 @@ static bind_t g_bindings[] =
 
 	// OSPx
 	{ "+zoomView", -1, -1, -1, -1 },
+	{ "+vstr", -1, -1, -1, -1 },
 	// -OSPx
 
 	{"weapon 1",     -1,             -1, -1, -1},
