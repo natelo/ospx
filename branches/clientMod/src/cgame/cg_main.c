@@ -301,6 +301,9 @@ vmCvar_t cg_complaintPopUp;
 vmCvar_t cg_drawReinforcementTime;
 vmCvar_t cg_noChat;				// Removes team and global chat (still visible in console)
 vmCvar_t cg_noVoice;			// 1 = shows team only, 2 = shows global only, 3 = disables voice fully.
+vmCvar_t cg_zoomedFOV;			// Value it zooms in when +zoomView key is down
+vmCvar_t cg_zoomedSens;			// Mouse sensitivity when in "+zoomView" mode
+
 // -OSPx
 
 typedef struct {
@@ -519,7 +522,9 @@ cvarTable_t cvarTable[] = {
 	{ &cg_complaintPopUp, "cg_complaintPopUp", "1", CVAR_ARCHIVE },
 	{ &cg_drawReinforcementTime, "cg_drawReinforcementTime", "1", CVAR_ARCHIVE },
 	{ &cg_noChat, "cg_noChat", "0", CVAR_ARCHIVE },
-	{ &cg_noVoice, "cg_noVoice", "0", CVAR_ARCHIVE }
+	{ &cg_noVoice, "cg_noVoice", "0", CVAR_ARCHIVE },
+	{ &cg_zoomedFOV, "cg_zoomedFOV", "80", CVAR_ARCHIVE },
+	{ &cg_zoomedSens, "cg_zoomedSens", ".3", CVAR_ARCHIVE }
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );

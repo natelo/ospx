@@ -3542,6 +3542,10 @@ static bind_t g_bindings[] =
 	{"+dropweapon",  -1,             -1, -1, -1},
 	// -NERVE - SMF
 
+	// OSPx
+	{ "+zoomView", -1, -1, -1, -1 },
+	// -OSPx
+
 	{"weapon 1",     -1,             -1, -1, -1},
 	{"weapon 2",     -1,             -1, -1, -1},
 	{"weapon 3",     -1,             -1, -1, -1},

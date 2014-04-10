@@ -267,6 +267,9 @@ void CG_Respawn( void ) {
 	cg.zoomedBinoc = cg.zoomedScope = qfalse;
 	cg.zoomTime = 0;
 	cg.zoomval = 0;
+	// OSPx - Reset zoomedFOV
+	cg.zoomedFOV = qfalse;
+	cg.zoomedTime = 0;
 
 	// clear pmext
 	memset( &cg.pmext, 0, sizeof( cg.pmext ) );

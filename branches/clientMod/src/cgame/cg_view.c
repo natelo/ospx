@@ -807,6 +807,182 @@ void CG_Zoom( void ) {
 	}
 }
 
+/*
+====================
+OSPx - Zoom FOV
+CG_zoomViewSet_f
+
+Toggles zoom effect (based upon cg_zoomFOV value - can be in or out)
+====================
+*/
+void CG_zoomViewSet_f(void) {
+	float value;
+
+	if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
+		cg.snap->ps.pm_flags & PMF_FOLLOW)
+		return;
+
+	if (cg_zoomedFOV.value > 140)
+		value = 140;
+	else if (cg_zoomedFOV.value < 90)
+		value = 90;
+	else
+		value = cg_zoomedFOV.value;
+
+	if (!cg.zoomedFOV) {
+		cg.zoomedVal = value;
+		cg.zoomedTime = cg.time;
+		cg.zoomedFOV = qtrue;
+	}
+}
+
+/*
+====================
+OSPx - Zoom FOV
+CG_zoomViewRevert_f
+
+Reverts back to default (when player releases the key)
+====================
+*/
+void CG_zoomViewRevert_f(void) {
+	cg.zoomedVal = cg_fov.value;
+	cg.zoomedTime = cg.time;
+	cg.zoomedFOV = qfalse;
+	// Need to reset this..
+	cg.zoomed = qfalse;
+	cg.zoomedBinoc = qfalse;
+	cg.zoomedScope = qfalse;
+	cg.zoomTime = 0;
+	cg.zoomval = 0;
+}
+
+/*
+====================
+OSPx - Zoom FOV
+CG_CalcZoomedFov
+
+Basically a rip of CG_CalcFov
+====================
+*/
+static int CG_CalcZoomedFov(void) {
+	static float lastfov = 90;      // for transitions back from zoomed in modes
+	float x;
+	float fov_x, fov_y;
+	float zoomFov;
+	float f;
+	float value;
+
+	if (cg.predictedPlayerState.stats[STAT_HEALTH] <= 0 && !(cgs.gametype >= GT_WOLF && cg.snap->ps.pm_flags & PMF_FOLLOW)) {
+		cg.zoomedFOV = qfalse;
+		cg.zoomedTime = 0;
+		cg.zoomedVal = 0;
+		// Reset any other views..
+	}
+	else {
+		cg.zoomed = qfalse;
+		cg.zoomedBinoc = qfalse;
+		cg.zoomedScope = qfalse;
+		cg.zoomTime = 0;
+		cg.zoomval = 0;
+	}
+
+	if (cg.predictedPlayerState.pm_type == PM_INTERMISSION) {
+		// if in intermission, use a fixed value
+		fov_x = 90;
+	}
+	else {
+		// user selectable
+		if (cgs.dmflags & DF_FIXED_FOV) {
+			// dmflag to prevent wide fov for all clients
+			fov_x = 90;
+		}
+		else {
+			fov_x = cg_fov.value;
+			if (cgs.gametype == GT_SINGLE_PLAYER) {
+				if (fov_x < 1) {
+					fov_x = 1;	// L0 - Limited from 160 to 140
+				}
+				else if (fov_x > 140) {
+					fov_x = 140;
+				}
+			}
+			else {
+				if (fov_x < 90) {
+					fov_x = 90;	 // L0 - Limited from 160 to 140
+				}
+				else if (fov_x > 140) {
+					fov_x = 140;
+				}
+			}
+		}
+
+		// account for zooms
+		if (cg.zoomedVal) {
+			zoomFov = cg.zoomedVal;   // (SA) use user scrolled amount
+
+			if (zoomFov < 1) {
+				zoomFov = 1;	// L0 - Limited from 160 to 140
+			}
+			else if (zoomFov > 140) {
+				zoomFov = 140;
+			}
+		}
+		else {
+			zoomFov = lastfov;
+		}
+
+		// zooming in
+		if (cg.zoomedFOV) {
+			cg.zoomedBinoc = qfalse;
+			f = (cg.time - cg.zoomedTime) / (float)ZOOM_TIME;
+			if (f > 1.0) {
+				fov_x = cg.zoomedVal;
+			}
+			else {
+				fov_x = fov_x + f * (cg.zoomedVal - fov_x);
+			}
+			lastfov = fov_x;
+		}
+		else { // zooming out
+			f = (cg.time - cg.zoomedTime) / (float)ZOOM_TIME;
+			if (f > 1.0) {
+				fov_x = fov_x;
+			}
+			else {
+				fov_x = zoomFov + f * (fov_x - zoomFov);
+			}
+		}
+	}
+
+	x = cg.refdef.width / tan(fov_x / 360 * M_PI);
+	fov_y = atan2(cg.refdef.height, x);
+	fov_y = fov_y * 360 / M_PI;
+	// set it
+	cg.refdef.fov_x = fov_x;
+	cg.refdef.fov_y = fov_y;
+
+	if (cg_zoomedSens.value > 1.0f)
+		value = 1.0f;
+	else if (cg_zoomedSens.value < 0.0f)
+		value = 0.1f;
+	else
+		value = cg_zoomedSens.value;
+
+	
+	if (cg.snap->ps.pm_type == PM_FREEZE || (cg.snap->ps.pm_type == PM_DEAD && (cg.snap->ps.pm_flags & PMF_LIMBO)) || cg.snap->ps.pm_flags & PMF_TIME_LOCKPLAYER) {
+		// No movement for pauses
+		cg.zoomSensitivity = 0;
+	}
+	else if (!cg.zoomedFOV) {
+		cg.zoomSensitivity = 1;
+	}
+	else {
+		cg.zoomSensitivity = value;
+	}
+
+	return qfalse;
+}
+
 
 /*
 ====================
@@ -1263,7 +1439,12 @@ static int CG_CalcViewValues( void ) {
 	}
 
 	// field of view
-	return CG_CalcFov();
+	// OSPx - Patched for zoomed POV
+	if (cg.zoomedFOV)
+		return CG_CalcZoomedFov();
+	else
+		// End
+		return CG_CalcFov();
 }
 
 
@@ -1455,6 +1636,18 @@ void CG_DrawSkyBoxPortal( void ) {
 				fov_x = fov_x + f * ( zoomFov - fov_x );
 			}
 			lastfov = fov_x;
+// OSPx - zommed FOV
+		}
+		else if (cg.zoomedFOV) {
+			f = (cg.time - cg.zoomedTime) / (float)ZOOM_TIME;
+			if (f > 1.0) {
+				fov_x = cg.zoomedVal;
+			}
+			else {
+				fov_x = fov_x + f * (cg.zoomedVal - fov_x);
+			}
+			lastfov = fov_x;
+// End
 		} else if ( cg.zoomval ) {    // zoomed by sniper/snooper
 			fov_x = cg.zoomval;
 			lastfov = fov_x;

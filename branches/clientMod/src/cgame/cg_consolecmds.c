@@ -578,6 +578,11 @@ static consoleCommand_t commands[] = {
 	{ "SetWeaponCrosshair", CG_SetWeaponCrosshair_f },
 	// -NERVE - SMF
 
+	// OSPx
+	{ "+zoomView", CG_zoomViewSet_f },
+	{ "-zoomView", CG_zoomViewRevert_f },
+	// -OSPx
+
 	// Arnout
 	{ "dumploc", CG_DumpLocation_f },
 };

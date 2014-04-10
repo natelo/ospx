@@ -677,6 +677,9 @@ static void CG_MapRestart( void ) {
 	cg.zoomedBinoc = cg.zoomedScope = qfalse;
 	cg.zoomTime = 0;
 	cg.zoomval = 0;
+	// OSPx - Reset ZoomedFOV
+	cg.zoomedFOV = qfalse;
+	cg.zoomedTime = 0;
 
 	// reset fog to world fog (if present)
 	trap_R_SetFog( FOG_CMD_SWITCHFOG, FOG_MAP,20,0,0,0,0 );

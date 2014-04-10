@@ -794,6 +794,11 @@ typedef struct {
 	float zoomSensitivity;
 	float zoomval;
 
+	// OSPx - zoomFOV
+	qboolean zoomedFOV;
+	int zoomedTime;
+	float zoomedVal;
+	float zoomedSens;
 
 	// information screen text during loading
 	char infoScreenText[MAX_STRING_CHARS];
@@ -1799,6 +1804,8 @@ extern vmCvar_t cg_complaintPopUp;
 extern vmCvar_t cg_drawReinforcementTime;
 extern vmCvar_t cg_noChat;
 extern vmCvar_t cg_noVoice;
+extern vmCvar_t cg_zoomedFOV;
+extern vmCvar_t cg_zoomedSens;
 // -OSPx
 
 //
@@ -1841,6 +1848,9 @@ void CG_ZoomDown_f( void );
 void CG_ZoomIn_f( void );
 void CG_ZoomOut_f( void );
 void CG_ZoomUp_f( void );
+// OSPx - FOV zoom effect
+void CG_zoomViewSet_f(void);
+void CG_zoomViewRevert_f(void);
 
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
 

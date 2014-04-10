@@ -2678,7 +2678,8 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	}
 
 	// OSPx - Disable muzzleFlash if they have it off..	
-	if (!cg_muzzleFlash.integer) {
+	// NOTE: Patched for zoomed FOV
+	if (!cg_muzzleFlash.integer || cg.zoomedFOV) {
 		flash.hModel = 0;
 	}
 
