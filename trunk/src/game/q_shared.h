@@ -488,9 +488,19 @@ extern vec4_t colorWhite;
 extern vec4_t colorLtGrey;
 extern vec4_t colorMdGrey;
 extern vec4_t colorDkGrey;
+// OSPx - Colors
+extern vec4_t colorOrange;
+extern vec4_t colorMdRed;
+extern vec4_t colorMdGreen;
+extern vec4_t colorDkGreen;
+extern vec4_t colorMdCyan;
+extern vec4_t colorMdYellow;
+extern vec4_t colorMdOrange;
+extern vec4_t colorMdBlue;
 
 #define Q_COLOR_ESCAPE  '^'
-#define Q_IsColorString( p )  ( p && *( p ) == Q_COLOR_ESCAPE && *( ( p ) + 1 ) && *( ( p ) + 1 ) != Q_COLOR_ESCAPE )
+#define Q_IsColorString(p)	((p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) && isalnum(*((p)+1))) // ^[0-9a-zA-Z]
+// -OSPx
 
 #define COLOR_BLACK     '0'
 #define COLOR_RED       '1'
