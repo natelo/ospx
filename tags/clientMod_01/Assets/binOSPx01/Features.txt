@@ -1,0 +1,213 @@
+OSPx Client mod for Return to Castle Wolfenstein v1.4 
+===================
+Version: 0.1
+Date:    10 Mar 2014 
+Author:  Nate 'L0
+Forums:  http://rtcwx.com
+Contact: nate.afk@gmail.com
+
+
+----------- 
+SHORT
+-----------
+
+New Cvars (Short):
+------------------
+cg_crosshairPulse         0|1 // Off|On
+cg_bloodDamageBlend       0|1 // Off|On
+cg_bloodFlash             0|1 // Off|On
+cg_crosshairAlpha         0.00|1.00 // Float
+cg_crosshairAlphaAlt      0.00|1.00 // Float
+cg_crosshairColor         color|0x-escape // String/Hex
+cg_crosshairColorAlt      color|0x-escape // String/Hex
+cg_drawWeaponIconFlash    0|1 // Off|On
+cg_printObjectiveInfo     0|1 // Off|On
+cg_muzzleFlash            0|1 // Off|On 
+cg_complaintPopUp         0|1 // Off|On
+cg_drawReinforcementTime  0|1 // Off|On
+cg_noChat                 0|1 // Off|On  
+cg_noVoice                0-3 // 0 = game default, 1 = Team only, 2 = Global, 3 = Disables all Voices 
+cg_zoomedFOV              90-120    // FOV it will zoom in/out to when +zoomView key is pressed.   
+cg_zoomedSens             0.01|2.00 // Scaled Mouse Sensitivity when in zoomFOV view
+cg_noAmmoAutoSwitch       0|1 // Off|On
+
+
+New commands (Short):
+---------------------
++zoomView   // A dynamic FOV switch 
++vstr       // Customizable "+" command support
+^8 +colors  // ET colors were ported
+
+
+Modifications (Short):
+----------------------
+- Screenshake // Screenshake code was ported from ET
+- New Colors  // Colors were ported from ET
+- Demo Interrupted Connection fix
+- Modified few HUD prints 
+- Map levelshot image fix for custom resolutions
+
+
+----------- 
+DETAILED 
+
+Note: Most of explanations are copied directly from OSP's readme.
+-----------
+
+
+New Cvars (Long):
+----------------
+cg_crosshairPulse
+  0 - Crosshair does NOT expand with movement/firing.
+  1 - Crosshair will grow to reflect current "spead" of fire due to
+      movement/firing.
+      
+cg_bloodDamageBlend
+  Specifies the transparency level of blood "splatters" when hit
+  by other players' bullets.
+  
+cg_bloodFlash
+  Specifies intensity of the red blood "flash" when taking damage.
+  
+cg_crosshairAlpha
+cg_crosshairAlphaAlt
+  Specifies the transparency of the crosshair (Alt is for the
+  secondary crosshair).  Note "cg_crosshairHealth" must be
+  set to 0 for this option to be enabled.
+
+cg_crosshairColor
+cg_crosshairColorAlt
+  Specifies the color of the crosshair (Alt is for the secondary
+  crosshair).  0x-escape is of the format 0xRRGGBB, where RRGGBB
+  specify the Red/Green/Blue channels respecitively.  Each value
+  is in hexidecimal format (00-FF).  For color naming, most common
+  color names are available.  Note "cg_crosshairHealth" must be
+  set to 0 for this option to be enabled.  String colors that
+  are available for use:
+		"white"
+		"black"
+		"red"
+		"green"
+		"blue"
+		"yellow"
+		"magenta"
+		"cyan"
+		"orange"
+		"mdred"     (Medium Red)
+		"mdgreen"   (Medium Green)
+		"dkgreen"		(Dark Green)
+		"mdcyan"		(Medium Cyan)
+		"mdyellow"  (Medium Yellow)
+		"mdorange"  (Medium Orange)
+		"mdblue"		(Medium Blue)
+		"ltgrey"		(Light Grey)
+		"mdgrey"		(Medium Grey)
+		"dkgrey"		(Dark Grey)
+
+cg_drawWeaponIconFlash
+  0 - Weapon icon flashing not enabled
+  1 - Outline of weapon icon is colored based on weapon state:
+		Red = Firing
+		Yellow = Reload
+		White = Switching
+		
+cg_printObjectiveInfo
+  0 - No printing of objective messages in the console (center-print only)
+  1 - Objective messages show up in both console and center
+  
+cg_muzzleFlash
+  0 - Local flash effect is NOT seen when firing current weapon.
+  1 - Weapon flash effect is shown when weapon is fired.
+  
+cg_complaintPopUp
+  0 - Disables the auto-popup of the teammate complaint request for
+      being killed by a teammate.
+  1 - Auto-popup of teammate complaint request enabled.
+        
+cg_drawReinforcementTime
+  0 - Team reinforcement time not drawn on the active HUD.
+  1 - Shows team reinforcement time on the active HUD.
+
+cg_noChat
+  0 - Will act as default and print all chats.
+  1 - Will disable Team and Global chats. Chats will still be visible 
+      in console, player just wont see it in game (HUD). 
+  
+cg_noVoice
+  0 - Act as default.
+  1 - Disables any Global voice chats and only plays Team voice chats
+  2 - Disables Team voice chats and only plays Global voice chats.
+  3 - Disables all Voice chats. 
+  NOTE: This only disables drawing and playing of chats, player can still use Vsay
+        but (s)he just wont see/hear it.
+ 
+cg_zoomedFOV  
+  90-120 - A value of FOV (field of view) it will zoom to when player hold down +zoomView key.
+  
+cg_zoomedSens
+  0.01-2.00 - Mouse sensitivity percentage when in zoomed (+zoomView) view. E.g. 1.00 = 100%.. 
+  NOTE: This is not actual mouse sensitivity but rather a scale up/down of
+        player's current sensitivity. I.e. 1.00 will produce same sensitivity
+        in zoomed view as player has by default while 0.8 will 
+        produce 80% sensitivity or in other words, will make mouse 20% slower
+        in zoomed view than player has normally/when not in zoomed view.
+        
+cg_noAmmoAutoSwitch
+  0 - Weapon is NOT switched if completely out of ammo
+  1 - Weapon is automatically switched if completely out of ammo        
+         
+
+New commands (Long):
+---------------------
++zoomView is a toggle button for zoomedFOV. 
+  Zoomed FOV is basically a fancy FOV (Field Of View) toggle.
+  When player will hold down a key it will zoom in/out 
+  (depending of cg_zoomedFOV and player's cg_FOV setting),
+  once key is released it will revert back to default FOV.
+  NOTE: cg_zoomedFOV value can only be set between 90 and 120. 
+        Anything out of boundaries will revert to 90 or 120.
+        This is to ensure that zoomed FOV falls into general
+        PB restricted values on most of the servers. 
+
++vstr gives customizable "+" command support.  That is, with
+      +vstr, a player has the ability to execute a command when a
+      key is pressed, and another command when the same key is
+      released.
+
+	Format: bind <some_key> +vstr <var1> <var2>
+
+	e.g.
+		set some_var "say HEY!"
+		set another_var "say There!!"
+		bind o +vstr some_var another_var
+
+		pressing o results in:  "HEY!"
+		releasing o results in: "There!!"
+		
+^8 +colors 
+  There are 32 color escape codes in the UI and cgame modules.  
+  From the normal ^0 - ^7, the following are also available:
+
+	- ^8, ^9, ^<, ^>, ^:, ^=, ^?, ^@
+	- ^A - ^O   (note, caps MUST be used to get the proper color)
+	- For future compatibility with Main/, use ^p (lower case) for
+        the color black.   
+  
+
+Modifications (Long):
+----------------------
+- Screenshake
+  Default RTCW screenshake is annoying and given me countless
+  of headaches..so default shaking code was replaced with one
+  from et NQ mod, which less dizzy and more eye friendly.
+
+- Demo Interrupted Connection fix
+  Just a small fix that solves "connection interrupted" print
+  when user is viewing demo with timescale set lower than 0.5
+
+- Modified few HUD prints
+  Mainly few cosmetic fixes so default warmup prints are not so dull. 
+  
+- Map levelshot image
+  Fixed missing map image on map loading when player uses custom resolution.  
+                                                                                      

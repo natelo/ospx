@@ -1,0 +1,56 @@
+OSPx Client mod for Return to Castle Wolfenstein v1.4 
+===================
+Version: 0.1
+Date:    10 Mar 2014    
+
+--------
+Credits:
+--------
+Developer:
+  Nate 'L0 (nate.afk@gmail.com)
+
+Code snippets & bits ported/derived from:
+  - OSP (ET port)
+  - NQ (screenshake)
+  - wolfX (zoomedFOV..)       
+
+Code is mainly derived from ET |& wolfX. Some parts of the
+code are directly ported while other parts just act the same 
+while work differently in the back end. I claim no credits 
+for it either way, only credit I claim is the time that was 
+used to port/recreate it & effort to make it work..
+  
+--------
+ABOUT:
+--------
+OSPx (in short: OSP x (unattended)) is basically a partial
+client clone of OSP mod with few enhancements.
+
+Client mod is a part of a OSPx project, which aim is to
+recreate OSP mod and enhance the experience so 
+it's up to more modern times. OSPx (once released)
+will be full blown 1.4 client-server side mod, 
+which will basically be a clone of OSP with few enhamcements.
+
+This mod is a client mod only, it's meant to work 
+with any 1.4 server-side mod (Shrub, Bani..) 
+thus it's lighter in features. In it's current form it 
+is NOT meant as replacement for OSP client nor any 
+other client sided mod. 
+
+This mod was created simply because I wanted some 
+of the OSP features on server-only mods.
+
+! Read Docs/Features.txt to see what was added/changed.
+! If you have any Q's visit the forum or contact me.
+! Source code is currently unavailable. It will be released
+  with OSPx project.  
+
+-------
+Author:  Nate 'L0
+Forums:  http://rtcwx.com
+Contact: nate.afk@gmail.com
+
+
+
+

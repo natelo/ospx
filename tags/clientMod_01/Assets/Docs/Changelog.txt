@@ -1,0 +1,66 @@
+========================
+OSPx client 0.1 Release
+
+Date: 10 Mar 2014
+========================
+
+r25
+- Fixed map levelshot image loading on custom resolutions. - Added new line at the end in bg_misc.c 
+---------------------
+r24
+Added cg_noAmmoAutoSwitch.
+---------------------
+r23
+- Changed default cg_zoomedFOV value from 80 to 90. - Upped cg_zoomedSense limit fro, 1.00 to 2.00. 
+---------------------
+r22
+Changed zoomFOV limit to between 120 & 90 since that's a value servers usually force.
+---------------------
+r21
+Added +vstr (toggle)
+---------------------
+r20
+- Fixed warmup prints - Added fancy warmup print in corner.
+---------------------
+r19
+Added +zoomView for fancy FOV toggling.
+---------------------
+r18
+Ported NQ's shakeCamera code.
+---------------------
+r17
+Fixed connection interrupted for demo previewing.
+---------------------
+r16
+Added cg_noChat Added cg_noVoice
+---------------------
+r15
+Moving current to a new branch since it will be client side only...
+---------------------
+r14
+Added cg_drawReinforcementTime - Currently there's no offset so I can release Client mod bin only..
+---------------------
+r13
+Added cg_complaintPopUp.
+---------------------
+r12
+Added: - cg_printObojectiveInfo for client logging, - cg_muzzleFlash so client can disable it. 
+---------------------
+r11
+Added Weapon (current state) Highlighting.
+---------------------
+r10
+- Added colored crosshairs  - Created Assets folder and added scripts/crosshairs.shader
+---------------------
+r9
+Color fix - forgot to export the new colors..
+---------------------
+r8
+Tabbed out spaces between colors so it's not so messy..
+---------------------
+r7
+Ported colors.
+---------------------
+r6
+Ported to client side following features: - cg_crosshairPulse - cg_bloodDamageBlend - cg_bloodFlash
+---------------------
