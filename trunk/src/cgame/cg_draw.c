@@ -2144,8 +2144,8 @@ static void CG_DrawVote( void ) {
 			s = "Server Host cannot be complained against";
 			CG_DrawStringExt( 8, 200, CG_TranslateString( s ), color, qtrue, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
 			return;
-		}
-		if ( cgs.complaintClient == -4 ) {
+		}							  // OSPx - Complaint popup
+		if (cgs.complaintClient == -4 && cg_complaintPopUp.integer) {
 			s = "You were team-killed by the Server Host";
 			CG_DrawStringExt( 8, 200, CG_TranslateString( s ), color, qtrue, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
 			return;
@@ -2160,11 +2160,15 @@ static void CG_DrawVote( void ) {
 			Q_strncpyz( str2, "vote no", 32 );
 		}
 
-		s = va( CG_TranslateString( "File complaint against %s for team-killing?" ), cgs.clientinfo[cgs.complaintClient].name );
-		CG_DrawStringExt( 8, 200, s, color, qtrue, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
+		// OSPx - Complaint popup
+		if (cg_complaintPopUp.integer)
+		{
+			s = va(CG_TranslateString("File complaint against %s for team-killing?"), cgs.clientinfo[cgs.complaintClient].name);
+			CG_DrawStringExt(8, 200, s, color, qtrue, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80);
 
-		s = va( CG_TranslateString( "Press '%s' for YES, or '%s' for No" ), str1, str2 );
-		CG_DrawStringExt( 8, 214, s, color, qtrue, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
+			s = va(CG_TranslateString("Press '%s' for YES, or '%s' for No"), str1, str2);
+			CG_DrawStringExt(8, 214, s, color, qtrue, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80);
+		}
 		return;
 	}
 
