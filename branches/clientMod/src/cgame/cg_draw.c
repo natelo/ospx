@@ -2547,13 +2547,13 @@ static void CG_DrawWarmup( void ) {
 		if ( cgs.gamestate == GS_WAITING_FOR_PLAYERS ) {
 			cw = 10;
 
-			s = CG_TranslateString( "Game Stopped - Waiting for more players" );
+			s = CG_TranslateString( "^3Game Stopped ^7- Waiting for more players" );
 
 			w = CG_DrawStrlen( s );
 			CG_DrawStringExt( 320 - w * 6, 120, s, colorWhite, qfalse, qtrue, 12, 18, 0 );
 
 
-			s1 = va( CG_TranslateString( "Waiting for %i players" ), cgs.minclients );
+			s1 = va( CG_TranslateString( "Waiting for ^3%i ^7players" ), cgs.minclients );
 			s2 = CG_TranslateString( "or call a vote to start match" );
 
 			w = CG_DrawStrlen( s1 );
@@ -2576,9 +2576,9 @@ static void CG_DrawWarmup( void ) {
 	}
 
 	if ( cgs.gametype == GT_WOLF_STOPWATCH ) {
-		s = va( "%s %i", CG_TranslateString( "(WARMUP) Match begins in:" ), sec + 1 );
+		s = va( "%s %i", CG_TranslateString( "(^3WARMUP^7) Match begins in:" ), sec + 1 );
 	} else {
-		s = va( "%s %i", CG_TranslateString( "(WARMUP) Match begins in:" ), sec + 1 );
+		s = va( "%s %i", CG_TranslateString( "(^3WARMUP^7) Match begins in:" ), sec + 1 );
 	}
 
 	w = CG_DrawStrlen( s );
@@ -2641,16 +2641,16 @@ static void CG_DrawWarmup( void ) {
 
 		cw = 10;
 
-		w = CG_DrawStrlen( s );
-		CG_DrawStringExt( 320 - w * cw / 2, 140, s, colorWhite,
+		w = CG_DrawStrlen( s ); // OSPx - Pushed all lower for 20
+		CG_DrawStringExt( 320 - w * cw / 2, 160, s, colorWhite,
 						  qfalse, qtrue, cw, (int)( cw * 1.5 ), 0 );
 
 		w = CG_DrawStrlen( s1 );
-		CG_DrawStringExt( 320 - w * cw / 2, 160, s1, colorWhite,
+		CG_DrawStringExt( 320 - w * cw / 2, 180, s1, colorWhite,
 						  qfalse, qtrue, cw, (int)( cw * 1.5 ), 0 );
 
 		w = CG_DrawStrlen( s2 );
-		CG_DrawStringExt( 320 - w * cw / 2, 180, s2, colorWhite,
+		CG_DrawStringExt( 320 - w * cw / 2, 200, s2, colorWhite,
 						  qfalse, qtrue, cw, (int)( cw * 1.5 ), 0 );
 	}
 }
@@ -3097,7 +3097,12 @@ void CG_DrawObjectiveIcons() {
 	seconds -= mins * 60;
 	tens = seconds / 10;
 	seconds -= tens * 10;
-	if ( msec < 0 ) {
+
+	// OSPx - Print fancy warmup in corner..
+	if (cgs.gamestate != GS_PLAYING) {
+		fade = fabs(sin(cg.time * 0.002)) * cg_hudAlpha.value;
+		s = va("^3Warmup");
+	} else if (msec < 0) {
 		fade = fabs( sin( cg.time * 0.002 ) ) * cg_hudAlpha.value;
 		s = va( "0:00" );
 	} else {
