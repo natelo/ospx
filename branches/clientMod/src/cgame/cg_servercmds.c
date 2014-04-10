@@ -1493,7 +1493,11 @@ static void CG_ServerCommand( void ) {
 		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		Q_strncpyz( text, s, MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
-		CG_AddToTeamChat( text ); // JPW NERVE
+
+		// OSPx - No chat if it's disabled..
+		if (!cg_noChat.integer)			
+			CG_AddToTeamChat( text ); // JPW NERVE
+
 		CG_Printf( "[skipnotify]%s\n", text ); // JPW NERVE
 
 		// NERVE - SMF - we also want this to display in limbo chat
@@ -1516,7 +1520,11 @@ static void CG_ServerCommand( void ) {
 		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		Q_strncpyz( text, s, MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
-		CG_AddToTeamChat( text );
+
+		// OSPx - No chat if it's disabled..
+		if (!cg_noChat.integer)
+			CG_AddToTeamChat( text );
+
 		CG_Printf( "[skipnotify]%s\n", text ); // JPW NERVE
 
 		// NERVE - SMF - we also want this to display in limbo chat
@@ -1528,16 +1536,28 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "vchat" ) ) {
+		// OSPx - No voice prints
+		if (cg_noVoice.integer == 1 || cg_noVoice.integer == 3)
+			return;
+
 		CG_VoiceChat( SAY_ALL );            // NERVE - SMF - enabled support
 		return;
 	}
 
 	if ( !strcmp( cmd, "vtchat" ) ) {
+		// OSPx - No voice prints
+		if (cg_noVoice.integer == 2 || cg_noVoice.integer == 3)
+			return;
+
 		CG_VoiceChat( SAY_TEAM );           // NERVE - SMF - enabled support
 		return;
 	}
 
 	if ( !strcmp( cmd, "vtell" ) ) {
+		// OSPx - No voice prints
+		if (cg_noVoice.integer)
+			return;
+
 		CG_VoiceChat( SAY_TELL );           // NERVE - SMF - enabled support
 		return;
 	}
