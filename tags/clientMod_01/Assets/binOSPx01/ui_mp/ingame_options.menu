@@ -524,7 +524,7 @@
 			textalign ITEM_ALIGN_CENTER
 			textfont	UI_FONT_NORMAL
 			textscale .25		
-			textalignx 128
+			textalignx 30
 			textaligny 12
 			forecolor 1 .75 0 1
 			visible 0 
