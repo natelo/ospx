@@ -1792,6 +1792,7 @@ extern vmCvar_t cg_crosshairAlpha;
 extern vmCvar_t cg_crosshairAlphaAlt;
 extern vmCvar_t cg_crosshairColor;
 extern vmCvar_t cg_crosshairColorAlt;
+extern vmCvar_t cg_drawWeaponIconFlash;
 // -OSPx
 
 //

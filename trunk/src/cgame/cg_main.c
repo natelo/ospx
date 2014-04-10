@@ -294,6 +294,7 @@ vmCvar_t cg_crosshairAlpha;
 vmCvar_t cg_crosshairAlphaAlt;
 vmCvar_t cg_crosshairColor;
 vmCvar_t cg_crosshairColorAlt;
+vmCvar_t cg_drawWeaponIconFlash;
 // -OSPx
 
 typedef struct {
@@ -505,7 +506,8 @@ cvarTable_t cvarTable[] = {
 	{ &cg_crosshairAlpha, "cg_crosshairAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cg_crosshairAlphaAlt, "cg_crosshairAlphaAlt", "1.0", CVAR_ARCHIVE },
 	{ &cg_crosshairColor, "cg_crosshairColor", "White", CVAR_ARCHIVE },
-	{ &cg_crosshairColorAlt, "cg_crosshairColorAlt", "White", CVAR_ARCHIVE }
+	{ &cg_crosshairColorAlt, "cg_crosshairColorAlt", "White", CVAR_ARCHIVE },
+	{ &cg_drawWeaponIconFlash, "cg_drawWeaponIconFlash", "0", CVAR_ARCHIVE }
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
