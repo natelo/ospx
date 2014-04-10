@@ -523,7 +523,7 @@ cvarTable_t cvarTable[] = {
 	{ &cg_drawReinforcementTime, "cg_drawReinforcementTime", "1", CVAR_ARCHIVE },
 	{ &cg_noChat, "cg_noChat", "0", CVAR_ARCHIVE },
 	{ &cg_noVoice, "cg_noVoice", "0", CVAR_ARCHIVE },
-	{ &cg_zoomedFOV, "cg_zoomedFOV", "80", CVAR_ARCHIVE },
+	{ &cg_zoomedFOV, "cg_zoomedFOV", "90", CVAR_ARCHIVE },
 	{ &cg_zoomedSens, "cg_zoomedSens", ".3", CVAR_ARCHIVE }
 	// -OSPx
 };

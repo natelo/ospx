@@ -961,8 +961,8 @@ static int CG_CalcZoomedFov(void) {
 	cg.refdef.fov_x = fov_x;
 	cg.refdef.fov_y = fov_y;
 
-	if (cg_zoomedSens.value > 1.0f)
-		value = 1.0f;
+	if (cg_zoomedSens.value > 2.0f)
+		value = 2.0f;
 	else if (cg_zoomedSens.value < 0.0f)
 		value = 0.1f;
 	else
