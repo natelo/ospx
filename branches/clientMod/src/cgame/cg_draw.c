@@ -1251,6 +1251,11 @@ static void CG_DrawDisconnect( void ) {
 	const char      *s;
 	int w;          // bk010215 - FIXME char message[1024];
 
+	// OSPx - Fix for "connection interrupted" when user is previewing demo with timescale lower than 0.5...
+	if (cg.demoPlayback && cg_timescale.value != 1.0f) {
+		return;
+	}
+
 	// draw the phone jack if we are completely past our buffers
 	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
 	trap_GetUserCmd( cmdNum, &cmd );
