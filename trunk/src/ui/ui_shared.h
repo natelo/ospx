@@ -339,6 +339,8 @@ typedef struct {
 	qhandle_t fxBasePic;
 	qhandle_t fxPic[7];
 	qhandle_t crosshairShader[NUM_CROSSHAIRS];
+	// OSPx
+	qhandle_t crosshairAltShader[NUM_CROSSHAIRS];
 
 } cachedAssets_t;
 

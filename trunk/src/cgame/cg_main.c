@@ -290,6 +290,10 @@ vmCvar_t cg_antilag;
 vmCvar_t cg_crosshairPulse;
 vmCvar_t cg_bloodDamageBlend;
 vmCvar_t cg_bloodFlash;
+vmCvar_t cg_crosshairAlpha;
+vmCvar_t cg_crosshairAlphaAlt;
+vmCvar_t cg_crosshairColor;
+vmCvar_t cg_crosshairColorAlt;
 // -OSPx
 
 typedef struct {
@@ -497,7 +501,11 @@ cvarTable_t cvarTable[] = {
 	// OSPx
 	{ &cg_crosshairPulse, "cg_crosshairPulse", "1", CVAR_ARCHIVE },
 	{ &cg_bloodDamageBlend, "cg_bloodDamageBlend", "1.0", CVAR_ARCHIVE },
-	{ &cg_bloodFlash, "cg_bloodFlash", "1.0", CVAR_ARCHIVE }
+	{ &cg_bloodFlash, "cg_bloodFlash", "1.0", CVAR_ARCHIVE },
+	{ &cg_crosshairAlpha, "cg_crosshairAlpha", "1.0", CVAR_ARCHIVE },
+	{ &cg_crosshairAlphaAlt, "cg_crosshairAlphaAlt", "1.0", CVAR_ARCHIVE },
+	{ &cg_crosshairColor, "cg_crosshairColor", "White", CVAR_ARCHIVE },
+	{ &cg_crosshairColorAlt, "cg_crosshairColorAlt", "White", CVAR_ARCHIVE }
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
@@ -528,7 +536,14 @@ void CG_RegisterCvars( void ) {
 	trap_Cvar_Register( NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register( NULL, "head", DEFAULT_HEAD, CVAR_USERINFO | CVAR_ARCHIVE );
 
+// OSPx
+	// Auto actions
+	//CG_setClientFlags();
 
+	// Crosshairs
+	BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
+	BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
+// -OSPx
 }
 
 /*
@@ -561,6 +576,14 @@ void CG_UpdateCvars( void ) {
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Update( cv->vmCvar );
+
+		// OSPx - Crosshairs
+		if (cv->vmCvar == &cg_crosshairColor || cv->vmCvar == &cg_crosshairAlpha) {
+			BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
+		}
+		else if (cv->vmCvar == &cg_crosshairColorAlt || cv->vmCvar == &cg_crosshairAlphaAlt)     {
+			BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
+		} // -OSPx
 	}
 
 	// if force model changed
@@ -1241,8 +1264,8 @@ static void CG_RegisterGraphics( void ) {
 //----(SA)	end
 
 	for ( i = 0 ; i < NUM_CROSSHAIRS ; i++ ) {
-		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va( "gfx/2d/crosshair%c", 'a' + i ) );
-		cg.crosshairShaderAlt[i] = trap_R_RegisterShader( va( "gfx/2d/crosshair%c_alt", 'a' + i ) );
+		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va( "gfx/2d/crosshair%c_OSPx", 'a' + i ) );
+		cg.crosshairShaderAlt[i] = trap_R_RegisterShader( va( "gfx/2d/crosshair%c_alt_OSPx", 'a' + i ) );
 	}
 
 	cgs.media.backTileShader = trap_R_RegisterShader( "gfx/2d/backtile" );

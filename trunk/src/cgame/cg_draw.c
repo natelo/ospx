@@ -1705,7 +1705,8 @@ static void CG_DrawCrosshair( void ) {
 		CG_ColorForHealth( hcolor );
 		trap_R_SetColor( hcolor );
 	} else {
-		trap_R_SetColor( NULL );
+		// OSPx - Crosshair (patched)
+		trap_R_SetColor(cg.xhairColor);
 	}
 
 	w = h = cg_crosshairSize.value;
@@ -1738,6 +1739,11 @@ static void CG_DrawCrosshair( void ) {
 		x = cg_crosshairX.integer;
 		y = cg_crosshairY.integer;
 		CG_AdjustFrom640( &x, &y, &w, &h );
+
+		// OSPx - Crosshairs
+		if (!cg_crosshairHealth.integer) {
+			trap_R_SetColor(cg.xhairColorAlt);
+		}
 
 		if ( cg.limboMenu ) { // JPW NERVE
 			trap_R_DrawStretchPic( x + 0.5 * ( cg.refdef.width - w ), y + 0.5 * ( cg.refdef.height - h ),

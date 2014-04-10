@@ -990,6 +990,13 @@ typedef struct {
 	char thirtySecondSound_g[MAX_QPATH];
 	char thirtySecondSound_a[MAX_QPATH];
 
+// OSPx 
+	// Crosshairs
+	vec4_t xhairColor;
+	vec4_t xhairColorAlt;
+
+// -OSPx
+
 	pmoveExt_t pmext;
 
 } cg_t;
@@ -1781,6 +1788,10 @@ extern vmCvar_t cg_antilag;
 extern vmCvar_t cg_crosshairPulse;
 extern vmCvar_t cg_bloodDamageBlend;
 extern vmCvar_t cg_bloodFlash;
+extern vmCvar_t cg_crosshairAlpha;
+extern vmCvar_t cg_crosshairAlphaAlt;
+extern vmCvar_t cg_crosshairColor;
+extern vmCvar_t cg_crosshairColorAlt;
 // -OSPx
 
 //
