@@ -822,8 +822,8 @@ void CG_zoomViewSet_f(void) {
 		cg.snap->ps.pm_flags & PMF_FOLLOW)
 		return;
 
-	if (cg_zoomedFOV.value > 140)
-		value = 140;
+	if (cg_zoomedFOV.value > 120)
+		value = 120;
 	else if (cg_zoomedFOV.value < 90)
 		value = 90;
 	else
@@ -900,18 +900,18 @@ static int CG_CalcZoomedFov(void) {
 			fov_x = cg_fov.value;
 			if (cgs.gametype == GT_SINGLE_PLAYER) {
 				if (fov_x < 1) {
-					fov_x = 1;	// L0 - Limited from 160 to 140
+					fov_x = 1;	// OSPx - Limited from 120 to 90
 				}
-				else if (fov_x > 140) {
-					fov_x = 140;
+				else if (fov_x > 120) {
+					fov_x = 120;
 				}
 			}
 			else {
 				if (fov_x < 90) {
-					fov_x = 90;	 // L0 - Limited from 160 to 140
+					fov_x = 90;	 // OSPx - Limited from 120 to 90
 				}
-				else if (fov_x > 140) {
-					fov_x = 140;
+				else if (fov_x > 120) {
+					fov_x = 120;
 				}
 			}
 		}
@@ -921,10 +921,10 @@ static int CG_CalcZoomedFov(void) {
 			zoomFov = cg.zoomedVal;   // (SA) use user scrolled amount
 
 			if (zoomFov < 1) {
-				zoomFov = 1;	// L0 - Limited from 160 to 140
+				zoomFov = 1;	// OSPx - Limited from 120 to 90
 			}
-			else if (zoomFov > 140) {
-				zoomFov = 140;
+			else if (zoomFov > 120) {
+				zoomFov = 120;
 			}
 		}
 		else {
