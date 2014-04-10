@@ -299,10 +299,11 @@ vmCvar_t cg_printObjectiveInfo;
 vmCvar_t cg_muzzleFlash;
 vmCvar_t cg_complaintPopUp;
 vmCvar_t cg_drawReinforcementTime;
-vmCvar_t cg_noChat;				// Removes team and global chat (still visible in console)
-vmCvar_t cg_noVoice;			// 1 = shows team only, 2 = shows global only, 3 = disables voice fully.
-vmCvar_t cg_zoomedFOV;			// Value it zooms in when +zoomView key is down
-vmCvar_t cg_zoomedSens;			// Mouse sensitivity when in "+zoomView" mode
+vmCvar_t cg_noChat;
+vmCvar_t cg_noVoice;
+vmCvar_t cg_zoomedFOV;
+vmCvar_t cg_zoomedSens;
+vmCvar_t cg_noAmmoAutoSwitch;
 
 // -OSPx
 
@@ -524,7 +525,8 @@ cvarTable_t cvarTable[] = {
 	{ &cg_noChat, "cg_noChat", "0", CVAR_ARCHIVE },
 	{ &cg_noVoice, "cg_noVoice", "0", CVAR_ARCHIVE },
 	{ &cg_zoomedFOV, "cg_zoomedFOV", "90", CVAR_ARCHIVE },
-	{ &cg_zoomedSens, "cg_zoomedSens", ".3", CVAR_ARCHIVE }
+	{ &cg_zoomedSens, "cg_zoomedSens", ".3", CVAR_ARCHIVE },
+	{ &cg_noAmmoAutoSwitch, "cg_noAmmoAutoSwitch", "1", CVAR_ARCHIVE },
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
