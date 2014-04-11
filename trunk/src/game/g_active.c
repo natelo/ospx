@@ -1307,13 +1307,17 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 		int clientNum;
 
 		if ( ent->client->sess.sessionTeam == TEAM_RED ) {
-			testtime = level.time % g_redlimbotime.integer;
+			// OSPx - Reinforcements Offset (patched)
+			testtime = (level.dwRedReinfOffset + level.time - level.startTime) % g_redlimbotime.integer;
+
 			if ( testtime < ent->client->pers.lastReinforceTime ) {
 				do_respawn = 1;
 			}
 			ent->client->pers.lastReinforceTime = testtime;
 		} else if ( ent->client->sess.sessionTeam == TEAM_BLUE )     {
-			testtime = level.time % g_bluelimbotime.integer;
+			// OSPx - Reinforcements Offset (patched)
+			testtime = (level.dwBlueReinfOffset + level.time - level.startTime) % g_bluelimbotime.integer;
+
 			if ( testtime < ent->client->pers.lastReinforceTime ) {
 				do_respawn = 1;
 			}

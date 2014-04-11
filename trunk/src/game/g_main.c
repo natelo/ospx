@@ -1245,9 +1245,12 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		BotAISetup( restart );
 		BotAILoadMap( restart );
 		G_InitBots( restart );
-	}
+	}	
 
 	G_RemapTeamShaders();
+
+	// OSPx - Reinforcements offset
+	reinforcementsOffset();
 }
 
 

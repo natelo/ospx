@@ -757,6 +757,12 @@ typedef struct {
 	int numOidTriggers;                 // DHM - Nerve
 
 	qboolean latchGametype;             // DHM - Nerve
+
+// OSPx
+	int dwBlueReinfOffset;	// Reinforcements offset
+	int dwRedReinfOffset;	// Reinforcements offset	
+// -OSPx
+
 } level_locals_t;
 
 extern qboolean reloading;                  // loading up a savegame
@@ -1459,3 +1465,9 @@ void G_ResetMarkers( gentity_t* ent );
 #define AP( x ) trap_SendServerCommand( -1, x )					// Print to all
 #define CP( x ) trap_SendServerCommand( ent - g_entities, x )	// Print to an ent
 #define CPx( x, y ) trap_SendServerCommand( x, y )				// Print to id = x
+
+//
+// g_match.c
+//
+void reinforcementsOffset(void);
+
