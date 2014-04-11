@@ -921,7 +921,7 @@ static float CG_DrawRespawnTimer(float y) {
 		CG_DrawStringExt((x + 4) - w, y, str, colorYellow, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
 	}
 	else if (cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR){
-		CG_DrawStringExt(x - w, y, str, colorRed, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+		CG_DrawStringExt(x - w, y, str, colorYellow, qtrue, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
 	}
 	return y += TINYCHAR_HEIGHT;
 }
@@ -1250,6 +1250,11 @@ static void CG_DrawDisconnect( void ) {
 	usercmd_t cmd;
 	const char      *s;
 	int w;          // bk010215 - FIXME char message[1024];
+
+	// OSPx - Fix for "connection interrupted" when user is previewing demo with timescale lower than 0.5...
+	if (cg.demoPlayback && cg_timescale.value != 1.0f) {
+		return;
+	}
 
 	// draw the phone jack if we are completely past our buffers
 	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
@@ -2542,13 +2547,13 @@ static void CG_DrawWarmup( void ) {
 		if ( cgs.gamestate == GS_WAITING_FOR_PLAYERS ) {
 			cw = 10;
 
-			s = CG_TranslateString( "Game Stopped - Waiting for more players" );
+			s = CG_TranslateString( "^3Game Stopped ^7Waiting for more players" );
 
 			w = CG_DrawStrlen( s );
 			CG_DrawStringExt( 320 - w * 6, 120, s, colorWhite, qfalse, qtrue, 12, 18, 0 );
 
 
-			s1 = va( CG_TranslateString( "Waiting for %i players" ), cgs.minclients );
+			s1 = va( CG_TranslateString( "Waiting for ^3%i ^7players" ), cgs.minclients );
 			s2 = CG_TranslateString( "or call a vote to start match" );
 
 			w = CG_DrawStrlen( s1 );
@@ -2571,9 +2576,9 @@ static void CG_DrawWarmup( void ) {
 	}
 
 	if ( cgs.gametype == GT_WOLF_STOPWATCH ) {
-		s = va( "%s %i", CG_TranslateString( "(WARMUP) Match begins in:" ), sec + 1 );
+		s = va( "%s %i", CG_TranslateString( "(^3WARMUP^7) Match begins in:" ), sec + 1 );
 	} else {
-		s = va( "%s %i", CG_TranslateString( "(WARMUP) Match begins in:" ), sec + 1 );
+		s = va( "%s %i", CG_TranslateString( "(^3WARMUP^7) Match begins in:" ), sec + 1 );
 	}
 
 	w = CG_DrawStrlen( s );
@@ -2636,16 +2641,16 @@ static void CG_DrawWarmup( void ) {
 
 		cw = 10;
 
-		w = CG_DrawStrlen( s );
-		CG_DrawStringExt( 320 - w * cw / 2, 140, s, colorWhite,
-						  qfalse, qtrue, cw, (int)( cw * 1.5 ), 0 );
+		w = CG_DrawStrlen(s); // OSPx - Pushed all lower for 20
+		CG_DrawStringExt(320 - w * cw / 2, 160, s, colorWhite,
+			qfalse, qtrue, cw, (int)(cw * 1.5), 0);
 
-		w = CG_DrawStrlen( s1 );
-		CG_DrawStringExt( 320 - w * cw / 2, 160, s1, colorWhite,
-						  qfalse, qtrue, cw, (int)( cw * 1.5 ), 0 );
+		w = CG_DrawStrlen(s1);
+		CG_DrawStringExt(320 - w * cw / 2, 180, s1, colorWhite,
+			qfalse, qtrue, cw, (int)(cw * 1.5), 0);
 
-		w = CG_DrawStrlen( s2 );
-		CG_DrawStringExt( 320 - w * cw / 2, 180, s2, colorWhite,
+		w = CG_DrawStrlen(s2);
+		CG_DrawStringExt(320 - w * cw / 2, 200, s2, colorWhite,
 						  qfalse, qtrue, cw, (int)( cw * 1.5 ), 0 );
 	}
 }
@@ -3092,7 +3097,12 @@ void CG_DrawObjectiveIcons() {
 	seconds -= mins * 60;
 	tens = seconds / 10;
 	seconds -= tens * 10;
-	if ( msec < 0 ) {
+
+	// OSPx - Print fancy warmup in corner..
+	if (cgs.gamestate != GS_PLAYING) {
+		fade = fabs(sin(cg.time * 0.002)) * cg_hudAlpha.value;
+		s = va("^3Warmup");
+	} else if (msec < 0) {
 		fade = fabs( sin( cg.time * 0.002 ) ) * cg_hudAlpha.value;
 		s = va( "0:00" );
 	} else {
@@ -3611,7 +3621,7 @@ void CG_StartShakeCamera( float p ) {
 	cg.cameraShakePhase = crandom() * M_PI; // start chain in random dir
 }
 
-void CG_ShakeCamera() {
+void CG_ShakeCamera( void ) {
 	float x, val;
 
 	if ( cg.time > cg.cameraShakeTime ) {
@@ -3622,13 +3632,14 @@ void CG_ShakeCamera() {
 	// JPW NERVE starts at 1, approaches 0 over time
 	x = ( cg.cameraShakeTime - cg.time ) / cg.cameraShakeLength;
 
-	// up/down
-	val = sin( M_PI * 8 * x + cg.cameraShakePhase ) * x * 18.0f * cg.cameraShakeScale;
-	cg.refdefViewAngles[0] += val;
-
-	// left/right
-	val = sin( M_PI * 15 * x + cg.cameraShakePhase ) * x * 16.0f * cg.cameraShakeScale;
-	cg.refdefViewAngles[1] += val;
+	// OSPx - NQ's shake cam..
+	val = sin(M_PI * 7 * x + cg.cameraShakePhase) * x * 4.0f * cg.cameraShakeScale;
+	cg.refdef.vieworg[2] += val;
+	val = sin(M_PI * 13 * x + cg.cameraShakePhase) * x * 4.0f * cg.cameraShakeScale;
+	cg.refdef.vieworg[1] += val;
+	val = cos(M_PI * 17 * x + cg.cameraShakePhase) * x * 4.0f * cg.cameraShakeScale;
+	cg.refdef.vieworg[0] += val;
+	// End
 
 	AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
 }
