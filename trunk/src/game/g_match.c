@@ -36,12 +36,12 @@ Created: 11.Mar/14
 
 /*
 =================
-Reinforcements offset
+MAtch settings
 
 Pretty much a dump from et..
 =================
 */
-void reinforcementsOffset(void) {
+void G_loadMatchGame(void) {
 	unsigned int i, dwBlueOffset, dwRedOffset;
 	unsigned int aRandomValues[MAX_REINFSEEDS];
 	char strReinfSeeds[MAX_STRING_CHARS];

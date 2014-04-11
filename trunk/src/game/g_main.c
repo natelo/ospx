@@ -1258,7 +1258,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_RemapTeamShaders();
 
 	// OSPx - Reinforcements offset
-	reinforcementsOffset();
+	G_loadMatchGame();
 }
 
 

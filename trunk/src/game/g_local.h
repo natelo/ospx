@@ -1473,5 +1473,5 @@ void G_ResetMarkers( gentity_t* ent );
 //
 // g_match.c
 //
-void reinforcementsOffset(void);
+void G_loadMatchGame(void);
 
