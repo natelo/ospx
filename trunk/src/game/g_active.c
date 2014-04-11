@@ -467,7 +467,7 @@ qboolean ClientInactivityTimer( gclient_t *client ) {
 		if (level.time > client->inactivityTime && client->inactivityWarning) {
 			client->inactivityWarning = qfalse;
 			client->inactivityTime = level.time + 60 * 1000;
-			trap_DropClient(client - level.clients, "Dropped due to inactivity", 0);
+			trap_DropClient(client - level.clients, "Dropped due to inactivity");
 			return(qfalse);
 		}
 
