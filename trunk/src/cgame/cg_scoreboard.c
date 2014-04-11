@@ -297,11 +297,9 @@ int WM_DrawObjectives( int x, int y, int width, float fade ) {
 
 		}
 		CG_DrawSmallString( x,y,s,fade );
-
-		if ( cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED ) {
-			msec = cg_redlimbotime.integer - ( cg.time % cg_redlimbotime.integer );
-		} else if ( cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_BLUE )     {
-			msec = cg_bluelimbotime.integer - ( cg.time % cg_bluelimbotime.integer );
+		// OSPx - Reinforcement Offset (patched)
+		if ( cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED || cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_BLUE ) {
+			msec = CG_CalculateReinfTime() * 1000;
 		} else { // no team (spectator mode)
 			msec = 0;
 		}

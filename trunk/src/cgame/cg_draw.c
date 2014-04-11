@@ -854,38 +854,6 @@ static float CG_DrawTeamOverlay( float y ) {
 }
 
 /*
-=================
-OSPx 
-Reinforcements Offset
-=================
-*/
-char *CG_CalculateReinfTime( void ) {
-	int msec, mins, seconds, tens;
-	char *s = "0.00";
-
-	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED) {
-		msec = cg_redlimbotime.integer - (cg.time % cg_redlimbotime.integer);
-	}
-	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_BLUE)     {
-		msec = cg_bluelimbotime.integer - (cg.time % cg_bluelimbotime.integer);
-	}
-	else {
-		msec = 0;
-	}
-
-	if (msec) {
-		seconds = msec / 1000;
-		mins = seconds / 60;
-		seconds -= mins * 60;
-		tens = seconds / 10;
-		seconds -= tens * 10;
-
-		s = va("%2.0f:%i%i", (float)mins, tens, seconds + 1);
-	}
-	return s;
-}
-
-/*
 ========================
 OSPx 
 Respawn Timer
@@ -908,9 +876,9 @@ static float CG_DrawRespawnTimer(float y) {
 	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR)
 		str = "";
 	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED)
-		str = va("Re: %s", CG_CalculateReinfTime());
+		str = va("Re: %d", CG_CalculateReinfTime());
 	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_BLUE)
-		str = va("Re: %s", CG_CalculateReinfTime());
+		str = va("Re: %d", CG_CalculateReinfTime());
 
 	w = CG_DrawStrlen(str) * TINYCHAR_WIDTH;
 
@@ -2421,6 +2389,27 @@ static void CG_DrawSpectatorMessage( void ) {
 
 /*
 =================
+OSPx 
+
+Reinforcement Offset
+=================
+*/
+float CG_CalculateReinfTime_Float( void ) {
+	team_t team;
+	int dwDeployTime;
+	
+	team = cgs.clientinfo[cg.snap->ps.clientNum].team;
+
+	dwDeployTime = (team == TEAM_RED) ? cg_redlimbotime.integer : cg_bluelimbotime.integer;
+	return (1 + (dwDeployTime - ((cgs.aReinfOffset[team] + cg.time - cgs.levelStartTime) % dwDeployTime)) * 0.001f);
+}
+
+int CG_CalculateReinfTime( void ) {
+	return((int)CG_CalculateReinfTime_Float());
+}
+
+/*
+=================
 CG_DrawLimboMessage
 =================
 */
@@ -2460,12 +2449,9 @@ static void CG_DrawLimboMessage( void ) {
 	// JPW NERVE
 	if ( cg.snap->ps.persistant[PERS_RESPAWNS_LEFT] == 0 ) {
 		str = CG_TranslateString( "No more reinforcements this round." );
-	} else if ( cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED ) {
-		str = va( CG_TranslateString( "Reinforcements deploy in %d seconds." ),
-				  (int)( 1 + (float)( cg_redlimbotime.integer - ( cg.time % cg_redlimbotime.integer ) ) * 0.001f ) );
 	} else {
-		str = va( CG_TranslateString( "Reinforcements deploy in %d seconds." ),
-				  (int)( 1 + (float)( cg_bluelimbotime.integer - ( cg.time % cg_bluelimbotime.integer ) ) * 0.001f ) );
+		// OSPx - Reinforcement Offset
+		str = va(CG_TranslateString("Reinforcements deploy in %d seconds."), CG_CalculateReinfTime());
 	}
 
 	CG_DrawSmallStringColor( INFOTEXT_STARTX, 104, str, color );
@@ -2500,12 +2486,9 @@ static qboolean CG_DrawFollow( void ) {
 		color[2] = 0.0;
 		if ( cg.snap->ps.persistant[PERS_RESPAWNS_LEFT] == 0 ) {
 			sprintf( deploytime, CG_TranslateString( "No more deployments this round" ) );
-		} else if ( cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED ) {
-			sprintf( deploytime, CG_TranslateString( "Deploying in %d seconds" ),
-					 (int)( 1 + (float)( cg_redlimbotime.integer - ( cg.time % cg_redlimbotime.integer ) ) * 0.001f ) );
 		} else {
-			sprintf( deploytime, CG_TranslateString( "Deploying in %d seconds" ),
-					 (int)( 1 + (float)( cg_bluelimbotime.integer - ( cg.time % cg_bluelimbotime.integer ) ) * 0.001f ) );
+			// OSPx - Reinforcement Offset
+			sprintf(deploytime, CG_TranslateString("Deploying in %d seconds"), CG_CalculateReinfTime() );
 		}
 
 		CG_DrawStringExt( INFOTEXT_STARTX, 68, deploytime, color, qtrue, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 80 );

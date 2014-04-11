@@ -107,6 +107,17 @@ typedef enum {
 	CLDMG_MAX
 } clientDamage_t;
 
+// OSPx
+
+// Random reinforcement seed settings
+#define MAX_REINFSEEDS  8
+#define REINF_RANGE     16      // (0 to n-1 second offset)
+#define REINF_BLUEDELT  3       // Allies shift offset
+#define REINF_REDDELT   2       // Axis shift offset
+extern const unsigned int aReinfSeeds[MAX_REINFSEEDS];
+
+// -OSPx
+
 // RF
 #define MAX_TAGCONNECTS     32
 
@@ -171,6 +182,10 @@ typedef enum {
 #define CS_TARGETEFFECT         35      //----(SA)
 
 #define CS_WOLFINFO             36      // NERVE - SMF
+
+// OSPx
+#define CS_REINFSEEDS           37      // Reinforcement seeds
+// -OSPx
 
 #define CS_MODELS               64
 #define CS_SOUNDS               ( CS_MODELS + MAX_MODELS )

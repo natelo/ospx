@@ -1598,6 +1598,10 @@ typedef struct {
 	int complaintClient;        // DHM - Nerve
 	int complaintEndTime;       // DHM - Nerve
 	float smokeWindDir; // JPW NERVE for smoke puffs & wind (arty, airstrikes, bullet impacts)
+
+	// OSPx
+	int aReinfOffset[TEAM_NUM_TEAMS];	// Team reinforcement offsets
+	// -OSPx
 } cgs_t;
 
 //==============================================================================
@@ -1945,7 +1949,9 @@ qboolean CG_YourTeamHasFlag();
 qboolean CG_OtherTeamHasFlag();
 qhandle_t CG_StatusHandle( int task );
 void CG_Fade( int r, int g, int b, int a, float time );
-
+// OSPx - Reinforcement offset
+int CG_CalculateReinfTime(void);
+float CG_CalculateReinfTime_Float(void);
 
 
 
@@ -2245,6 +2251,8 @@ void CG_SendMoveSpeed( animation_t *animList, int numAnims, char *modelName );
 void CG_LoadVoiceChats();               // NERVE - SMF
 void CG_PlayBufferedVoiceChats();       // NERVE - SMF
 void CG_AddToNotify( const char *str );
+// OSPx
+void CG_ParseReinforcementTimes(const char *pszReinfSeedString);
 
 //
 // cg_playerstate.c

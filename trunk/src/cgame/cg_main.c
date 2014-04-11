@@ -2379,6 +2379,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	s = CG_ConfigString( CS_LEVEL_START_TIME );
 	cgs.levelStartTime = atoi( s );
 
+// OSPx
+	CG_ParseReinforcementTimes(CG_ConfigString(CS_REINFSEEDS));
+// -OSPx
+
 // JPW NERVE -- pick a direction for smoke drift on the client -- cheap trick because it can be different on different clients, but who cares?
 	cgs.smokeWindDir = crandom();
 // jpw
