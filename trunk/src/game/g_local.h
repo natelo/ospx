@@ -1230,6 +1230,10 @@ extern vmCvar_t g_antilag;
 
 extern vmCvar_t g_dbgRevive;
 
+// OSPx
+extern vmCvar_t g_spectatorInactivity;
+// -OSPx
+
 void    trap_Printf( const char *fmt );
 void    trap_Error( const char *fmt );
 int     trap_Milliseconds( void );

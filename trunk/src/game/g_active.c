@@ -438,26 +438,46 @@ Returns qfalse if the client is dropped
 =================
 */
 qboolean ClientInactivityTimer( gclient_t *client ) {
-	if ( !g_inactivity.integer ) {
+	// OSPx - Inactivity Timer
+	if ((g_inactivity.integer == 0 && client->sess.sessionTeam != TEAM_SPECTATOR) || 
+		(g_spectatorInactivity.integer == 0 && client->sess.sessionTeam == TEAM_SPECTATOR)) {
+
 		// give everyone some time, so if the operator sets g_inactivity during
 		// gameplay, everyone isn't kicked
 		client->inactivityTime = level.time + 60 * 1000;
 		client->inactivityWarning = qfalse;
-	} else if ( client->pers.cmd.forwardmove ||
-				client->pers.cmd.rightmove ||
-				client->pers.cmd.upmove ||
-				( client->pers.cmd.wbuttons & WBUTTON_ATTACK2 ) ||
-				( client->pers.cmd.buttons & BUTTON_ATTACK ) ) {
-		client->inactivityTime = level.time + g_inactivity.integer * 1000;
+	}
+	else if (client->pers.cmd.forwardmove ||
+		client->pers.cmd.rightmove ||
+		client->pers.cmd.upmove ||
+		(client->pers.cmd.wbuttons & WBUTTON_ATTACK2) ||
+		(client->pers.cmd.buttons & BUTTON_ATTACK) ||
+		(client->pers.cmd.wbuttons & WBUTTON_LEANLEFT) ||
+		(client->pers.cmd.wbuttons & WBUTTON_LEANRIGHT)
+		|| client->ps.pm_type == PM_DEAD) {
+
 		client->inactivityWarning = qfalse;
-	} else if ( !client->pers.localClient ) {
-		if ( level.time > client->inactivityTime ) {
-			trap_DropClient( client - level.clients, "Dropped due to inactivity" );
-			return qfalse;
+		client->inactivityTime = level.time + 1000 *
+			((client->sess.sessionTeam != TEAM_SPECTATOR) ?
+			g_inactivity.integer :
+			g_spectatorInactivity.integer);
+
+	}
+	else if (!client->pers.localClient) {
+		if (level.time > client->inactivityTime && client->inactivityWarning) {
+			client->inactivityWarning = qfalse;
+			client->inactivityTime = level.time + 60 * 1000;
+			trap_DropClient(client - level.clients, "Dropped due to inactivity", 0);
+			return(qfalse);
 		}
-		if ( level.time > client->inactivityTime - 10000 && !client->inactivityWarning ) {
+
+		if (!client->inactivityWarning && level.time > client->inactivityTime - 10000) {
+			CPx(client - level.clients, "cp \"^310 seconds until inactivity drop!\n\"");
+			CPx(client - level.clients, "print \"^310 seconds until inactivity drop!\n\"");
+			G_Printf("10s inactivity warning issued to: %s\n", client->pers.netname);
+
 			client->inactivityWarning = qtrue;
-			trap_SendServerCommand( client - level.clients, "cp \"Ten seconds until inactivity drop!\n\"" );
+			client->inactivityTime = level.time + 10000;    // Just for safety
 		}
 	}
 	return qtrue;
