@@ -1848,6 +1848,7 @@ extern vmCvar_t	cg_showFlags;
 extern vmCvar_t cg_announcer;
 extern vmCvar_t cg_autoAction;
 extern vmCvar_t cg_useScreenshotJPEG;
+extern vmCvar_t cg_uinfo;
 
 extern vmCvar_t int_cl_maxpackets;
 extern vmCvar_t int_cl_timenudge;
