@@ -508,15 +508,21 @@ typedef struct {
 	int voteCount;                  // to prevent people from constantly calling votes
 	int teamVoteCount;              // to prevent people from constantly calling votes
 
-	int complaints;                     // DHM - Nerve :: number of complaints lodged against this client
-	int complaintClient;                // DHM - Nerve :: able to lodge complaint against this client
-	int complaintEndTime;               // DHM - Nerve :: until this time has expired
+	int complaints;                 // DHM - Nerve :: number of complaints lodged against this client
+	int complaintClient;            // DHM - Nerve :: able to lodge complaint against this client
+	int complaintEndTime;           // DHM - Nerve :: until this time has expired
 
-	int lastReinforceTime;              // DHM - Nerve :: last reinforcement
+	int lastReinforceTime;          // DHM - Nerve :: last reinforcement
 
 	qboolean teamInfo;              // send team overlay updates?
 
-	qboolean bAutoReloadAux; // TTimo - auxiliary storage for pmoveExt_t::bAutoReload, to achieve persistance
+	qboolean bAutoReloadAux;		// TTimo - auxiliary storage for pmoveExt_t::bAutoReload, to achieve persistance
+
+	// OSPx	
+	unsigned int clientFlags;		// Client settings that need server involvement
+	unsigned int clientMaxPackets;	// Client com_maxpacket settings
+	unsigned int clientTimeNudge;	// Client cl_timenudge settings
+
 } clientPersistant_t;
 
 // OSPx - Antilag

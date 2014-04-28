@@ -311,6 +311,10 @@ vmCvar_t cg_showFlags;
 vmCvar_t cg_announcer;
 vmCvar_t cg_autoAction;
 vmCvar_t cg_useScreenshotJPEG;
+
+// - Mappings
+vmCvar_t int_cl_maxpackets;
+vmCvar_t int_cl_timenudge;
 // -OSPx
 
 typedef struct {
@@ -539,7 +543,10 @@ cvarTable_t cvarTable[] = {
 	{ &cg_showFlags, "cg_showFlags", "1", CVAR_ARCHIVE },
 	{ &cg_announcer, "cg_announcer", "1", CVAR_ARCHIVE },
 	{ &cg_autoAction, "cg_autoAction", "0", CVAR_ARCHIVE },
-	{ &cg_useScreenshotJPEG, "cg_useScreenshotJPEG", "1", CVAR_ARCHIVE }
+	{ &cg_useScreenshotJPEG, "cg_useScreenshotJPEG", "1", CVAR_ARCHIVE },
+
+	{ &int_cl_maxpackets, "cl_maxpackets", "30", CVAR_ARCHIVE },
+	{ &int_cl_timenudge, "cl_timenudge", "0", CVAR_ARCHIVE },
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
@@ -614,8 +621,10 @@ void CG_UpdateCvars( void ) {
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Update( cv->vmCvar );
 // OSPx
-		// Auto Actions
-		if (cv->vmCvar == &cg_autoAction) {
+		// Client Flags
+		if (cv->vmCvar == &cg_autoAction || cv->vmCvar == &cg_autoReload ||
+			cv->vmCvar == &int_cl_timenudge || cv->vmCvar == &int_cl_maxpackets ||
+			cv->vmCvar == &cg_autoactivate || cv->vmCvar == &cg_predictItems) {
 			fSetFlags = qtrue;
 		// Crosshairs
 		} else if (cv->vmCvar == &cg_crosshairColor || cv->vmCvar == &cg_crosshairAlpha) {
@@ -660,7 +669,7 @@ void CG_setClientFlags(void) {
 	}
 
 	cg.pmext.bAutoReload = (cg_autoReload.integer > 0);
-	trap_Cvar_Set("cg_uinfo", va("%d",
+	trap_Cvar_Set("cg_uinfo", va("%d %d %d",
 		// Client Flags
 		(
 			((cg_autoReload.integer > 0) ? CGF_AUTORELOAD : 0) |
@@ -668,7 +677,12 @@ void CG_setClientFlags(void) {
 			((cg_autoactivate.integer > 0) ? CGF_AUTOACTIVATE : 0) |
 			((cg_predictItems.integer > 0) ? CGF_PREDICTITEMS : 0)
 			// Add more in here, as needed
-		)
+		),
+
+		// Timenudge
+		int_cl_timenudge.integer,
+		// MaxPackets
+		int_cl_maxpackets.integer
 
 		));
 }

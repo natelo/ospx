@@ -1431,31 +1431,32 @@ void ClientUserinfoChanged( int clientNum ) {
 		sscanf(s, "%[^z]s:%*s", s);
 	}	
 
-	// check the item prediction
-	s = Info_ValueForKey( userinfo, "cg_predictItems" );
-	if ( !atoi( s ) ) {
-		client->pers.predictItemPickup = qfalse;
-	} else {
-		client->pers.predictItemPickup = qtrue;
-	}
-
-	// check the auto activation
-	s = Info_ValueForKey( userinfo, "cg_autoactivate" );
-	if ( !atoi( s ) ) {
-		client->pers.autoActivate = PICKUP_ACTIVATE;
-	} else {
+	// OSPx - Client info settings
+	if (ent->r.svFlags & SVF_BOT) {
 		client->pers.autoActivate = PICKUP_TOUCH;
-	}
-
-	// check the auto reload setting
-	s = Info_ValueForKey( userinfo, "cg_autoReload" );
-	if ( atoi( s ) ) {
 		client->pers.bAutoReloadAux = qtrue;
 		client->pmext.bAutoReload = qtrue;
-	} else {
-		client->pers.bAutoReloadAux = qfalse;
-		client->pmext.bAutoReload = qfalse;
+		client->pers.predictItemPickup = qfalse;
 	}
+	else {
+		s = Info_ValueForKey(userinfo, "cg_uinfo");
+		sscanf(s, "%i %i %i",
+			&client->pers.clientFlags,
+			&client->pers.clientTimeNudge,
+			&client->pers.clientMaxPackets);
+
+		client->pers.autoActivate = (client->pers.clientFlags & CGF_AUTOACTIVATE) ? PICKUP_TOUCH : PICKUP_ACTIVATE;
+		client->pers.predictItemPickup = ((client->pers.clientFlags & CGF_PREDICTITEMS) != 0);
+
+		if (client->pers.clientFlags & CGF_AUTORELOAD) {
+			client->pers.bAutoReloadAux = qtrue;
+			client->pmext.bAutoReload = qtrue;
+		}
+		else {
+			client->pers.bAutoReloadAux = qfalse;
+			client->pmext.bAutoReload = qfalse;
+		}
+	} // -OSPx
 
 	// set name
 	Q_strncpyz( oldname, client->pers.netname, sizeof( oldname ) );
