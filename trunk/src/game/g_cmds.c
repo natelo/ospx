@@ -1161,6 +1161,29 @@ void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool
 	}
 	// dhm
 
+	// OSPx - Fix some annoying vsay exploits..
+	if (mode == SAY_TEAM && (
+		!Q_stricmp(id, "DynamiteDefused") ||
+		!Q_stricmp(id, "DynamitePlanted")))
+	{
+		return;
+	}
+
+	if (mode == SAY_ALL &&
+		(!Q_stricmp(id, "DynamiteDefused") ||
+		!Q_stricmp(id, "DynamitePlanted")))
+	{
+		return;
+	} 
+	
+	// No vsay's for specs..
+	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
+		CP("cp \"You cannot voice chat as spectator^3!\n\"2");
+		return;
+	}
+	// end
+	// -OSPx
+
 	if ( target ) {
 		G_VoiceTo( ent, target, mode, id, voiceonly );
 		return;
