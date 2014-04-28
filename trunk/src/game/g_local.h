@@ -634,6 +634,10 @@ struct gclient_s {
 
 	gentity_t       *tempHead;  // Gordon: storing a temporary head for bullet head shot detection
 
+	// OSPx
+	int infoTime;
+	// -OSPx
+
 	pmoveExt_t pmext;
 };
 
