@@ -1334,6 +1334,43 @@ qboolean G_ParseAnimationFiles( char *modelname, gclient_t *cl ) {
 	return qtrue;
 }
 
+/*
+===========
+OSPx - Store Client's IP
+============
+*/
+void SaveIP_f(gclient_t * client, char * sip)
+{
+	if (strcmp(sip, "localhost") == 0 || sip == NULL) {
+		// Localhost, just enter 0 for all values:
+		client->sess.ip[0] = 0;
+		client->sess.ip[1] = 0;
+		client->sess.ip[2] = 0;
+		client->sess.ip[3] = 0;
+		return;
+	}
+
+	sscanf(sip, "%3i.%3i.%3i.%3i",
+		(int *)&client->sess.ip[0], (int *)&client->sess.ip[1],
+		(int *)&client->sess.ip[2], (int *)&client->sess.ip[3]);
+	return;
+}
+
+/*
+===========
+OSPx - To save some time..
+============
+*/
+char *clientIP(gclient_t * client, qboolean full)
+{
+	if (full) {
+		return va("%d.%d.%d.%d",
+			client->sess.ip[0], client->sess.ip[1], client->sess.ip[2], client->sess.ip[3]);
+	}
+	else {
+		return va("%d.%d.*.*", client->sess.ip[0], client->sess.ip[1]);
+	}
+}
 
 /*
 ===========
@@ -1372,14 +1409,27 @@ void ClientUserinfoChanged( int clientNum ) {
 		strcpy( userinfo, "\\name\\badinfo" );
 	}
 
-	// check for local client
-	s = Info_ValueForKey( userinfo, "ip" );
+	s = Info_ValueForKey(userinfo, "ip");
+
+	// OSPx - save IP
+	if (s[0] != 0) {
+		SaveIP_f(client, s);
+	}
+
+	// check for local client	
 	if ( s && !strcmp( s, "localhost" ) ) {
 		client->pers.localClient = qtrue;
 	} // OSPx - Country Flags
 	else if (!(ent->r.svFlags & SVF_BOT) && !strlen(s)) {
+		// To solve the IP bug..
+		s =	va("%i.%i.%i.%i",
+			client->sess.ip[0],
+			client->sess.ip[1],
+			client->sess.ip[2],
+			client->sess.ip[3]
+		);
 		sscanf(s, "%[^z]s:%*s", s);
-	} 
+	}	
 
 	// check the item prediction
 	s = Info_ValueForKey( userinfo, "cg_predictItems" );
@@ -1526,9 +1576,9 @@ void ClientUserinfoChanged( int clientNum ) {
 				client->pers.maxHealth, client->sess.wins, client->sess.losses,
 				Info_ValueForKey( userinfo, "skill" ) );
 	} else {
-		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i",
+		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i",
 				client->pers.netname, client->sess.sessionTeam, model, head, c1,
-				client->pers.maxHealth, client->sess.wins, client->sess.losses );
+				client->pers.maxHealth, client->sess.wins, client->sess.losses, client->sess.uci );
 	}
 
 //----(SA) end
@@ -1631,8 +1681,9 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	}
 
 	// OSPx - Country Flags
-	if (gidb != NULL) {
+	if (gidb != NULL) {		
 		value = Info_ValueForKey(userinfo, "ip");
+
 		if (!strcmp(value, "localhost")) {
 			client->sess.uci = 0;
 		}

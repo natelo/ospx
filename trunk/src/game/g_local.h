@@ -475,6 +475,7 @@ typedef struct {
 
 	// OSPx
 	unsigned int uci;				// Country Flags
+	unsigned char	ip[4];			// IPs
 } clientSession_t;
 
 //
