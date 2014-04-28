@@ -327,6 +327,10 @@ void Weapon_Syringe( gentity_t *ent ) {
 
 				ClientSpawn( traceEnt, qtrue );
 
+				// OSPx - Antilag
+				G_ResetTrail(traceEnt);
+				traceEnt->client->saved.leveltime = 0;
+
 				memcpy( traceEnt->client->ps.ammo,ammo,sizeof( int ) * MAX_WEAPONS );
 				memcpy( traceEnt->client->ps.ammoclip,ammoclip,sizeof( int ) * MAX_WEAPONS );
 				memcpy( traceEnt->client->ps.weapons,weapons,sizeof( int ) * ( MAX_WEAPONS / ( sizeof( int ) * 8 ) ) );
@@ -1592,6 +1596,11 @@ Bullet_Fire
 void Bullet_Fire( gentity_t *ent, float spread, int damage ) {
 	vec3_t end;
 
+	// OSPx - Antilag
+	if (g_antilag.integer && ent->client && !(ent->r.svFlags & SVF_BOT)) {
+		G_TimeShiftAllClients(ent->client->pers.cmd.serverTime, ent);
+	}
+
 	Bullet_Endpos( ent, spread, &end );
 	Bullet_Fire_Extended( ent, ent, muzzleTrace, end, spread, damage );
 }
@@ -1613,7 +1622,12 @@ void Bullet_Fire_Extended( gentity_t *source, gentity_t *attacker, vec3_t start,
 
 	damage *= s_quadFactor;
 
-	G_HistoricalTrace( source, &tr, start, NULL, NULL, end, source->s.number, MASK_SHOT );
+	trap_Trace(&tr, start, NULL, NULL, end, source->s.number, MASK_SHOT);
+
+	// OSPx - Antilag
+	if (tr.surfaceFlags & SURF_NOIMPACT) {
+		goto untimeshift;
+	}
 
 	// DHM - Nerve :: only in single player
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
@@ -1765,6 +1779,12 @@ void Bullet_Fire_Extended( gentity_t *source, gentity_t *attacker, vec3_t start,
 			}
 
 		}
+	}
+
+	// OSPx- Antilag
+	untimeshift:
+	if (g_antilag.integer && attacker->client && !(attacker->r.svFlags & SVF_BOT)) {
+		G_UnTimeShiftAllClients(attacker);
 	}
 }
 
@@ -1941,6 +1961,11 @@ void VenomPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	PerpendicularVector( right, forward );
 	CrossProduct( forward, right, up );
 
+	// OSPx - Antilag
+	if (g_antilag.integer && ent->client &&	!(ent->r.svFlags & SVF_BOT)) {
+		G_TimeShiftAllClients(ent->client->pers.cmd.serverTime, ent);
+	}
+
 	oldScore = ent->client->ps.persistant[PERS_SCORE];
 
 	// generate the "random" spread pattern
@@ -1954,6 +1979,11 @@ void VenomPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 			hitClient = qtrue;
 			ent->client->ps.persistant[PERS_ACCURACY_HITS]++;
 		}
+	}
+
+	// OSPx - Antilag
+	if (g_antilag.integer && ent->client && !(ent->r.svFlags & SVF_BOT)) {
+		G_UnTimeShiftAllClients(ent);
 	}
 }
 

@@ -2585,7 +2585,7 @@ void G_RunFrame( int levelTime ) {
 		return;
 	}
 
-	level.frameTime = trap_Milliseconds();
+	level.frameStartTime = trap_Milliseconds();
 
 	level.framenum++;
 	level.previousTime = level.time;
