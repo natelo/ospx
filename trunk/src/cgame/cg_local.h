@@ -711,6 +711,20 @@ typedef struct {
 #define MAX_SPAWN_VARS          64
 #define MAX_SPAWN_VARS_CHARS    2048
 
+// OSPx - Draw HUDnames
+typedef struct specName_s
+{
+	float		x;
+	float		y;
+	float		scale;
+	const char *text;
+	vec3_t		origin;
+	int         lastVisibleTime;
+	int         lastInvisibleTime;
+	qboolean    visible;
+	float		alpha;
+}specName_t;
+
 typedef struct {
 	int clientFrame;                // incremented each frame
 
@@ -999,6 +1013,10 @@ typedef struct {
 	// Crosshairs
 	vec4_t xhairColor;
 	vec4_t xhairColorAlt;
+
+	// Draw names on hud
+	qboolean	renderingFreeCam;
+	specName_t	specOnScreenNames[MAX_CLIENTS];
 
 // -OSPx
 
@@ -1811,6 +1829,8 @@ extern vmCvar_t cg_noVoice;
 extern vmCvar_t cg_noAmmoAutoSwitch;
 extern vmCvar_t cg_zoomedFOV;
 extern vmCvar_t cg_zoomedSens;
+extern vmCvar_t	vp_drawnames;
+extern vmCvar_t	cg_drawNames;
 // -OSPx
 
 //
@@ -1959,11 +1979,22 @@ qboolean CG_YourTeamHasFlag();
 qboolean CG_OtherTeamHasFlag();
 qhandle_t CG_StatusHandle( int task );
 void CG_Fade( int r, int g, int b, int a, float time );
-// OSPx - Reinforcement offset
+
+// OSPx 
+
+// - Reinforcement offset
 int CG_CalculateReinfTime(void);
 float CG_CalculateReinfTime_Float(void);
+// - Text
+int CG_Text_Width_Ext(const char *text, float scale, int limit, fontInfo_t* font);
+int CG_Text_Height_Ext(const char *text, float scale, int limit, fontInfo_t* font);
+void CG_Text_Paint_Ext(float x, float y, float scalex, float scaley, vec4_t color, const char *text, float adjust, int limit, int style, fontInfo_t* font);
+// - Hud names
+void CG_Text_Paint_ext2(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
+int CG_Text_Width_ext2(const char *text, float scale, int limit);
+int CG_Text_Height_ext2(const char *text, float scale, int limit);
 
-
+// -OSPx
 
 //
 // cg_player.c
