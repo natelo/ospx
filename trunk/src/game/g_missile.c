@@ -996,6 +996,13 @@ void G_RunFlamechunk( gentity_t *ent ) {
 	trace_t tr;
 	float speed, dot;
 
+	// OSPx - Flamer bug fix
+	// Project Bugfix
+	// Bugfix 062 - Flamethrower serverside chunks can fly across the map if aimed properly
+	VectorCopy(ent->s.pos.trDelta, vel);
+	speed = VectorNormalize(vel);
+	// -OSPx
+
 	// Adust the current speed of the chunk
 	if ( level.time - ent->timestamp > 50 ) {
 		VectorCopy( ent->s.pos.trDelta, vel );

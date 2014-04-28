@@ -2106,22 +2106,19 @@ LIGHTNING GUN
 
 // TTimo - extracted G_FlameDamage to unify with Weapon_FlamethrowerFire usage
 void G_BurnMeGood( gentity_t *self, gentity_t *body ) {
+
 	// add the new damage
 	body->flameQuota += 5;
 	body->flameQuotaTime = level.time;
 
-	// JPW NERVE -- yet another flamethrower damage model, trying to find a feels-good damage combo that isn't overpowered
-	if ( body->lastBurnedFrameNumber != level.framenum ) {
-		G_Damage( body,self->parent,self->parent,vec3_origin,self->r.currentOrigin,5,0,MOD_FLAMETHROWER );   // was 2 dmg in release ver, hit avg. 2.5 times per frame
-		body->lastBurnedFrameNumber = level.framenum;
+	if (level.time - body->lastBurnedFrameNumber >= 1) {
+		G_Damage(body, self->parent, self->parent, vec3_origin, self->r.currentOrigin, 4, 0, MOD_FLAMETHROWER);
+		body->lastBurnedFrameNumber = level.time;
 	}
-	// jpw
 
-	// make em burn
-	if ( body->client && ( body->health <= 0 || body->flameQuota > 0 ) ) { // JPW NERVE was > FLAME_THRESHOLD
-		if ( body->s.onFireEnd < level.time ) {
+	if (body->client && (body->health <= 0 || body->flameQuota > 0)) { // JPW NERVE was > FLAME_THRESHOLD
+		if (body->s.onFireEnd < level.time)
 			body->s.onFireStart = level.time;
-		}
 
 		body->s.onFireEnd = level.time + FIRE_FLASH_TIME;
 		body->flameBurnEnt = self->s.number;
