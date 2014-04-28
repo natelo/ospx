@@ -608,6 +608,8 @@ static consoleCommand_t commands[] = {
 	// OSPx	
 	{ "+vstr", CG_vstrDown_f },
 	{ "-vstr", CG_vstrUp_f },
+	{ "+zoomView", CG_zoomViewSet_f },
+	{ "-zoomView", CG_zoomViewRevert_f },
 	// -OSPx
 
 	// Arnout

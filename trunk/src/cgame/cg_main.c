@@ -303,6 +303,8 @@ vmCvar_t cg_noChat;
 vmCvar_t cg_noVoice;
 vmCvar_t cg_noAmmoAutoSwitch;
 vmCvar_t cg_wideScreen;
+vmCvar_t cg_zoomedFOV;
+vmCvar_t cg_zoomedSens;
 // -OSPx
 
 typedef struct {
@@ -523,7 +525,9 @@ cvarTable_t cvarTable[] = {
 	{ &cg_noChat, "cg_noChat", "0", CVAR_ARCHIVE },
 	{ &cg_noVoice, "cg_noVoice", "0", CVAR_ARCHIVE },
 	{ &cg_noAmmoAutoSwitch, "cg_noAmmoAutoSwitch", "1", CVAR_ARCHIVE },
-	{ &cg_wideScreen, "cg_wideScreen", "0", CVAR_ARCHIVE | CVAR_LATCH }
+	{ &cg_wideScreen, "cg_wideScreen", "0", CVAR_ARCHIVE | CVAR_LATCH },
+	{ &cg_zoomedFOV, "cg_zoomedFOV", "90", CVAR_ARCHIVE },
+	{ &cg_zoomedSens, "cg_zoomedSens", ".3", CVAR_ARCHIVE }
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
