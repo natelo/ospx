@@ -1585,6 +1585,19 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	trap_SetConfigstring( CS_PLAYERS + clientNum, s );
 
+	// OSPx - We need to send client private info (ip..) only to log and not a configstring
+	// as \configstrings reveals user data which is something we don't want..
+	if (!(ent->r.svFlags & SVF_BOT)) {
+		char *team;
+
+		team = ( client->sess.sessionTeam == TEAM_RED) ? "Axis" :
+			   ((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
+
+		// Print essentials and skip the garbage		
+		s = va("name\\%s\\team\\%s\\IP\\%s\\country\\%s",
+			client->pers.netname, team, clientIP(client, qtrue), client->sess.uci);
+	}
+
 	// this is not the userinfo actually, it's the config string
 	G_LogPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, s );
 	G_DPrintf( "ClientUserinfoChanged: %i :: %s\n", clientNum, s );
