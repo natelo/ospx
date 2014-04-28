@@ -1180,9 +1180,7 @@ void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool
 	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
 		CP("cp \"You cannot voice chat as spectator^3!\n\"2");
 		return;
-	}
-	// end
-	// -OSPx
+	} // -OSPx
 
 	if ( target ) {
 		G_VoiceTo( ent, target, mode, id, voiceonly );
