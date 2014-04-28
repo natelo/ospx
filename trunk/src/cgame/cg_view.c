@@ -1428,7 +1428,7 @@ static int CG_CalcViewValues( void ) {
 	}
 
 	// field of view
-	// OSPx - Patched for zoomed POV
+	// OSPx - Patched for zoomed FOV
 	if (cg.zoomedFOV)
 		return CG_CalcZoomedFov();
 	else

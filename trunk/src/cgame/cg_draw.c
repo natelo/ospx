@@ -2181,7 +2181,13 @@ static void CG_DrawCrosshairNames( void ) {
 	w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 
 	// draw the name and class
-	CG_DrawSmallStringColor( 320 - w / 2, 170, s, color );
+	// OSPx - Colored names
+	if (cg_coloredCrosshairNames.integer) {
+		CG_DrawStringExt(320 - w / 2, 170, s, color, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 40);
+	}
+	else {
+		CG_DrawSmallStringColor(320 - w / 2, 170, s, color);
+	}
 
 	// draw the health bar
 	playerHealth = cg.identifyClientHealth;
