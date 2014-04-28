@@ -309,6 +309,8 @@ vmCvar_t vp_drawnames;
 vmCvar_t cg_drawNames;
 vmCvar_t cg_showFlags;
 vmCvar_t cg_announcer;
+vmCvar_t cg_autoAction;
+vmCvar_t cg_useScreenshotJPEG;
 // -OSPx
 
 typedef struct {
@@ -535,10 +537,14 @@ cvarTable_t cvarTable[] = {
 	{ &vp_drawnames, "vp_drawnames", "0", CVAR_ARCHIVE | CVAR_CHEAT },
 	{ &cg_drawNames, "cg_drawNames", "1", CVAR_ROM },
 	{ &cg_showFlags, "cg_showFlags", "1", CVAR_ARCHIVE },
-	{ &cg_announcer, "cg_announcer", "1", CVAR_ARCHIVE }
+	{ &cg_announcer, "cg_announcer", "1", CVAR_ARCHIVE },
+	{ &cg_autoAction, "cg_autoAction", "0", CVAR_ARCHIVE },
+	{ &cg_useScreenshotJPEG, "cg_useScreenshotJPEG", "1", CVAR_ARCHIVE }
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
+// OSPx - Client Flags
+void CG_setClientFlags(void);
 
 /*
 =================
@@ -567,8 +573,8 @@ void CG_RegisterCvars( void ) {
 	trap_Cvar_Register( NULL, "head", DEFAULT_HEAD, CVAR_USERINFO | CVAR_ARCHIVE );
 
 // OSPx
-	// Auto actions
-	//CG_setClientFlags();
+	// Client Flags
+	CG_setClientFlags();
 
 	// Crosshairs
 	BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
@@ -603,17 +609,22 @@ CG_UpdateCvars
 void CG_UpdateCvars( void ) {
 	int i;
 	cvarTable_t *cv;
+	qboolean fSetFlags = qfalse;	// OSPx - Auto Actions
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Update( cv->vmCvar );
-
-		// OSPx - Crosshairs
-		if (cv->vmCvar == &cg_crosshairColor || cv->vmCvar == &cg_crosshairAlpha) {
+// OSPx
+		// Auto Actions
+		if (cv->vmCvar == &cg_autoAction) {
+			fSetFlags = qtrue;
+		// Crosshairs
+		} else if (cv->vmCvar == &cg_crosshairColor || cv->vmCvar == &cg_crosshairAlpha) {
 			BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
 		}
 		else if (cv->vmCvar == &cg_crosshairColorAlt || cv->vmCvar == &cg_crosshairAlphaAlt)     {
 			BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
-		} // -OSPx
+		}
+// -OSPx
 	}
 
 	// if force model changed
@@ -630,8 +641,37 @@ void CG_UpdateCvars( void ) {
 		}
 		autoReloadModificationCount = cg_autoReload.modificationCount;
 	}
+
+	// OSPx - Client Flags
+	if (fSetFlags) {
+		CG_setClientFlags();
+	}
 }
 
+/*
+=================
+OSPx - Client Flags
+=================
+*/
+void CG_setClientFlags(void) {
+
+	if (cg.demoPlayback) {
+		return;
+	}
+
+	cg.pmext.bAutoReload = (cg_autoReload.integer > 0);
+	trap_Cvar_Set("cg_uinfo", va("%d",
+		// Client Flags
+		(
+			((cg_autoReload.integer > 0) ? CGF_AUTORELOAD : 0) |
+			((cg_autoAction.integer & AA_STATSDUMP) ? CGF_STATSDUMP : 0) |
+			((cg_autoactivate.integer > 0) ? CGF_AUTOACTIVATE : 0) |
+			((cg_predictItems.integer > 0) ? CGF_PREDICTITEMS : 0)
+			// Add more in here, as needed
+		)
+
+		));
+}
 
 int CG_CrosshairPlayer( void ) {
 	if ( cg.time > ( cg.crosshairClientTime + 1000 ) ) {
@@ -721,6 +761,23 @@ const char *CG_Argv( int arg ) {
 	trap_Argv( arg, buffer, sizeof( buffer ) );
 
 	return buffer;
+}
+
+/*
+================
+OSPx - Name generation for SS's and Demo's
+================
+*/
+// Standard naming for screenshots/demos
+char *CG_generateFilename(void) {
+	qtime_t ct;
+	const char *pszServerInfo = CG_ConfigString(CS_SERVERINFO);
+
+	trap_RealTime(&ct);
+	return(va("%s.%02d.%d/%02d.%02d.%02d-%s",
+		aMonths[ct.tm_mon], ct.tm_mday, 1900 + ct.tm_year,
+		ct.tm_hour, ct.tm_min, ct.tm_sec,
+		Info_ValueForKey(pszServerInfo, "mapname")));
 }
 
 

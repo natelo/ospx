@@ -2327,6 +2327,42 @@ static void CG_DrawIntermission( void ) {
 		return;
 	}
 
+// OSPx
+	// Auto Actions
+	if (!cg.demoPlayback) {
+		static int doScreenshot = 0, doDemostop = 0;
+
+		if (!cg.latchAutoActions) {
+			cg.latchAutoActions = qtrue;
+
+			// Some instantly open console to check the stats..
+			if (cg_autoAction.integer & AA_SCREENSHOT) {
+				doScreenshot = cg.time + 250;
+			}
+			/*
+			if (cg_autoAction.integer & AA_STATSDUMP) {
+				CG_dumpStats_f();
+			}
+			*/
+			if ((cg_autoAction.integer & AA_DEMORECORD) &&
+				((cgs.gametype == GT_WOLF_STOPWATCH && cgs.currentRound == 0) ||
+				cgs.gametype != GT_WOLF_STOPWATCH)) {
+				doDemostop = cg.time + 5000;
+			}
+		}
+
+		if (doScreenshot > 0 && doScreenshot < cg.time) {
+			CG_autoScreenShot_f();
+			doScreenshot = 0;
+		}
+
+		if (doDemostop > 0 && doDemostop < cg.time) {
+			trap_SendConsoleCommand("stoprecord\n");
+			doDemostop = 0;
+		}
+	} 
+// -OSPx
+
 	cg.scoreFadeTime = cg.time;
 	CG_DrawScoreboard();
 }

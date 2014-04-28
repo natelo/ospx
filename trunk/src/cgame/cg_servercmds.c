@@ -207,6 +207,11 @@ static void CG_ParseWarmup( void ) {
 
 	} else if ( warmup > 0 && cg.warmup <= 0 ) {
 		trap_S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
+
+		// OSPx - Auto Actions
+		if (!cg.demoPlayback && cg_autoAction.integer & AA_DEMORECORD) {
+			CG_autoRecord_f();
+		}
 	}
 
 	cg.warmup = warmup;
@@ -767,6 +772,7 @@ static void CG_MapRestart( void ) {
 
 	trap_S_ClearLoopingSounds( qtrue );
 
+	cg.latchAutoActions = qfalse;			// OSPx - Auto Actions
 	cg.latchVictorySound = qfalse;          // NERVE - SMF
 // JPW NERVE -- reset render flags
 	cg_fxflags = 0;

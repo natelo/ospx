@@ -525,12 +525,34 @@ static void CG_DumpLocation_f( void ) {
 }
 
 /*
-===================
-OSPx
+	
+	OSPx - New stuff
 
-+vstr
-===================
 */
+const char *aMonths[12] = {
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+
+// currentime
+void CG_currentTime_f(void) {
+	qtime_t ct;
+
+	trap_RealTime(&ct);
+	CG_Printf("[cgnotify]Current time: ^3%02d:%02d:%02d (%02d %s %d)\n", ct.tm_hour, ct.tm_min, ct.tm_sec, ct.tm_mday, aMonths[ct.tm_mon], 1900 + ct.tm_year);
+}
+
+// Dynamically names a demo and sets up the recording
+void CG_autoRecord_f(void) {	// Due rtcw bug we need to sync"h" first..but to avoid any bugs we set it to 0 first..
+	trap_SendConsoleCommand(va("g_synchronousclients 0;g_synchronousclients 1;record %s;g_synchronousclients 0\n", CG_generateFilename()));
+}
+
+// Dynamically names a screenshot[JPEG]
+void CG_autoScreenShot_f(void) {
+	trap_SendConsoleCommand(va("screenshot%s %s\n", ((cg_useScreenshotJPEG.integer) ? "JPEG" : ""), CG_generateFilename()));
+}
+
+// +vstr
 void CG_vstrDown_f(void) {
 	if (trap_Argc() == 5) {
 		trap_SendConsoleCommand(va("vstr %s;", CG_Argv(1)));
@@ -538,19 +560,15 @@ void CG_vstrDown_f(void) {
 	else { CG_Printf("[cgnotify]^3Usage: ^7+vstr [down_vstr] [up_vstr]\n"); }
 }
 
-/*
-===================
-OSPx
-
--vstr
-===================
-*/
+// -vstr
 void CG_vstrUp_f(void) {
 	if (trap_Argc() == 5) {
 		trap_SendConsoleCommand(va("vstr %s;", CG_Argv(2)));
 	}
 	else { CG_Printf("[cgnotify]^3Usage: ^7+vstr [down_vstr] [up_vstr]\n"); }
 }
+
+/*	OSPx - New stuff ends here	*/
 
 typedef struct {
 	char    *cmd;
@@ -610,6 +628,11 @@ static consoleCommand_t commands[] = {
 	{ "-vstr", CG_vstrUp_f },
 	{ "+zoomView", CG_zoomViewSet_f },
 	{ "-zoomView", CG_zoomViewRevert_f },
+	{ "autoRecord", CG_autoRecord_f },
+	{ "autoScreenshot", CG_autoScreenShot_f },
+	{ "currentTime", CG_currentTime_f },
+	{ "time", CG_currentTime_f },
+	//{ "statsdump", CG_dumpStats_f },
 	// -OSPx
 
 	// Arnout

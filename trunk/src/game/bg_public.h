@@ -1735,4 +1735,10 @@ extern animStringItem_t animBodyPartsStr[];
 // Crosshairs
 void BG_setCrosshair(char *colString, float *col, float alpha, char *cvarName);
 
+// Client flags for server processing
+#define CGF_AUTORELOAD      0x01
+#define CGF_STATSDUMP       0x02
+#define CGF_AUTOACTIVATE    0x04
+#define CGF_PREDICTITEMS    0x08
+
 // -OSPx

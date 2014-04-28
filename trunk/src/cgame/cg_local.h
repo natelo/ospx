@@ -1025,6 +1025,9 @@ typedef struct {
 	int		centerPrintAnnouncerDuration;
 	vec3_t	centerPrintAnnouncerColor;
 	int		centerPrintAnnouncerMode;
+
+	// Auto Actions
+	qboolean	latchAutoActions;
 // -OSPx
 
 	pmoveExt_t pmext;
@@ -1843,6 +1846,8 @@ extern vmCvar_t	vp_drawnames;
 extern vmCvar_t	cg_drawNames;
 extern vmCvar_t	cg_showFlags;
 extern vmCvar_t cg_announcer;
+extern vmCvar_t cg_autoAction;
+extern vmCvar_t cg_useScreenshotJPEG;
 // -OSPx
 
 //
@@ -1871,6 +1876,8 @@ qboolean CG_GetTag( int clientNum, char *tagname, orientation_t * or );
 qboolean CG_GetWeaponTag( int clientNum, char *tagname, orientation_t * or );
 
 qboolean CG_CheckCenterView();
+// OSPx
+char *CG_generateFilename( void );
 
 //
 // cg_view.c
@@ -2301,6 +2308,11 @@ void CG_DrawTourneyScoreboard( void );
 //
 qboolean CG_ConsoleCommand( void );
 void CG_InitConsoleCommands( void );
+// OSPx
+void CG_autoRecord_f( void );
+void CG_autoScreenShot_f( void );
+void CG_dumpStats_f( void );
+extern const char *aMonths[12];
 
 //
 // cg_servercmds.c
@@ -2340,6 +2352,7 @@ void        trap_Error( const char *fmt );
 // milliseconds should only be used for performance tuning, never
 // for anything game related.  Get time from the CG_DrawActiveFrame parameter
 int         trap_Milliseconds( void );
+int         trap_RealTime(qtime_t *qtime); // OSPx - So it's more acessible
 
 // console variable interaction
 void        trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
@@ -2564,3 +2577,14 @@ void        CG_StartCamera( const char *name, qboolean startBlack );
 int         CG_LoadCamera( const char *name );
 void        CG_FreeCamera( int camNum );
 //----(SA)	end
+
+/*
+
+	OSPx - New stuff below
+
+*/
+
+// OSP's Autoaction values
+#define AA_DEMORECORD   0x01
+#define AA_SCREENSHOT   0x02
+#define AA_STATSDUMP    0x04
