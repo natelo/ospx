@@ -164,6 +164,7 @@ vmCvar_t g_dbgRevive;
 
 // OSPx
 vmCvar_t g_spectatorInactivity;
+vmCvar_t g_showFlags;
 // -OSPx
 
 cvarTable_t gameCvarTable[] = {
@@ -301,7 +302,8 @@ cvarTable_t gameCvarTable[] = {
 	{&g_dbgRevive, "g_dbgRevive", "0", 0, 0, qfalse},
 
 // OSPx
-	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse }
+	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },
+	{ &g_showFlags, "g_showFlags", "1", 0 },
 // -OSPx
 };
 
@@ -1249,6 +1251,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		G_Printf( "-----------------------------------\n" );
 	}
 
+	// OSPx - Country Flags
+	GeoIP_open();
+
 	if ( trap_Cvar_VariableIntegerValue( "bot_enable" ) ) {
 		BotAISetup( restart );
 		BotAILoadMap( restart );
@@ -1292,6 +1297,9 @@ void G_ShutdownGame( int restart ) {
 		// done.
 	}
 	// done.
+
+	// OSPx - Country Flags
+	GeoIP_close();
 
 	// write all the client session data so we can get it back
 	G_WriteSessionData();

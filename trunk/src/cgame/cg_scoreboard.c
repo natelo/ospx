@@ -34,6 +34,36 @@ If you have questions concerning this license or the applicable additional terms
 
 /*
 =================
+OSPx - Country Flags 
+
+Author: mcwf
+=================
+*/
+qboolean cf_draw(float x, float y, float fade, int clientNum) {
+
+	float alpha[4];
+	float flag_step = 32;
+	unsigned int flag_sd = 512;
+	unsigned int client_flag = atoi(Info_ValueForKey(CG_ConfigString(clientNum + CS_PLAYERS), "uci"));
+
+
+	if (client_flag < 255) {
+		float x1 = (float)((client_flag * (unsigned int)flag_step) % flag_sd);
+		float y1 = (float)(floor((client_flag * flag_step) / flag_sd) * flag_step);
+		float x2 = x1 + flag_step;
+		float y2 = y1 + flag_step;
+		alpha[0] = alpha[1] = alpha[2] = 1.0; alpha[3] = fade;
+
+		trap_R_SetColor(alpha);
+		CG_DrawPicST(x, y, flag_step, flag_step, x1 / flag_sd, y1 / flag_sd, x2 / flag_sd, y2 / flag_sd, cgs.media.countryFlags);
+		trap_R_SetColor(NULL);
+		return qtrue;
+	}
+	return qfalse;
+}
+
+/*
+=================
 CG_DrawScoreboard
 =================
 */
@@ -435,6 +465,17 @@ static void WM_DrawClientScore( int x, int y, score_t *score, float *color, floa
 			maxchars -= 2;
 		}
 	}
+
+	// OSPx - Country Flags
+	if ((score->ping != -1) && (score->ping != 999) && (cg_showFlags.integer)) 
+	{
+		if (cf_draw(tempx - 7, y - 7, fade, ci->clientNum)) 
+		{ 
+			offset += 14;
+			tempx += 18;	
+			maxchars -= 2;
+		}
+	} 
 
 	// draw name
 	CG_DrawStringExt( tempx, y, ci->name, hcolor, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, maxchars );

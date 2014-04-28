@@ -307,6 +307,7 @@ vmCvar_t cg_zoomedFOV;
 vmCvar_t cg_zoomedSens;
 vmCvar_t vp_drawnames;
 vmCvar_t cg_drawNames;
+vmCvar_t cg_showFlags;
 // -OSPx
 
 typedef struct {
@@ -531,7 +532,8 @@ cvarTable_t cvarTable[] = {
 	{ &cg_zoomedFOV, "cg_zoomedFOV", "90", CVAR_ARCHIVE },
 	{ &cg_zoomedSens, "cg_zoomedSens", ".3", CVAR_ARCHIVE },
 	{ &vp_drawnames, "vp_drawnames", "0", CVAR_ARCHIVE | CVAR_CHEAT },
-	{ &cg_drawNames, "cg_drawNames", "1", CVAR_ROM }
+	{ &cg_drawNames, "cg_drawNames", "1", CVAR_ROM },
+	{ &cg_showFlags, "cg_showFlags", "1", CVAR_ARCHIVE },
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
@@ -1296,6 +1298,9 @@ static void CG_RegisterGraphics( void ) {
 
 	cgs.media.backTileShader = trap_R_RegisterShader( "gfx/2d/backtile" );
 	cgs.media.noammoShader = trap_R_RegisterShader( "icons/noammo" );
+
+	// OSPx - Country Flags (by mcwf)
+	cgs.media.countryFlags = trap_R_RegisterShaderNoMip("gfx/flags/world_flags");
 
 	// powerup shaders
 //	cgs.media.quadShader = trap_R_RegisterShader("powerups/quad" );

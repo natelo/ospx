@@ -280,7 +280,18 @@ void CG_DrawRect( float x, float y, float width, float height, float size, const
 	trap_R_SetColor( NULL );
 }
 
+/*
+================
+OSPx - CG_DrawPicST (Country Flags by mcwf)
 
+Allows passing of st co-ords
+Coordinates are 640*480 virtual values
+=================
+*/
+void CG_DrawPicST(float x, float y, float width, float height, float s0, float t0, float s1, float t1, qhandle_t hShader) {
+	CG_AdjustFrom640(&x, &y, &width, &height);
+	trap_R_DrawStretchPic(x, y, width, height, s0, t0, s1, t1, hShader);
+}
 
 /*
 ================

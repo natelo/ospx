@@ -467,11 +467,14 @@ typedef struct {
 	int playerWeapon;               // DHM - Nerve :: for GT_WOLF
 	int playerItem;                 // DHM - Nerve :: for GT_WOLF
 	int playerSkin;                 // DHM - Nerve :: for GT_WOLF
-	int spawnObjectiveIndex;         // JPW NERVE index of objective to spawn nearest to (returned from UI)
+	int spawnObjectiveIndex;        // JPW NERVE index of objective to spawn nearest to (returned from UI)
 	int latchPlayerType;            // DHM - Nerve :: for GT_WOLF not archived
 	int latchPlayerWeapon;          // DHM - Nerve :: for GT_WOLF not archived
 	int latchPlayerItem;            // DHM - Nerve :: for GT_WOLF not archived
 	int latchPlayerSkin;            // DHM - Nerve :: for GT_WOLF not archived
+
+	// OSPx
+	unsigned int uci;				// Country Flags
 } clientSession_t;
 
 //
@@ -1236,6 +1239,7 @@ extern vmCvar_t g_dbgRevive;
 
 // OSPx
 extern vmCvar_t g_spectatorInactivity;
+extern vmCvar_t g_showFlags;
 // -OSPx
 
 void    trap_Printf( const char *fmt );
@@ -1483,3 +1487,18 @@ void G_HistoricalTrace(gentity_t* ent, trace_t *results, const vec3_t start, con
 //
 void G_loadMatchGame(void);
 
+//
+// g_geoip.c
+//
+typedef struct GeoIPTag {
+	fileHandle_t GeoIPDatabase;
+	unsigned char * cache;
+	unsigned int memsize;
+} GeoIP;
+
+unsigned long GeoIP_addr_to_num(const char *addr);
+unsigned int GeoIP_seek_record(GeoIP *gi, unsigned long ipnum);
+void GeoIP_open(void);
+void GeoIP_close(void);
+extern GeoIP * gidb;
+void G_ReadIP(gclient_t *client);

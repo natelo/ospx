@@ -1376,7 +1376,10 @@ void ClientUserinfoChanged( int clientNum ) {
 	s = Info_ValueForKey( userinfo, "ip" );
 	if ( s && !strcmp( s, "localhost" ) ) {
 		client->pers.localClient = qtrue;
-	}
+	} // OSPx - Country Flags
+	else if (!(ent->r.svFlags & SVF_BOT) && !strlen(s)) {
+		sscanf(s, "%[^z]s:%*s", s);
+	} 
 
 	// check the item prediction
 	s = Info_ValueForKey( userinfo, "cg_predictItems" );
@@ -1626,6 +1629,38 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 			return "BotConnectfailed";
 		}
 	}
+
+	// OSPx - Country Flags
+	if (gidb != NULL) {
+		value = Info_ValueForKey(userinfo, "ip");
+		if (!strcmp(value, "localhost")) {
+			client->sess.uci = 0;
+		}
+		else {
+			unsigned long ip = GeoIP_addr_to_num(value);
+
+			if (((ip & 0xFF000000) == 0x0A000000) ||
+				((ip & 0xFFF00000) == 0xAC100000) ||
+				((ip & 0xFFFF0000) == 0xC0A80000)) {
+
+				client->sess.uci = 0;
+			}
+			else {
+				unsigned int ret = GeoIP_seek_record(gidb, ip);
+
+				if (ret > 0) {
+					client->sess.uci = ret;
+				}
+				else {
+					client->sess.uci = 246;
+					G_LogPrintf("GeoIP: This IP:%s cannot be located\n", value);
+				}
+			}
+		}
+	}
+	else {
+		client->sess.uci = 255;
+	} // -OSPx
 
 	// get and distribute relevent paramters
 	G_LogPrintf( "ClientConnect: %i\n", clientNum );

@@ -1514,6 +1514,9 @@ typedef struct {
 	qhandle_t selectCursor;
 	qhandle_t sizeCursor;
 
+	// OSPx - Country Flags
+	qhandle_t countryFlags;
+
 } cgMedia_t;
 
 
@@ -1831,6 +1834,7 @@ extern vmCvar_t cg_zoomedFOV;
 extern vmCvar_t cg_zoomedSens;
 extern vmCvar_t	vp_drawnames;
 extern vmCvar_t	cg_drawNames;
+extern vmCvar_t	cg_showFlags;
 // -OSPx
 
 //
@@ -1934,6 +1938,9 @@ char* CG_TranslateString( const char *string );
 void CG_SaveTransTable();
 void CG_ReloadTranslation();
 // -NERVE - SMF
+
+// OSPx - Country Flags
+void CG_DrawPicST(float x, float y, float width, float height, float s0, float t0, float s1, float t1, qhandle_t hShader);
 
 //
 // cg_draw.c, cg_newDraw.c
