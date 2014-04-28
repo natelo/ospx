@@ -37,7 +37,8 @@ typedef struct {
 	int cvarFlags;
 	int modificationCount;          // for tracking changes
 	qboolean trackChange;           // track this variable, and announce if changed
-	qboolean teamShader;      // track and if changed, update shader state
+	qboolean fConfigReset;          // OSP: set this var to the default on a config reset
+	qboolean teamShader;			// track and if changed, update shader state
 } cvarTable_t;
 
 gentity_t g_entities[MAX_GENTITIES];
@@ -1071,7 +1072,26 @@ void G_UpdateCvars( void ) {
 	}
 }
 
+/*
+=================
+OSPx - G_wipeCvars
 
+Reset particular server variables back to defaults if a config is voted in.
+=================
+*/
+void G_wipeCvars(void) {
+	int i;
+	cvarTable_t *pCvars;
+
+	for (i = 0, pCvars = gameCvarTable; i < gameCvarTableSize; i++, pCvars++) {
+		if (pCvars->vmCvar && pCvars->fConfigReset) {
+			G_Printf("set %s %s\n", pCvars->cvarName, pCvars->defaultString);
+			trap_Cvar_Set(pCvars->cvarName, pCvars->defaultString);
+		}
+	}
+
+	G_UpdateCvars();
+}
 
 /*
 ==============

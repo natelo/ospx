@@ -1036,6 +1036,9 @@ void SendScoreboardMessageToAllClients( void );
 void QDECL G_Printf( const char *fmt, ... );
 void QDECL G_DPrintf( const char *fmt, ... );
 void QDECL G_Error( const char *fmt, ... );
+void G_UpdateCvars(void);
+// OSPx 
+void G_wipeCvars(void);
 
 //
 // g_client.c
