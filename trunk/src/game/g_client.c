@@ -1603,7 +1603,6 @@ void ClientUserinfoChanged( int clientNum ) {
 	G_DPrintf( "ClientUserinfoChanged: %i :: %s\n", clientNum, s );
 }
 
-
 /*
 ===========
 ClientConnect

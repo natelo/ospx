@@ -3768,6 +3768,9 @@ char *eventnames[] = {
 	"EV_GRENADE_BOUNCE",     // eventParm will be the soundindex
 	"EV_GENERAL_SOUND",
 	"EV_GLOBAL_SOUND",       // no attenuation
+// OSPx
+	"EV_ANNOUNCER_SOUND",	// Deals with countdown
+// -OSPx
 	"EV_BULLET_HIT_FLESH",
 	"EV_BULLET_HIT_WALL",
 	"EV_MISSILE_HIT",

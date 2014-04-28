@@ -796,6 +796,12 @@ static void CG_MapRestart( void ) {
 		}
 	}
 #endif
+
+	// OSPx - Fight Announcement 
+	if (cg.warmup == 0 && cg_announcer.integer)
+		// Poor man's solution...replace font one of this days as this is ridicoulus.	:C		
+		CG_AddAnnouncer("F IGH T !", cgs.media.countFightSound, 1.6f, 1200, 1.0f, 0.0f, 0.0f, ANNOUNCER_NORMAL);
+
 	trap_Cvar_Set( "cg_thirdPerson", "0" );
 }
 

@@ -1018,6 +1018,13 @@ typedef struct {
 	qboolean	renderingFreeCam;
 	specName_t	specOnScreenNames[MAX_CLIENTS];
 
+	// Announcer
+	int		centerPrintAnnouncerTime;
+	char	*centerPrintAnnouncer;
+	float	centerPrintAnnouncerScale;
+	int		centerPrintAnnouncerDuration;
+	vec3_t	centerPrintAnnouncerColor;
+	int		centerPrintAnnouncerMode;
 // -OSPx
 
 	pmoveExt_t pmext;
@@ -1835,6 +1842,7 @@ extern vmCvar_t cg_zoomedSens;
 extern vmCvar_t	vp_drawnames;
 extern vmCvar_t	cg_drawNames;
 extern vmCvar_t	cg_showFlags;
+extern vmCvar_t cg_announcer;
 // -OSPx
 
 //
@@ -2000,6 +2008,13 @@ void CG_Text_Paint_Ext(float x, float y, float scalex, float scaley, vec4_t colo
 void CG_Text_Paint_ext2(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
 int CG_Text_Width_ext2(const char *text, float scale, int limit);
 int CG_Text_Height_ext2(const char *text, float scale, int limit);
+// - Announcer
+void CG_AddAnnouncer(char *text, sfxHandle_t sound, float scale, int duration, float r, float g, float b, int mode);
+void CG_DrawAnnouncer(void);
+#define ANNOUNCER_NORMAL 1
+#define ANNOUNCER_SINE 2
+#define ANNOUNCER_INVERSE_SINE 3
+#define ANNOUNCER_TAN 4
 
 // -OSPx
 

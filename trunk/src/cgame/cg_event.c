@@ -2236,7 +2236,34 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 		break;
 		// dhm - end
+// OSPx
+	// Announcer sounds
+	case EV_ANNOUNCER_SOUND:
+		DEBUGNAME("EV_ANNOUNCER_SOUND");
+		if (cg_announcer.integer) {
+			// Ridah, check for a sound script
+			s = CG_ConfigString(CS_SOUNDS + es->eventParm);
+			if (!strstr(s, ".wav")) {
+				if (CG_SoundPlaySoundScript(s, NULL, es->number)) {
+					break;
+				}
+				// try with .wav
+				Q_strncpyz(tempStr, s, sizeof(tempStr));
+				Q_strcat(tempStr, sizeof(tempStr), ".wav");
+				s = tempStr;
+			}
+			// done.
 
+			if (cgs.gameSounds[es->eventParm]) {
+				trap_S_StartSound(NULL, cg.snap->ps.clientNum, CHAN_ANNOUNCER, cgs.gameSounds[es->eventParm]);
+			}
+			else {
+				s = CG_ConfigString(CS_SOUNDS + es->eventParm);
+				trap_S_StartSound(NULL, cg.snap->ps.clientNum, CHAN_ANNOUNCER, CG_CustomSound(es->number, s));
+			}
+		}
+		break;
+// -OSPx
 	case EV_PAIN:
 		// local player sounds are triggered in CG_CheckLocalSounds,
 		// so ignore events on the player

@@ -3716,6 +3716,9 @@ static void CG_Draw2D( void ) {
 		// -NERVE - SMF
 	}
 
+	// OSPx - Announcer
+	CG_DrawAnnouncer();
+
 	// Ridah, draw flash blends now
 	CG_DrawFlashBlend();
 }
@@ -4146,4 +4149,73 @@ int CG_Text_Width_Ext(const char *text, float scale, int limit, fontInfo_t* font
 	return out * useScale;
 }
 
+/*
+=====================
+CG_DrawAnnouncer
 
+Ported from ET
+=====================
+*/
+
+void CG_DrawAnnouncer(void)
+{
+	int		x, y, w, h;
+	float	scale, fade;
+	vec4_t	color;
+
+	if (!cg_announcer.integer || cg.centerPrintAnnouncerTime <= cg.time)
+		return;
+
+	fade = (float)(cg.centerPrintAnnouncerTime - cg.time) / cg.centerPrintAnnouncerDuration;
+
+	color[0] = cg.centerPrintAnnouncerColor[0];
+	color[1] = cg.centerPrintAnnouncerColor[1];
+	color[2] = cg.centerPrintAnnouncerColor[2];
+
+	switch (cg.centerPrintAnnouncerMode){
+	default:
+	case ANNOUNCER_NORMAL:
+		color[3] = fade;
+		break;
+	case ANNOUNCER_SINE:
+		color[3] = sin(M_PI * fade);
+		break;
+	case ANNOUNCER_INVERSE_SINE:
+		color[3] = 1 - sin(M_PI * fade);
+		break;
+	case ANNOUNCER_TAN:
+		color[3] = tan(M_PI * fade);
+	}
+
+	scale = (1.1f - color[3]) * cg.centerPrintAnnouncerScale;
+
+	h = CG_Text_Height_Ext(cg.centerPrintAnnouncer, scale, 0, &cgDC.Assets.textFont);
+
+	y = (SCREEN_HEIGHT - h) / 2;
+
+	w = CG_Text_Width_Ext(cg.centerPrintAnnouncer, scale, 0, &cgDC.Assets.textFont);
+
+	x = (SCREEN_WIDTH - w) / 2;
+
+	CG_Text_Paint_Ext(x, y, scale, scale, color, cg.centerPrintAnnouncer, 0, 0, 0, &cgDC.Assets.textFont);
+}
+
+void CG_AddAnnouncer(char *text, sfxHandle_t sound, float scale, int duration, float r, float g, float b, int mode)
+{
+	if (!cg_announcer.integer)
+		return;
+
+	if (sound)
+		trap_S_StartLocalSound(sound, CHAN_ANNOUNCER);
+
+	if (text){
+		cg.centerPrintAnnouncer = text;
+		cg.centerPrintAnnouncerTime = cg.time + duration;
+		cg.centerPrintAnnouncerScale = scale;
+		cg.centerPrintAnnouncerDuration = duration;
+		cg.centerPrintAnnouncerColor[0] = r;
+		cg.centerPrintAnnouncerColor[1] = g;
+		cg.centerPrintAnnouncerColor[2] = b;
+		cg.centerPrintAnnouncerMode = mode;
+	}
+}
