@@ -1048,9 +1048,12 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 //
 // g_mem.c
 //
-void *G_Alloc( int size );
-void G_InitMemory( void );
-void Svcmd_GameMem_f( void );
+// Tardo - Replaced these to use the same memory pool. Avoids leaks.
+qboolean G_CanAlloc(unsigned int size);
+void *G_Alloc(unsigned int size);
+void G_Free(void *ptr);
+void G_InitMemory(void);
+void Svcmd_GameMem_f(void);
 
 //
 // g_session.c
