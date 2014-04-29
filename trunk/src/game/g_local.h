@@ -1297,6 +1297,7 @@ extern vmCvar_t server_autoconfig;
 extern vmCvar_t match_mutespecs;
 extern vmCvar_t match_warmupDamage;
 extern vmCvar_t match_readypercent;
+extern vmCvar_t match_minplayers;
 extern vmCvar_t g_nextmap;
 
 extern vmCvar_t vote_allow_comp;

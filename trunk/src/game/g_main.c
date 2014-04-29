@@ -172,6 +172,7 @@ vmCvar_t server_autoconfig;
 vmCvar_t match_mutespecs;
 vmCvar_t match_warmupDamage;
 vmCvar_t match_readypercent;
+vmCvar_t match_minplayers;
 vmCvar_t g_nextmap;
 
 // Voting
@@ -339,6 +340,7 @@ cvarTable_t gameCvarTable[] = {
 	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
 	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
 	{ &match_readypercent, "match_readypercent", "100", 0, 0, qfalse, qtrue },
+	{ &match_minplayers, "match_minplayers", MATCH_MINPLAYERS, 0, 0, qfalse, qfalse },
 	{ &g_nextmap, "nextmap", "", CVAR_TEMP },
 
 	{ &vote_allow_comp, "vote_allow_comp", "1", 0, 0, qfalse, qfalse },
@@ -2557,29 +2559,40 @@ NERVE - SMF - Once a frame, check for changes in wolf MP player state
 =============
 */
 void CheckWolfMP() {
-	// TTimo unused
-//	static qboolean latch = qfalse;
+	
+	if (g_gametype.integer >= GT_WOLF) {
+		if (g_gamestate.integer == GS_PLAYING || g_gamestate.integer == GS_INTERMISSION) {
+			if (level.intermissiontime && g_gamestate.integer != GS_INTERMISSION) {
+				trap_Cvar_Set("gamestate", va("%i", GS_INTERMISSION));
+			}
+			return;
+		}
 
-	// check because we run 3 game frames before calling Connect and/or ClientBegin
-	// for clients on a map_restart
-	if ( g_gametype.integer < GT_WOLF ) {
-		return;
-	}
+		// check warmup latch
+		if (g_gamestate.integer == GS_WARMUP) {
+			if (!g_doWarmup.integer ||
+				(level.numPlayingClients >= match_minplayers.integer &&
+				level.lastRestartTime + 1000 < level.time /* && G_readyMatchState() */ )) 
+			{
+				int delay = (g_warmup.integer < 10) ? 11 : g_warmup.integer + 1;
 
-	// NERVE - SMF - check game state
-	CheckGameState();
+				level.warmupTime = level.time + (delay * 1000);
+				trap_Cvar_Set("gamestate", va("%i", GS_WARMUP_COUNTDOWN));
+				trap_Cvar_Update(&g_gamestate);
+				trap_SetConfigstring(CS_WARMUP, va("%i", level.warmupTime));
+			}
+		}
 
-	if ( level.warmupTime == 0 ) {
-		return;
-	}
-
-	// if the warmup time has counted down, restart
-	if ( level.time > level.warmupTime ) {
-		level.warmupTime += 10000;
-		trap_Cvar_Set( "g_restarted", "1" );
-		trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
-		level.restarted = qtrue;
-		return;
+		// if the warmup time has counted down, restart
+		if (g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
+			if (level.time > level.warmupTime) {
+				level.warmupTime += 10000;
+				trap_Cvar_Set("g_restarted", "1");
+				trap_SendConsoleCommand(EXEC_APPEND, "map_restart 0\n");
+				level.restarted = qtrue;
+				return;
+			}
+		}
 	}
 }
 // -NERVE - SMF

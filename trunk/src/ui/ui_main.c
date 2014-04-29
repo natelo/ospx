@@ -7675,6 +7675,7 @@ cvarTable_t cvarTable[] = {
 	{ &ui_crosshairAlphaAlt, "cg_crosshairAlphaAlt", "1.0", CVAR_ARCHIVE },
 	{ &ui_crosshairAlpha, "cg_crosshairAlpha", "1.0", CVAR_ARCHIVE },
 	// Game mappings
+	/*
 	{ NULL, "bot_enable", "1", CVAR_ARCHIVE },
 	{ NULL, "bot_minplayers", "0", CVAR_ARCHIVE },
 	{ NULL, "g_altStopwatchMode", "0", CVAR_ARCHIVE },
@@ -7688,7 +7689,7 @@ cvarTable_t cvarTable[] = {
 	{ NULL, "sv_maxRate", "0", CVAR_ARCHIVE },
 	{ NULL, "g_spectatorInactivity", "0", CVAR_ARCHIVE },
 	{ NULL, "match_latejoin", "1", CVAR_ARCHIVE },
-	//{ NULL, "match_minplayers", MATCH_MINPLAYERS, CVAR_ARCHIVE }, //FIXME!
+	{ NULL, "match_minplayers", MATCH_MINPLAYERS, CVAR_ARCHIVE },
 	{ NULL, "match_mutespecs", "0", CVAR_ARCHIVE },
 	{ NULL, "match_readypercent", "100", CVAR_ARCHIVE },
 	{ NULL, "match_timeoutcount", "3", CVAR_ARCHIVE },
@@ -7716,6 +7717,7 @@ cvarTable_t cvarTable[] = {
 	{ NULL, "vote_allow_kick", "1", CVAR_ARCHIVE },
 	{ NULL, "vote_limit", "5", CVAR_ARCHIVE },
 	{ NULL, "vote_percent", "50", CVAR_ARCHIVE },
+	*/
 // -OSPx
 
 	{ &ui_hudAlpha, "cg_hudAlpha", "1.0", CVAR_ARCHIVE }

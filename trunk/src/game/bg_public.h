@@ -1753,4 +1753,7 @@ typedef struct {
 extern const voteType_t voteToggles[];
 extern int numVotesAvailable;
 
+// Match
+#define MATCH_MINPLAYERS "1" 
+
 // -OSPx
