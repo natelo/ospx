@@ -185,6 +185,7 @@ extern const unsigned int aReinfSeeds[MAX_REINFSEEDS];
 
 // OSPx
 #define CS_REINFSEEDS           37      // Reinforcement seeds
+#define CS_SERVERTOGGLES        38      // Shows current enable/disabled settings (for voting UI)
 // -OSPx
 
 #define CS_MODELS               64

@@ -244,6 +244,11 @@ typedef struct modelDef_s {
 #define CVAR_HIDE       0x00000008
 #define CVAR_NOTOGGLE   0x00000010
 
+// OSPx - "setting" flags for items
+#define SVS_DISABLED_SHOW   0x01
+#define SVS_ENABLED_SHOW    0x02
+// -OSPx
+
 #define UI_MAX_TEXT_LINES 64
 
 typedef struct itemDef_s {
@@ -279,6 +284,12 @@ typedef struct itemDef_s {
 	float special;                  // used for feeder id's etc.. diff per type
 	int cursorPos;                  // cursor position in characters
 	void *typeData;                 // type specific data ptr's
+
+	// OSPx - on-the-fly enable/disable of items
+	int settingTest;
+	int settingFlags;
+	int voteFlag;
+
 } itemDef_t;
 
 typedef struct {
@@ -407,6 +418,10 @@ typedef struct {
 	void ( *stopCinematic )( int handle );
 	void ( *drawCinematic )( int handle, float x, float y, float w, float h );
 	void ( *runCinematicFrame )( int handle );
+
+	// OSPx
+	int(*getConfigString)(int index, char* buff, int buffsize);
+	// -OSPx
 
 	float yscale;
 	float xscale;
