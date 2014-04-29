@@ -1036,6 +1036,8 @@ void AddMaxLivesIP( char *str );
 void AddMaxLivesGUID( char *str );
 void ClearMaxLivesIP();
 void ClearMaxLivesGUID();
+void Svcmd_ResetMatch_f(qboolean fDoReset, qboolean fDoRestart);
+void Svcmd_ShuffleTeams_f(void);
 
 //
 // g_weapon.c
@@ -1094,7 +1096,7 @@ void G_RunClient( gentity_t *ent );
 // g_team.c
 //
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
-
+void G_shuffleTeams(void);
 
 //
 // g_mem.c
@@ -1552,6 +1554,8 @@ void G_HistoricalTrace(gentity_t* ent, trace_t *results, const vec3_t start, con
 // g_match.c
 //
 void G_loadMatchGame(void);
+void G_resetRoundState(void);
+void G_resetModeState(void);
 
 //
 // g_geoip.c

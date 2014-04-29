@@ -1587,3 +1587,61 @@ void SP_team_WOLF_checkpoint( gentity_t *ent ) {
 
 	trap_LinkEntity( ent );
 }
+
+
+/*
+=================
+G_shuffleTeams
+
+OSPx - Shuffle's teams
+=================
+*/
+void G_shuffleTeams(void) {
+	int count = 0, tmpCount, i;
+	int players[MAX_CLIENTS];
+	char	cmd[MAX_TOKEN_CHARS];
+
+	trap_Argv(1, cmd, sizeof(cmd));
+	memset(players, -1, sizeof(players));
+
+	if (g_gamestate.integer == GS_RESET)
+		return;
+
+	//G_teamReset(TEAM_RED, qtrue);
+	//G_teamReset(TEAM_BLUE, qtrue);
+
+	for (i = 0; i < MAX_CLIENTS; i++)
+	{
+		if ((!g_entities[i].inuse) || (level.clients[i].pers.connected != CON_CONNECTED))
+			continue;
+		
+		if ((level.clients[i].sess.sessionTeam != TEAM_RED) && (level.clients[i].sess.sessionTeam != TEAM_BLUE))
+			continue;
+
+		players[count] = i;
+		count++;
+	}
+
+	tmpCount = count;	
+	for (i = 0; i < count; i++)
+	{
+		int j;
+
+		do {
+			j = (rand() % count);
+		} while (players[j] == -1);
+		
+		if (i & 1)
+			level.clients[players[j]].sess.sessionTeam = TEAM_BLUE;
+		else
+			level.clients[players[j]].sess.sessionTeam = TEAM_RED;
+
+		ClientUserinfoChanged(players[j]);
+		ClientBegin(players[j]);
+
+		players[j] = players[tmpCount - 1];
+		players[tmpCount - 1] = -1;
+		tmpCount--;
+	}
+	AP("cp \"^1Teams have been shuffled!\n\"");
+}

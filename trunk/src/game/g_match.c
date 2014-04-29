@@ -67,3 +67,26 @@ void G_loadMatchGame(void) {
 
 	trap_SetConfigstring(CS_REINFSEEDS, strReinfSeeds);
 }
+
+/*
+=================
+Reset Round state
+=================
+*/
+void G_resetRoundState(void) {
+	if (g_gametype.integer == GT_WOLF_STOPWATCH) {
+		trap_Cvar_Set("g_currentRound", "0");
+	}
+}
+
+/*
+=================
+Reset mode state
+=================
+*/
+void G_resetModeState(void) {
+	if (g_gametype.integer == GT_WOLF_STOPWATCH) {
+		trap_Cvar_Set("g_nextTimeLimit", "0");
+	}
+}
+

@@ -49,15 +49,11 @@ static const char *DEACTIVATED = "DEACTIVATED";
 static const char *ENABLED = "ENABLED";
 static const char *DISABLED = "DISABLED";
 
-static const char *gameNames[] = {
-	"Single Player",
-	"Cooperative",
+static const char *gameNames[] = {	
 	"Objective",
 	"Stopwatch",
-	"Campaign",
-	"Last Man Standing"
+	"Capture The Flag"
 };
-
 
 //
 // Update info:
@@ -86,7 +82,7 @@ static const vote_reference_t aVoteInfo[] = {
 	{ 0x1ff, "nextmap",			G_Nextmap_v,		"Load Next Map",				"^7\n  Loads the next map or campaign in the map queue" },
 	{ 0x1ff, "pub",				G_Pub_v,			"Load Public Settings",			"^7\n  Loads standard public settings for the current mode" },
 	{ 0x1ff, "referee",			G_Referee_v,		"Referee",						" <player_id>^7\n  Elects a player to have admin abilities" },
-	{ 0x1ff, "shuffleteamsxp",	G_ShuffleTeams_v,	"Shuffle Teams by XP",			" ^7\n  Randomly place players on each team, based on XP" },
+	{ 0x1ff, "shuffleteams",	G_ShuffleTeams_v,	"Shuffle Teams",				" ^7\n  Randomly place players on each team" },
 	{ 0x1ff, "startmatch",		G_StartMatch_v,		"Start Match",					" ^7\n  Sets all players to \"ready\" status to start the match" },
 	{ 0x1ff, "swapteams",		G_SwapTeams_v,		"Swap Teams",					" ^7\n  Switch the players on each team" },
 	{ 0x1ff, "friendlyfire",	G_FriendlyFire_v,	"Friendly Fire",				" <0|1>^7\n  Toggles ability to hurt teammates" },
@@ -119,7 +115,6 @@ int G_voteCmdCheck( gentity_t *ent, char *arg, char *arg2, qboolean fRefereeCmd 
 
 	return( G_NOTFOUND );
 }
-
 
 // Voting help summary.
 void G_voteHelp( gentity_t *ent, qboolean fShowVote ) {
