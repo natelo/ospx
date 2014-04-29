@@ -2422,31 +2422,49 @@ void ClientCommand( int clientNum ) {
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
 	if ( Q_stricmp( cmd, "say" ) == 0 ) {
-		Cmd_Say_f( ent, SAY_ALL, qfalse );
-		return;
+		// OSPx - Ignored
+		if (!ent->client->sess.ignored) {
+			Cmd_Say_f(ent, SAY_ALL, qfalse);
+			return;
+		}
 	}
 	if ( Q_stricmp( cmd, "say_team" ) == 0 ) {
-		Cmd_Say_f( ent, SAY_TEAM, qfalse );
-		return;
+		// OSPx - Ignored
+		if (!ent->client->sess.ignored) {
+			Cmd_Say_f(ent, SAY_TEAM, qfalse);
+			return;
+		}
 	}
 	// NERVE - SMF
 	if ( Q_stricmp( cmd, "say_limbo" ) == 0 ) {
-		Cmd_Say_f( ent, SAY_LIMBO, qfalse );
-		return;
+		// OSPx - Ignored
+		if (!ent->client->sess.ignored) {
+			Cmd_Say_f(ent, SAY_LIMBO, qfalse);
+			return;
+		}
 	}
 	if ( Q_stricmp( cmd, "vsay" ) == 0 ) {
-		Cmd_Voice_f( ent, SAY_ALL, qfalse, qfalse );
-		return;
+		// OSPx - Ignored
+		if (!ent->client->sess.ignored) {
+			Cmd_Voice_f(ent, SAY_ALL, qfalse, qfalse);
+			return;
+		}
 	}
 	if ( Q_stricmp( cmd, "vsay_team" ) == 0 ) {
-		Cmd_Voice_f( ent, SAY_TEAM, qfalse, qfalse );
-		return;
+		// OSPx - Ignored
+		if (!ent->client->sess.ignored) {
+			Cmd_Voice_f(ent, SAY_TEAM, qfalse, qfalse);
+			return;
+		}
 	}
 	// -NERVE - SMF
 
 	if ( Q_stricmp( cmd, "tell" ) == 0 ) {
-		Cmd_Tell_f( ent );
-		return;
+		// OSPx - Ignored
+		if (!ent->client->sess.ignored) {
+			Cmd_Tell_f(ent);
+			return;
+		}
 	}
 	if ( Q_stricmp( cmd, "score" ) == 0 ) {
 		Cmd_Score_f( ent );
@@ -2491,7 +2509,10 @@ void ClientCommand( int clientNum ) {
 	else if ( Q_stricmp( cmd, "where" ) == 0 ) {
 		Cmd_Where_f( ent );
 	} else if ( Q_stricmp( cmd, "callvote" ) == 0 )  {
-		Cmd_CallVote_f( ent );
+		// OSPx - Ignored
+		if (!ent->client->sess.ignored) {
+			Cmd_CallVote_f(ent);
+		}
 	} else if ( Q_stricmp( cmd, "vote" ) == 0 )  {
 		Cmd_Vote_f( ent );
 	} else if ( Q_stricmp( cmd, "gc" ) == 0 )  {
