@@ -1138,10 +1138,6 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey( configstring, "t" );
 	newInfo.team = atoi( v );
 
-	// OSPx - User status
-	v = Info_ValueForKey(configstring, "st");
-	newInfo.usrStatus = atoi(v);
-
 //----(SA) modified this for head separation
 
 	// head
@@ -1228,25 +1224,6 @@ void CG_NewClientInfo( int clientNum ) {
 			CG_LoadClientInfo( &newInfo );
 		}
 	}
-
-	// OSPx - Admins
-	if (clientNum == cg.clientNum) {
-		trap_Cvar_Set("authLevel", va("%i", newInfo.usrStatus));
-
-		if (newInfo.usrStatus != ci->usrStatus) {
-			if (newInfo.usrStatus <= USR_REGULAR) {
-				const char *info = CG_ConfigString(CS_SERVERINFO);
-
-				trap_Cvar_Set("cg_ui_voteFlags", Info_ValueForKey(info, "voteFlags"));
-				CG_Printf("[cgnotify]^3*** You have been stripped of your Privileged user status! ***\n");
-
-			}
-			else {
-				trap_Cvar_Set("cg_ui_voteFlags", "0");
-				CG_Printf("[cgnotify]^2*** You have been authorized \"%s\" status ***\n", ((newInfo.usrStatus == USR_ADMIN) ? "Privileged user" : "referee"));				
-			}
-		}
-	} // - OSPx
 
 	// replace whatever was there with the new one
 	newInfo.infoValid = qtrue;

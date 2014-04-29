@@ -840,9 +840,6 @@ typedef struct {
 	int playerNumber;
 	qboolean teamLeader;
 	char playerNames[MAX_CLIENTS][MAX_NAME_LENGTH];
-// OSPx
-	qboolean playerMuted[MAX_CLIENTS];
-// -OSPx
 	char teamNames[MAX_CLIENTS][MAX_NAME_LENGTH];
 	int teamClientNums[MAX_CLIENTS];
 

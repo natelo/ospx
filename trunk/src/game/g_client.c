@@ -1419,10 +1419,6 @@ void ClientUserinfoChanged( int clientNum ) {
 	// check for local client	
 	if ( s && !strcmp( s, "localhost" ) ) {
 		client->pers.localClient = qtrue;
-// OSPx - Local client is maxed out to highest level Admin.
-#ifndef _DEBUG
-		client->sess.status = ADMIN_5; 
-#endif
 	} // OSPx - Country Flags
 	else if (!(ent->r.svFlags & SVF_BOT) && !strlen(s)) {
 		// To solve the IP bug..
@@ -1576,24 +1572,22 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	if ( ent->r.svFlags & SVF_BOT ) {
 
-		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\country\\%i\\mu\\%i\\st\\%i",
+		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s",
 				client->pers.netname, client->sess.sessionTeam, model, head, c1,
 				client->pers.maxHealth, client->sess.wins, client->sess.losses,
-				Info_ValueForKey(userinfo, "skill"), client->sess.uci, 
-				(client->sess.muted ? 1 : 0), client->sess.status );
+				Info_ValueForKey( userinfo, "skill" ) );
 	} else {
-		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i\\mu\\%i\\st\\%i",
+		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i",
 				client->pers.netname, client->sess.sessionTeam, model, head, c1,
-				client->pers.maxHealth, client->sess.wins, client->sess.losses, 
-				client->sess.uci, (client->sess.muted ? 1 : 0), client->sess.status );
+				client->pers.maxHealth, client->sess.wins, client->sess.losses, client->sess.uci );
 	}
 
 //----(SA) end
 
 	trap_SetConfigstring( CS_PLAYERS + clientNum, s );
 
-	// OSPx - We need to send client private info (ip..) only to log and not a configstring,
-	// as \configstrings reveals all user data in it which is something we don't want..
+	// OSPx - We need to send client private info (ip..) only to log and not a configstring
+	// as \configstrings reveals user data which is something we don't want..
 	if (!(ent->r.svFlags & SVF_BOT)) {
 		char *team;
 
@@ -1601,18 +1595,8 @@ void ClientUserinfoChanged( int clientNum ) {
 			   ((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
 
 		// Print essentials and skip the garbage		
-		s = va("name\\%s\\team\\%s\\IP\\%s\\country\\%i\\muted\\%s\\status\\%i",
-			client->pers.netname, team, clientIP(client, qtrue), client->sess.uci, 
-			(client->sess.muted ? "yes" : "no"), client->sess.status);
-	}
-	// Account for bots..
-	else {
-		char *team;
-
-		team = (client->sess.sessionTeam == TEAM_RED) ? "Axis" :
-			((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
-
-		s = va("Bot: name\\%s\\team\\%s", client->pers.netname, team);
+		s = va("name\\%s\\team\\%s\\IP\\%s\\country\\%s",
+			client->pers.netname, team, clientIP(client, qtrue), client->sess.uci);
 	}
 
 	// this is not the userinfo actually, it's the config string

@@ -41,8 +41,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "tr_types.h"
 #include "../game/bg_public.h"
 #include "cg_public.h"
-// OSPx - We need this as well..
-#include "../ui/ui_shared.h"
+
 
 #define POWERUP_BLINKS      5
 
@@ -599,9 +598,6 @@ typedef struct {
 	char headModelName[MAX_QPATH];
 	gender_t gender;                // from model
 	// -NERVE - SMF
-
-	// OSPx
-	int usrStatus;
 } clientInfo_t;
 
 
@@ -1854,8 +1850,6 @@ extern vmCvar_t cg_announcer;
 extern vmCvar_t cg_autoAction;
 extern vmCvar_t cg_useScreenshotJPEG;
 extern vmCvar_t cg_uinfo;
-
-extern vmCvar_t authLevel;
 
 extern vmCvar_t int_cl_maxpackets;
 extern vmCvar_t int_cl_timenudge;

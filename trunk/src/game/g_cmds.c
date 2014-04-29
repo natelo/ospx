@@ -957,11 +957,17 @@ void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char 
 	if ( mode == SAY_TEAM  && !OnSameTeam( ent, other ) ) {
 		return;
 	}
-	
+	// no chatting to players in tournements
+	if ( g_gametype.integer == GT_TOURNAMENT
+		 && other->client->sess.sessionTeam == TEAM_FREE
+		 && ent->client->sess.sessionTeam != TEAM_FREE ) {
+		return;
+	}
+
 	// NERVE - SMF - if spectator, no chatting to players in WolfMP
-	if (match_mutespecs.integer && !ent->client->sess.status && // OSPx
-		((ent->client->sess.sessionTeam == TEAM_FREE && other->client->sess.sessionTeam != TEAM_FREE) ||
-		(ent->client->sess.sessionTeam == TEAM_SPECTATOR && other->client->sess.sessionTeam != TEAM_SPECTATOR))) {
+	if ( g_gametype.integer >= GT_WOLF
+		 && ( ( ent->client->sess.sessionTeam == TEAM_FREE && other->client->sess.sessionTeam != TEAM_FREE ) ||
+			  ( ent->client->sess.sessionTeam == TEAM_SPECTATOR && other->client->sess.sessionTeam != TEAM_SPECTATOR ) ) ) {
 		return;
 	}
 
@@ -1122,11 +1128,8 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
 	if ( mode == SAY_TEAM && !OnSameTeam( ent, other ) ) {
 		return;
 	}
-	
-	// OSPx - Ignore spectators if set..
-	if (match_mutespecs.integer && !ent->client->sess.status &&
-		ent->client->sess.sessionTeam == TEAM_SPECTATOR && other->client->sess.sessionTeam != TEAM_SPECTATOR) 
-	{
+	// no chatting to players in tournements
+	if ( ( g_gametype.integer == GT_TOURNAMENT ) ) {
 		return;
 	}
 
@@ -1415,12 +1418,6 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 
 	if ( !g_voteFlags.integer ) {
 		trap_SendServerCommand( ent - g_entities, "print \"Voting not enabled on this server.\n\"" );
-		return;
-	}
-
-	// OSPx - Ignored patch
-	if (ent->client->sess.muted) {
-		CPx(ent - g_entities, "cp \"You are ^1muted^7!\n\"2");
 		return;
 	}
 
@@ -2425,48 +2422,30 @@ void ClientCommand( int clientNum ) {
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
 	if ( Q_stricmp( cmd, "say" ) == 0 ) {
-		// OSPx - Ignored patch
-		if (!ent->client->sess.muted) {
-			Cmd_Say_f(ent, SAY_ALL, qfalse);
-		}
+		Cmd_Say_f( ent, SAY_ALL, qfalse );
 		return;
 	}
 	if ( Q_stricmp( cmd, "say_team" ) == 0 ) {
-		// OSPx - Ignored patch
-		if (!ent->client->sess.muted) {
-			Cmd_Say_f(ent, SAY_TEAM, qfalse);
-		}
+		Cmd_Say_f( ent, SAY_TEAM, qfalse );
 		return;
 	}
 	// NERVE - SMF
 	if ( Q_stricmp( cmd, "say_limbo" ) == 0 ) {
-		// OSPx - Ignored patch
-		if (!ent->client->sess.muted) {
-			Cmd_Say_f(ent, SAY_LIMBO, qfalse);
-		}
+		Cmd_Say_f( ent, SAY_LIMBO, qfalse );
 		return;
 	}
 	if ( Q_stricmp( cmd, "vsay" ) == 0 ) {
-		// OSPx - Ignored patch
-		if (!ent->client->sess.muted) {
-			Cmd_Voice_f(ent, SAY_ALL, qfalse, qfalse);
-		}
+		Cmd_Voice_f( ent, SAY_ALL, qfalse, qfalse );
 		return;
 	}
 	if ( Q_stricmp( cmd, "vsay_team" ) == 0 ) {
-		// OSPx - Ignored patch
-		if (!ent->client->sess.muted) {
-			Cmd_Voice_f(ent, SAY_TEAM, qfalse, qfalse);
-		}
+		Cmd_Voice_f( ent, SAY_TEAM, qfalse, qfalse );
 		return;
 	}
 	// -NERVE - SMF
 
 	if ( Q_stricmp( cmd, "tell" ) == 0 ) {
-		// OSPx - Ignored patch
-		if (!ent->client->sess.muted) {
-			Cmd_Tell_f(ent);
-		}
+		Cmd_Tell_f( ent );
 		return;
 	}
 	if ( Q_stricmp( cmd, "score" ) == 0 ) {

@@ -33,7 +33,6 @@ Created: 11.Mar/14
 ===========================================================================
 */
 #include "g_local.h"
-#include "../../MAIN/ui_mp/menudef.h"
 
 /*
 =================
@@ -68,78 +67,3 @@ void G_loadMatchGame(void) {
 
 	trap_SetConfigstring(CS_REINFSEEDS, strReinfSeeds);
 }
-
-/*
-=================
-Reset Round state
-=================
-*/
-void G_resetRoundState(void) {
-	if (g_gametype.integer == GT_WOLF_STOPWATCH) {
-		trap_Cvar_Set("g_currentRound", "0");
-	}
-}
-
-/*
-=================
-Reset mode state
-=================
-*/
-void G_resetModeState(void) {
-	if (g_gametype.integer == GT_WOLF_STOPWATCH) {
-		trap_Cvar_Set("g_nextTimeLimit", "0");
-	}
-}
-
-/*
-=================
-Update configstring for vote info
-=================
-*/
-int G_checkServerToggle(vmCvar_t *cv) {
-	int nFlag;
-
-	if (cv == &match_mutespecs) {
-		nFlag = CV_SVS_MUTESPECS;
-	}
-	else if (cv == &g_friendlyFire) {
-		nFlag = CV_SVS_FRIENDLYFIRE;
-	}
-	else if (cv == &g_antilag) {
-		nFlag = CV_SVS_ANTILAG;
-	}
-	else if (cv == &g_teamForceBalance) {
-		nFlag = CV_SVS_BALANCEDTEAMS;
-	}
-	// special case for 2 bits
-	else if (cv == &match_warmupDamage) {
-		if (cv->integer > 0) {
-			level.server_settings &= ~CV_SVS_WARMUPDMG;
-			nFlag = (cv->integer > 2) ? 2 : cv->integer;
-			nFlag = nFlag << 2;
-		}
-		else {
-			nFlag = CV_SVS_WARMUPDMG;
-		}
-	}
-	else if (cv == &g_nextmap ) {
-		if (*cv->string) {
-			level.server_settings |= CV_SVS_NEXTMAP;
-		}
-		else {
-			level.server_settings &= ~CV_SVS_NEXTMAP;
-		}
-		return(qtrue);
-	}	
-	else { return(qfalse); }
-
-	if (cv->integer > 0) {
-		level.server_settings |= nFlag;
-	}
-	else {
-		level.server_settings &= ~nFlag;
-	}
-
-	return(qtrue);
-}
-

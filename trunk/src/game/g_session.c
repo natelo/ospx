@@ -50,7 +50,7 @@ void G_WriteClientSessionData( gclient_t *client ) {
 	const char  *s;
 	const char  *var;
 
-	s = va( "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",       // DHM - Nerve
+	s = va( "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",       // DHM - Nerve
 			client->sess.sessionTeam,
 			client->sess.spectatorTime,
 			client->sess.spectatorState,
@@ -71,9 +71,7 @@ void G_WriteClientSessionData( gclient_t *client ) {
 			client->sess.ip[0],
 			client->sess.ip[1],
 			client->sess.ip[2],
-			client->sess.ip[3],
-			client->sess.status,
-			client->sess.muted
+			client->sess.ip[3]
 			);
 
 	var = va( "session%i", client - level.clients );
@@ -96,7 +94,7 @@ void G_ReadSessionData( gclient_t *client ) {
 	var = va( "session%i", client - level.clients );
 	trap_Cvar_VariableStringBuffer( var, s, sizeof( s ) );
 
-	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",       // DHM - Nerve
+	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",       // DHM - Nerve
 			(int *)&client->sess.sessionTeam,
 			&client->sess.spectatorTime,
 			(int *)&client->sess.spectatorState,
@@ -116,9 +114,7 @@ void G_ReadSessionData( gclient_t *client ) {
 			(int *)&client->sess.ip[0],
 			(int *)&client->sess.ip[1],
 			(int *)&client->sess.ip[2],
-			(int *)&client->sess.ip[3],
-			(int *)&client->sess.status,
-			(int *)&client->sess.muted
+			(int *)&client->sess.ip[3]
 			);
 
 	// NERVE - SMF
@@ -146,6 +142,7 @@ void G_ReadSessionData( gclient_t *client ) {
 		}
 	}
 }
+
 
 /*
 ================
@@ -211,12 +208,11 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 	sess->ip[1] = 0;
 	sess->ip[2] = 0;
 	sess->ip[3] = 0;
-	sess->status = USER_REGULAR;
-	sess->muted = qfalse;
 	// -OSPx
 
 	G_WriteClientSessionData( client );
 }
+
 
 /*
 ==================

@@ -2351,7 +2351,7 @@ UI_BuildPlayerList
 */
 static void UI_BuildPlayerList() {
 	uiClientState_t cs;
-	int n, count, team, team2, playerTeamNumber, muted;
+	int n, count, team, team2, playerTeamNumber;
 	char info[MAX_INFO_STRING];
 
 	trap_GetClientState( &cs );
@@ -2371,15 +2371,6 @@ static void UI_BuildPlayerList() {
 			Q_strncpyz( uiInfo.playerNames[uiInfo.playerCount], Info_ValueForKey( info, "n" ), MAX_NAME_LENGTH );
 			Q_CleanStr( uiInfo.playerNames[uiInfo.playerCount] );
 			uiInfo.playerCount++;
-			// OSPx - Ignored
-			muted = atoi(Info_ValueForKey(info, "mu"));
-			if (muted) {
-				uiInfo.playerMuted[uiInfo.playerCount] = qtrue;
-			}
-			else {
-				uiInfo.playerMuted[uiInfo.playerCount] = qfalse;
-			}
-			// -OSPx
 			team2 = atoi( Info_ValueForKey( info, "t" ) );
 			if ( team2 == team ) {
 				Q_strncpyz( uiInfo.teamNames[uiInfo.myTeamCount], Info_ValueForKey( info, "n" ), MAX_NAME_LENGTH );
@@ -2864,19 +2855,6 @@ static qboolean UI_OwnerDrawVisible( int flags ) {
 			}
 			flags &= ~UI_SHOW_NEWBESTTIME;
 		}
-		// OSPx - Ignored
-		if (flags & UI_SHOW_PLAYERMUTED) {
-			if (!uiInfo.playerMuted[uiInfo.playerIndex]) {
-				vis = qfalse;
-			}
-			flags &= ~UI_SHOW_PLAYERMUTED;
-		}
-		if (flags & UI_SHOW_PLAYERNOTMUTED) {
-			if (uiInfo.playerMuted[uiInfo.playerIndex]) {
-				vis = qfalse;
-			}
-			flags &= ~UI_SHOW_PLAYERNOTMUTED;
-		} // -OSPx
 		if ( flags & UI_SHOW_DEMOAVAILABLE ) {
 			if ( !uiInfo.demoAvailable ) {
 				vis = qfalse;
@@ -7674,50 +7652,8 @@ cvarTable_t cvarTable[] = {
 	{ &ui_crosshairSize, "cg_crosshairSize", "48", CVAR_ARCHIVE },
 	{ &ui_crosshairAlphaAlt, "cg_crosshairAlphaAlt", "1.0", CVAR_ARCHIVE },
 	{ &ui_crosshairAlpha, "cg_crosshairAlpha", "1.0", CVAR_ARCHIVE },
-	// Game mappings
-	/*
-	{ NULL, "bot_enable", "1", CVAR_ARCHIVE },
-	{ NULL, "bot_minplayers", "0", CVAR_ARCHIVE },
-	{ NULL, "g_altStopwatchMode", "0", CVAR_ARCHIVE },
-	{ NULL, "g_ipcomplaintlimit", "3", CVAR_ARCHIVE },
-	{ NULL, "g_complaintlimit", "6", CVAR_ARCHIVE },
-	{ NULL, "g_doWarmup", "0", CVAR_ARCHIVE },
-	{ NULL, "g_inactivity", "0", CVAR_ARCHIVE },
-	{ NULL, "g_maxLives", "0", CVAR_ARCHIVE },
-	{ NULL, "refereePassword", "none", CVAR_ARCHIVE },
-	{ NULL, "g_teamForceBalance", "0", CVAR_ARCHIVE },
-	{ NULL, "sv_maxRate", "0", CVAR_ARCHIVE },
-	{ NULL, "g_spectatorInactivity", "0", CVAR_ARCHIVE },
-	{ NULL, "match_latejoin", "1", CVAR_ARCHIVE },
-	{ NULL, "match_minplayers", MATCH_MINPLAYERS, CVAR_ARCHIVE },
-	{ NULL, "match_mutespecs", "0", CVAR_ARCHIVE },
-	{ NULL, "match_readypercent", "100", CVAR_ARCHIVE },
-	{ NULL, "match_timeoutcount", "3", CVAR_ARCHIVE },
-	{ NULL, "match_timeoutlength", "180", CVAR_ARCHIVE },
-	{ NULL, "match_warmupDamage", "1", CVAR_ARCHIVE },
+
 	{ NULL, "server_autoconfig", "0", CVAR_ARCHIVE },
-	{ NULL, "team_maxPanzers", "-1", CVAR_ARCHIVE },
-	{ NULL, "team_maxplayers", "0", CVAR_ARCHIVE },
-	{ NULL, "team_nocontrols", "0", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_comp", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_gametype", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_kick", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_map", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_mutespecs", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_nextmap", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_pub", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_referee", "0", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_shuffleteamsxp", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_swapteams", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_friendlyfire", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_timelimit", "0", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_warmupdamage", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_antilag", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_muting", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_allow_kick", "1", CVAR_ARCHIVE },
-	{ NULL, "vote_limit", "5", CVAR_ARCHIVE },
-	{ NULL, "vote_percent", "50", CVAR_ARCHIVE },
-	*/
 // -OSPx
 
 	{ &ui_hudAlpha, "cg_hudAlpha", "1.0", CVAR_ARCHIVE }

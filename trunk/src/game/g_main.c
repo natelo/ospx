@@ -164,39 +164,12 @@ vmCvar_t url;
 vmCvar_t g_dbgRevive;
 
 // OSPx
-
-// General
 vmCvar_t g_spectatorInactivity;
 vmCvar_t g_showFlags;
 vmCvar_t server_autoconfig;
-vmCvar_t match_mutespecs;
-vmCvar_t match_warmupDamage;
-vmCvar_t match_readypercent;
-vmCvar_t match_minplayers;
-vmCvar_t g_nextmap;
-
-// Voting
-vmCvar_t vote_allow_comp;
-vmCvar_t vote_allow_gametype;
-vmCvar_t vote_allow_kick;
-vmCvar_t vote_allow_map;
-vmCvar_t vote_allow_matchreset;
-vmCvar_t vote_allow_mutespecs;
-vmCvar_t vote_allow_nextmap;
-vmCvar_t vote_allow_pub;
-vmCvar_t vote_allow_referee;
-vmCvar_t vote_allow_shuffleteamsxp;
-vmCvar_t vote_allow_swapteams;
-vmCvar_t vote_allow_friendlyfire;
-vmCvar_t vote_allow_timelimit;
-vmCvar_t vote_allow_warmupdamage;
-vmCvar_t vote_allow_antilag;
-vmCvar_t vote_allow_balancedteams;
-vmCvar_t vote_allow_muting;
 
 // - System
 vmCvar_t z_serverflags;
-
 // -OSPx
 
 cvarTable_t gameCvarTable[] = {
@@ -337,29 +310,6 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },
 	{ &g_showFlags, "g_showFlags", "1", 0 },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
-	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
-	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
-	{ &match_readypercent, "match_readypercent", "100", 0, 0, qfalse, qtrue },
-	{ &match_minplayers, "match_minplayers", MATCH_MINPLAYERS, 0, 0, qfalse, qfalse },
-	{ &g_nextmap, "nextmap", "", CVAR_TEMP },
-
-	{ &vote_allow_comp, "vote_allow_comp", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_gametype, "vote_allow_gametype", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_kick, "vote_allow_kick", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_map, "vote_allow_map", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_matchreset, "vote_allow_matchreset", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_mutespecs, "vote_allow_mutespecs", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_nextmap, "vote_allow_nextmap", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_pub, "vote_allow_pub", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_referee, "vote_allow_referee", "0", 0, 0, qfalse, qfalse },
-	{ &vote_allow_shuffleteamsxp, "vote_allow_shuffleteamsxp", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_swapteams, "vote_allow_swapteams", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_friendlyfire, "vote_allow_friendlyfire", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_timelimit, "vote_allow_timelimit", "0", 0, 0, qfalse, qfalse },
-	{ &vote_allow_warmupdamage, "vote_allow_warmupdamage", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_antilag, "vote_allow_antilag", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_balancedteams, "vote_allow_balancedteams", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_muting, "vote_allow_muting", "1", 0, 0, qfalse, qfalse },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse }
 // -OSPx
@@ -1059,16 +1009,11 @@ void G_RegisterCvars( void ) {
 	cvarTable_t *cv;
 	qboolean remapped = qfalse;
 
-	level.server_settings = 0; // OSPx
-
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
 							cv->defaultString, cv->cvarFlags );
 		if ( cv->vmCvar ) {
 			cv->modificationCount = cv->vmCvar->modificationCount;
-
-			// OSPx - Track & Updates votes..			
-			G_checkServerToggle(cv->vmCvar);
 		}
 
 		if ( cv->teamShader ) {
@@ -1098,19 +1043,6 @@ void G_RegisterCvars( void ) {
 	// done
 
 	level.warmupModificationCount = g_warmup.modificationCount;
-
-	// OSPx	
-	trap_SetConfigstring(CS_SERVERTOGGLES, va("%d", level.server_settings));
-	if (match_readypercent.integer < 1) {
-		trap_Cvar_Set("match_readypercent", "1");
-	}	
-
-	if (pmove_msec.integer < 8) {
-		trap_Cvar_Set("pmove_msec", "8");
-	}
-	else if (pmove_msec.integer > 33) {
-		trap_Cvar_Set("pmove_msec", "33");
-	} // -OSPx
 }
 
 /*
@@ -1122,10 +1054,6 @@ void G_UpdateCvars( void ) {
 	int i;
 	cvarTable_t *cv;
 	qboolean remapped = qfalse;
-// OSPx
-	qboolean fToggles = qfalse;
-	qboolean fVoteFlags = qfalse;
-// -OSPx
 
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
 		if ( cv->vmCvar ) {
@@ -1142,54 +1070,9 @@ void G_UpdateCvars( void ) {
 				if ( cv->teamShader ) {
 					remapped = qtrue;
 				}
-// OSPx			
-				// Sanity checks
-				if (cv->vmCvar == &pmove_msec) {
-					if (pmove_msec.integer < 8) {
-						trap_Cvar_Set(cv->cvarName, "8");
-					}
-					else if (pmove_msec.integer > 33) {
-						trap_Cvar_Set(cv->cvarName, "33");
-					}
-				}
-				else if (cv->vmCvar == &match_readypercent) {
-					if (match_readypercent.integer < 1) {
-						trap_Cvar_Set(cv->cvarName, "1");
-					}
-					else if (match_readypercent.integer > 100) {
-						trap_Cvar_Set(cv->cvarName, "100");
-					}
-				}
-				// Track votes..
-				else if (cv->vmCvar == &vote_allow_comp || cv->vmCvar == &vote_allow_gametype ||
-					cv->vmCvar == &vote_allow_kick || cv->vmCvar == &vote_allow_map ||
-					cv->vmCvar == &vote_allow_matchreset ||
-					cv->vmCvar == &vote_allow_mutespecs || cv->vmCvar == &vote_allow_nextmap ||
-					cv->vmCvar == &vote_allow_pub || cv->vmCvar == &vote_allow_referee ||
-					cv->vmCvar == &vote_allow_shuffleteamsxp || cv->vmCvar == &vote_allow_swapteams ||
-					cv->vmCvar == &vote_allow_friendlyfire || cv->vmCvar == &vote_allow_timelimit ||
-					cv->vmCvar == &vote_allow_warmupdamage || cv->vmCvar == &vote_allow_antilag ||
-					cv->vmCvar == &vote_allow_balancedteams || cv->vmCvar == &vote_allow_muting
-					) {
-					fVoteFlags = qtrue;
-				}
-				else {
-					fToggles = (G_checkServerToggle(cv->vmCvar) || fToggles);
-				}
-// -OSPx
 			}
 		}
 	}
-
-// OSPx
-	if (fVoteFlags) {
-		G_voteFlags();
-	}
-
-	if (fToggles) {
-		trap_SetConfigstring(CS_SERVERTOGGLES, va("%d", level.server_settings));
-	} 
-// -OSPx
 
 	if ( remapped ) {
 		G_RemapTeamShaders();
@@ -1295,25 +1178,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		}
 	}
 
-	// OSPx - Patched to account for Votes
-	// set some level globals	
-	i = level.server_settings;
-	{
-		qboolean oldspawning = level.spawning;
-		voteInfo_t votedata;
-
-		memcpy(&votedata, &level.voteInfo, sizeof(voteInfo_t));
-
-		memset(&level, 0, sizeof(level));
-
-		memcpy(&level.voteInfo, &votedata, sizeof(voteInfo_t));
-
-		level.spawning = oldspawning;
-	} // -OSPx
-
+	// set some level globals
+	memset( &level, 0, sizeof( level ) );
 	level.time = levelTime;
 	level.startTime = levelTime;
-	level.server_settings = i;	// OSPx
 
 	level.snd_fry = G_SoundIndex( "sound/player/fry.wav" );    // FIXME standing in lava / slime
 	level.bulletRicochetSound = G_SoundIndex( "bulletRicochet" );
@@ -2559,40 +2427,29 @@ NERVE - SMF - Once a frame, check for changes in wolf MP player state
 =============
 */
 void CheckWolfMP() {
-	
-	if (g_gametype.integer >= GT_WOLF) {
-		if (g_gamestate.integer == GS_PLAYING || g_gamestate.integer == GS_INTERMISSION) {
-			if (level.intermissiontime && g_gamestate.integer != GS_INTERMISSION) {
-				trap_Cvar_Set("gamestate", va("%i", GS_INTERMISSION));
-			}
-			return;
-		}
+	// TTimo unused
+//	static qboolean latch = qfalse;
 
-		// check warmup latch
-		if (g_gamestate.integer == GS_WARMUP) {
-			if (!g_doWarmup.integer ||
-				(level.numPlayingClients >= match_minplayers.integer &&
-				level.lastRestartTime + 1000 < level.time /* && G_readyMatchState() */ )) 
-			{
-				int delay = (g_warmup.integer < 10) ? 11 : g_warmup.integer + 1;
+	// check because we run 3 game frames before calling Connect and/or ClientBegin
+	// for clients on a map_restart
+	if ( g_gametype.integer < GT_WOLF ) {
+		return;
+	}
 
-				level.warmupTime = level.time + (delay * 1000);
-				trap_Cvar_Set("gamestate", va("%i", GS_WARMUP_COUNTDOWN));
-				trap_Cvar_Update(&g_gamestate);
-				trap_SetConfigstring(CS_WARMUP, va("%i", level.warmupTime));
-			}
-		}
+	// NERVE - SMF - check game state
+	CheckGameState();
 
-		// if the warmup time has counted down, restart
-		if (g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
-			if (level.time > level.warmupTime) {
-				level.warmupTime += 10000;
-				trap_Cvar_Set("g_restarted", "1");
-				trap_SendConsoleCommand(EXEC_APPEND, "map_restart 0\n");
-				level.restarted = qtrue;
-				return;
-			}
-		}
+	if ( level.warmupTime == 0 ) {
+		return;
+	}
+
+	// if the warmup time has counted down, restart
+	if ( level.time > level.warmupTime ) {
+		level.warmupTime += 10000;
+		trap_Cvar_Set( "g_restarted", "1" );
+		trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+		level.restarted = qtrue;
+		return;
 	}
 }
 // -NERVE - SMF

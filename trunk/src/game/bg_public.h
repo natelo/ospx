@@ -185,7 +185,6 @@ extern const unsigned int aReinfSeeds[MAX_REINFSEEDS];
 
 // OSPx
 #define CS_REINFSEEDS           37      // Reinforcement seeds
-#define CS_SERVERTOGGLES        38      // Shows current enable/disabled settings (for voting UI)
 // -OSPx
 
 #define CS_MODELS               64
@@ -1741,19 +1740,5 @@ void BG_setCrosshair(char *colString, float *col, float alpha, char *cvarName);
 #define CGF_STATSDUMP       0x02
 #define CGF_AUTOACTIVATE    0x04
 #define CGF_PREDICTITEMS    0x08
-
-// Voting
-#define VOTING_DISABLED     ( ( 1 << numVotesAvailable ) - 1 )
-
-typedef struct {
-	const char  *pszCvar;
-	int flag;
-} voteType_t;
-
-extern const voteType_t voteToggles[];
-extern int numVotesAvailable;
-
-// Match
-#define MATCH_MINPLAYERS "1" 
 
 // -OSPx
