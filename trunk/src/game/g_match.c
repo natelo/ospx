@@ -36,7 +36,7 @@ Created: 11.Mar/14
 
 /*
 =================
-MAtch settings
+Match settings
 
 Pretty much a dump from et..
 =================
@@ -45,6 +45,11 @@ void G_loadMatchGame(void) {
 	unsigned int i, dwBlueOffset, dwRedOffset;
 	unsigned int aRandomValues[MAX_REINFSEEDS];
 	char strReinfSeeds[MAX_STRING_CHARS];
+
+	if (server_autoconfig.integer && (!(z_serverflags.integer & ZSF_COMP) || level.newSession)) {
+		G_configSet(g_gametype.integer, (server_autoconfig.integer == 1));
+		trap_Cvar_Set("z_serverflags", va("%d", z_serverflags.integer | ZSF_COMP));
+	}
 
 	// Set up the random reinforcement seeds for both teams and send to clients
 	dwBlueOffset = rand() % MAX_REINFSEEDS;

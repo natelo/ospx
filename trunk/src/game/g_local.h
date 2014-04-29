@@ -1254,6 +1254,9 @@ extern vmCvar_t g_dbgRevive;
 // OSPx
 extern vmCvar_t g_spectatorInactivity;
 extern vmCvar_t g_showFlags;
+extern vmCvar_t server_autoconfig;
+
+extern vmCvar_t z_serverflags;
 // -OSPx
 
 void    trap_Printf( const char *fmt );
@@ -1516,3 +1519,13 @@ void GeoIP_open(void);
 void GeoIP_close(void);
 extern GeoIP * gidb;
 void G_ReadIP(gclient_t *client);
+
+//
+// g_config.c
+//
+void G_configSet(int dwMode, qboolean doComp);
+
+//
+// Bit Flags
+//
+#define ZSF_COMP        0x01    // Have comp settings loaded for current gametype?

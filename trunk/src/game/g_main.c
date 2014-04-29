@@ -166,6 +166,10 @@ vmCvar_t g_dbgRevive;
 // OSPx
 vmCvar_t g_spectatorInactivity;
 vmCvar_t g_showFlags;
+vmCvar_t server_autoconfig;
+
+// - System
+vmCvar_t z_serverflags;
 // -OSPx
 
 cvarTable_t gameCvarTable[] = {
@@ -305,6 +309,9 @@ cvarTable_t gameCvarTable[] = {
 // OSPx
 	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },
 	{ &g_showFlags, "g_showFlags", "1", 0 },
+	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
+
+	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse }
 // -OSPx
 };
 
