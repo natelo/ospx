@@ -1601,7 +1601,7 @@ void ClientUserinfoChanged( int clientNum ) {
 			   ((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
 
 		// Print essentials and skip the garbage		
-		s = va("name\\%s\\team\\%s\\IP\\%s\\country\\%s\\muted\\%s\\status\\",
+		s = va("name\\%s\\team\\%s\\IP\\%s\\country\\%i\\muted\\%s\\status\\%i",
 			client->pers.netname, team, clientIP(client, qtrue), client->sess.uci, 
 			(client->sess.muted ? "yes" : "no"), client->sess.status);
 	}
