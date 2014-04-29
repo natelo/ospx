@@ -1421,6 +1421,12 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		return;
 	}
 
+	// OSPx - Ignored patch
+	if (!ent->client->sess.muted) {
+		CPx(ent - g_entities, "cp \"You are ^1muted^7!\n\"2");
+		return;
+	}
+
 	if ( level.voteTime ) {
 		trap_SendServerCommand( ent - g_entities, "print \"A vote is already in progress.\n\"" );
 		return;
@@ -2422,30 +2428,48 @@ void ClientCommand( int clientNum ) {
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
 	if ( Q_stricmp( cmd, "say" ) == 0 ) {
-		Cmd_Say_f( ent, SAY_ALL, qfalse );
+		// OSPx - Ignored patch
+		if (!ent->client->sess.muted) {
+			Cmd_Say_f(ent, SAY_ALL, qfalse);
+		}
 		return;
 	}
 	if ( Q_stricmp( cmd, "say_team" ) == 0 ) {
-		Cmd_Say_f( ent, SAY_TEAM, qfalse );
+		// OSPx - Ignored patch
+		if (!ent->client->sess.muted) {
+			Cmd_Say_f(ent, SAY_TEAM, qfalse);
+		}
 		return;
 	}
 	// NERVE - SMF
 	if ( Q_stricmp( cmd, "say_limbo" ) == 0 ) {
-		Cmd_Say_f( ent, SAY_LIMBO, qfalse );
+		// OSPx - Ignored patch
+		if (!ent->client->sess.muted) {
+			Cmd_Say_f(ent, SAY_LIMBO, qfalse);
+		}
 		return;
 	}
 	if ( Q_stricmp( cmd, "vsay" ) == 0 ) {
-		Cmd_Voice_f( ent, SAY_ALL, qfalse, qfalse );
+		// OSPx - Ignored patch
+		if (!ent->client->sess.muted) {
+			Cmd_Voice_f(ent, SAY_ALL, qfalse, qfalse);
+		}
 		return;
 	}
 	if ( Q_stricmp( cmd, "vsay_team" ) == 0 ) {
-		Cmd_Voice_f( ent, SAY_TEAM, qfalse, qfalse );
+		// OSPx - Ignored patch
+		if (!ent->client->sess.muted) {
+			Cmd_Voice_f(ent, SAY_TEAM, qfalse, qfalse);
+		}
 		return;
 	}
 	// -NERVE - SMF
 
 	if ( Q_stricmp( cmd, "tell" ) == 0 ) {
-		Cmd_Tell_f( ent );
+		// OSPx - Ignored patch
+		if (!ent->client->sess.muted) {
+			Cmd_Tell_f(ent);
+		}
 		return;
 	}
 	if ( Q_stricmp( cmd, "score" ) == 0 ) {

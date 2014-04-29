@@ -1572,14 +1572,14 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	if ( ent->r.svFlags & SVF_BOT ) {
 
-		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s",
+		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\country\\%i\\mu\\%i",
 				client->pers.netname, client->sess.sessionTeam, model, head, c1,
 				client->pers.maxHealth, client->sess.wins, client->sess.losses,
-				Info_ValueForKey( userinfo, "skill" ) );
+				Info_ValueForKey(userinfo, "skill"), client->sess.uci, (client->sess.muted ? 1 : 0) );
 	} else {
-		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i",
+		s = va( "n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i\\mu\\%i",
 				client->pers.netname, client->sess.sessionTeam, model, head, c1,
-				client->pers.maxHealth, client->sess.wins, client->sess.losses, client->sess.uci );
+				client->pers.maxHealth, client->sess.wins, client->sess.losses, client->sess.uci, (client->sess.muted ? 1 : 0) );
 	}
 
 //----(SA) end
@@ -1595,8 +1595,8 @@ void ClientUserinfoChanged( int clientNum ) {
 			   ((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
 
 		// Print essentials and skip the garbage		
-		s = va("name\\%s\\team\\%s\\IP\\%s\\country\\%s",
-			client->pers.netname, team, clientIP(client, qtrue), client->sess.uci);
+		s = va("name\\%s\\team\\%s\\IP\\%s\\country\\%s\\muted\\%s",
+			client->pers.netname, team, clientIP(client, qtrue), client->sess.uci, (client->sess.muted ? "yes" : "no"));
 	}
 
 	// this is not the userinfo actually, it's the config string

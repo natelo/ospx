@@ -489,6 +489,7 @@ typedef struct {
 	unsigned int uci;				// Country Flags
 	unsigned char	ip[4];			// IPs
 	adminStatus_t status;			// Admin, Ref..
+	qboolean muted;					// Ignored players
 } clientSession_t;
 
 //

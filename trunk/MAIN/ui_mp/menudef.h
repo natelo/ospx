@@ -428,6 +428,9 @@ If you have questions concerning this license or the applicable additional terms
 #define CV_SVF_BALANCEDTEAMS    32768
 #define CV_SVF_MUTING           65536
 
+#define UI_SHOW_PLAYERMUTED     0x01000000
+#define UI_SHOW_PLAYERNOTMUTED  0x02000000
+
 // referee level
 #define RL_NONE                 0
 #define RL_REFEREE              1

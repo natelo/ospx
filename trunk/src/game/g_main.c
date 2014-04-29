@@ -164,6 +164,8 @@ vmCvar_t url;
 vmCvar_t g_dbgRevive;
 
 // OSPx
+
+// General
 vmCvar_t g_spectatorInactivity;
 vmCvar_t g_showFlags;
 vmCvar_t server_autoconfig;
@@ -189,6 +191,7 @@ vmCvar_t vote_allow_muting;
 
 // - System
 vmCvar_t z_serverflags;
+
 // -OSPx
 
 cvarTable_t gameCvarTable[] = {

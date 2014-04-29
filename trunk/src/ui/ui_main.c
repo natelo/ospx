@@ -2351,7 +2351,7 @@ UI_BuildPlayerList
 */
 static void UI_BuildPlayerList() {
 	uiClientState_t cs;
-	int n, count, team, team2, playerTeamNumber;
+	int n, count, team, team2, playerTeamNumber, muted;
 	char info[MAX_INFO_STRING];
 
 	trap_GetClientState( &cs );
@@ -2371,6 +2371,15 @@ static void UI_BuildPlayerList() {
 			Q_strncpyz( uiInfo.playerNames[uiInfo.playerCount], Info_ValueForKey( info, "n" ), MAX_NAME_LENGTH );
 			Q_CleanStr( uiInfo.playerNames[uiInfo.playerCount] );
 			uiInfo.playerCount++;
+			// OSPx - Ignored
+			muted = atoi(Info_ValueForKey(info, "mu"));
+			if (muted) {
+				uiInfo.playerMuted[uiInfo.playerCount] = qtrue;
+			}
+			else {
+				uiInfo.playerMuted[uiInfo.playerCount] = qfalse;
+			}
+			// -OSPx
 			team2 = atoi( Info_ValueForKey( info, "t" ) );
 			if ( team2 == team ) {
 				Q_strncpyz( uiInfo.teamNames[uiInfo.myTeamCount], Info_ValueForKey( info, "n" ), MAX_NAME_LENGTH );
@@ -2855,6 +2864,19 @@ static qboolean UI_OwnerDrawVisible( int flags ) {
 			}
 			flags &= ~UI_SHOW_NEWBESTTIME;
 		}
+		// OSPx - Ignored
+		if (flags & UI_SHOW_PLAYERMUTED) {
+			if (!uiInfo.playerMuted[uiInfo.playerIndex]) {
+				vis = qfalse;
+			}
+			flags &= ~UI_SHOW_PLAYERMUTED;
+		}
+		if (flags & UI_SHOW_PLAYERNOTMUTED) {
+			if (uiInfo.playerMuted[uiInfo.playerIndex]) {
+				vis = qfalse;
+			}
+			flags &= ~UI_SHOW_PLAYERNOTMUTED;
+		} // -OSPx
 		if ( flags & UI_SHOW_DEMOAVAILABLE ) {
 			if ( !uiInfo.demoAvailable ) {
 				vis = qfalse;
