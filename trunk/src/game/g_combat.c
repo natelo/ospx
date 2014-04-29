@@ -887,7 +887,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	// the intermission has allready been qualified for, so don't
 	// allow any extra scoring
-	if ( level.intermissionQueued || g_gamestate.integer != GS_PLAYING ) {
+	if (level.intermissionQueued || g_gamestate.integer != GS_PLAYING && match_warmupDamage.integer == 0) {
 		return;
 	}
 
@@ -1023,7 +1023,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// if TF_NO_FRIENDLY_FIRE is set, don't do damage to the target
 		// if the attacker was on the same team
 		if ( targ != attacker && OnSameTeam( targ, attacker )  ) {
-			if ( !g_friendlyFire.integer ) {
+			// OSPx - Patched for warmup damage..
+			if ((g_gamestate.integer != GS_PLAYING && match_warmupDamage.integer == 1)) {
+				return;
+			}
+			else if ( !g_friendlyFire.integer ) {
 				return;
 			}
 		}

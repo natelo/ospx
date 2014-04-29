@@ -957,17 +957,11 @@ void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char 
 	if ( mode == SAY_TEAM  && !OnSameTeam( ent, other ) ) {
 		return;
 	}
-	// no chatting to players in tournements
-	if ( g_gametype.integer == GT_TOURNAMENT
-		 && other->client->sess.sessionTeam == TEAM_FREE
-		 && ent->client->sess.sessionTeam != TEAM_FREE ) {
-		return;
-	}
-
+	
 	// NERVE - SMF - if spectator, no chatting to players in WolfMP
-	if ( g_gametype.integer >= GT_WOLF
-		 && ( ( ent->client->sess.sessionTeam == TEAM_FREE && other->client->sess.sessionTeam != TEAM_FREE ) ||
-			  ( ent->client->sess.sessionTeam == TEAM_SPECTATOR && other->client->sess.sessionTeam != TEAM_SPECTATOR ) ) ) {
+	if (match_mutespecs.integer && !ent->client->sess.status && // OSPx
+		((ent->client->sess.sessionTeam == TEAM_FREE && other->client->sess.sessionTeam != TEAM_FREE) ||
+		(ent->client->sess.sessionTeam == TEAM_SPECTATOR && other->client->sess.sessionTeam != TEAM_SPECTATOR))) {
 		return;
 	}
 
@@ -1128,8 +1122,11 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
 	if ( mode == SAY_TEAM && !OnSameTeam( ent, other ) ) {
 		return;
 	}
-	// no chatting to players in tournements
-	if ( ( g_gametype.integer == GT_TOURNAMENT ) ) {
+	
+	// OSPx - Ignore spectators if set..
+	if (match_mutespecs.integer && !ent->client->sess.status &&
+		ent->client->sess.sessionTeam == TEAM_SPECTATOR && other->client->sess.sessionTeam != TEAM_SPECTATOR) 
+	{
 		return;
 	}
 

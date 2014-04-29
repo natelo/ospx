@@ -531,7 +531,7 @@ Svcmd_StartMatch_f
 NERVE - SMF - starts match if in tournament mode
 ============
 */
-void Svcmd_StartMatch_f() {
+void Svcmd_StartMatch_f( void ) {
 	if ( !g_noTeamSwitching.integer ) {
 		trap_SendServerCommand( -1, va( "print \"g_noTeamSwitching not activated.\n\"" ) );
 		return;
@@ -588,7 +588,7 @@ Svcmd_SwapTeams_f
 NERVE - SMF - swaps all clients to opposite team
 ============
 */
-void Svcmd_SwapTeams_f() {
+void Svcmd_SwapTeams_f( void ) {
 //  if ( g_gamestate.integer != GS_PLAYING ) {
 	if ( ( g_gamestate.integer == GS_INITIALIZE ) || // JPW NERVE -- so teams can swap between checkpoint rounds
 		 ( g_gamestate.integer == GS_WAITING_FOR_PLAYERS ) ||

@@ -809,6 +809,7 @@ typedef struct {
 
 	// Votes
 	voteInfo_t voteInfo;
+	int server_settings;
 // -OSPx
 
 } level_locals_t;
@@ -1038,6 +1039,7 @@ void AddMaxLivesGUID( char *str );
 void ClearMaxLivesIP();
 void ClearMaxLivesGUID();
 void Svcmd_ResetMatch_f(qboolean fDoReset, qboolean fDoRestart);
+void Svcmd_SwapTeams_f(void);
 void Svcmd_ShuffleTeams_f(void);
 
 //
@@ -1292,6 +1294,10 @@ extern vmCvar_t g_dbgRevive;
 extern vmCvar_t g_spectatorInactivity;
 extern vmCvar_t g_showFlags;
 extern vmCvar_t server_autoconfig;
+extern vmCvar_t match_mutespecs;
+extern vmCvar_t match_warmupDamage;
+extern vmCvar_t match_readypercent;
+extern vmCvar_t g_nextmap;
 
 extern vmCvar_t vote_allow_comp;
 extern vmCvar_t vote_allow_gametype;
@@ -1557,6 +1563,7 @@ void G_HistoricalTrace(gentity_t* ent, trace_t *results, const vec3_t start, con
 void G_loadMatchGame(void);
 void G_resetRoundState(void);
 void G_resetModeState(void);
+int G_checkServerToggle(vmCvar_t *cv);
 
 //
 // g_geoip.c

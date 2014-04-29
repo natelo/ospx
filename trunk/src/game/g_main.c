@@ -169,6 +169,10 @@ vmCvar_t g_dbgRevive;
 vmCvar_t g_spectatorInactivity;
 vmCvar_t g_showFlags;
 vmCvar_t server_autoconfig;
+vmCvar_t match_mutespecs;
+vmCvar_t match_warmupDamage;
+vmCvar_t match_readypercent;
+vmCvar_t g_nextmap;
 
 // Voting
 vmCvar_t vote_allow_comp;
@@ -332,6 +336,10 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },
 	{ &g_showFlags, "g_showFlags", "1", 0 },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
+	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
+	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
+	{ &match_readypercent, "match_readypercent", "100", 0, 0, qfalse, qtrue },
+	{ &g_nextmap, "nextmap", "", CVAR_TEMP },
 
 	{ &vote_allow_comp, "vote_allow_comp", "1", 0, 0, qfalse, qfalse },
 	{ &vote_allow_gametype, "vote_allow_gametype", "1", 0, 0, qfalse, qfalse },
@@ -1049,11 +1057,16 @@ void G_RegisterCvars( void ) {
 	cvarTable_t *cv;
 	qboolean remapped = qfalse;
 
+	level.server_settings = 0; // OSPx
+
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
 							cv->defaultString, cv->cvarFlags );
 		if ( cv->vmCvar ) {
 			cv->modificationCount = cv->vmCvar->modificationCount;
+
+			// OSPx - Track & Updates votes..			
+			G_checkServerToggle(cv->vmCvar);
 		}
 
 		if ( cv->teamShader ) {
@@ -1083,6 +1096,19 @@ void G_RegisterCvars( void ) {
 	// done
 
 	level.warmupModificationCount = g_warmup.modificationCount;
+
+	// OSPx	
+	trap_SetConfigstring(CS_SERVERTOGGLES, va("%d", level.server_settings));
+	if (match_readypercent.integer < 1) {
+		trap_Cvar_Set("match_readypercent", "1");
+	}	
+
+	if (pmove_msec.integer < 8) {
+		trap_Cvar_Set("pmove_msec", "8");
+	}
+	else if (pmove_msec.integer > 33) {
+		trap_Cvar_Set("pmove_msec", "33");
+	} // -OSPx
 }
 
 /*
@@ -1094,6 +1120,10 @@ void G_UpdateCvars( void ) {
 	int i;
 	cvarTable_t *cv;
 	qboolean remapped = qfalse;
+// OSPx
+	qboolean fToggles = qfalse;
+	qboolean fVoteFlags = qfalse;
+// -OSPx
 
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
 		if ( cv->vmCvar ) {
@@ -1110,9 +1140,54 @@ void G_UpdateCvars( void ) {
 				if ( cv->teamShader ) {
 					remapped = qtrue;
 				}
+// OSPx			
+				// Sanity checks
+				if (cv->vmCvar == &pmove_msec) {
+					if (pmove_msec.integer < 8) {
+						trap_Cvar_Set(cv->cvarName, "8");
+					}
+					else if (pmove_msec.integer > 33) {
+						trap_Cvar_Set(cv->cvarName, "33");
+					}
+				}
+				else if (cv->vmCvar == &match_readypercent) {
+					if (match_readypercent.integer < 1) {
+						trap_Cvar_Set(cv->cvarName, "1");
+					}
+					else if (match_readypercent.integer > 100) {
+						trap_Cvar_Set(cv->cvarName, "100");
+					}
+				}
+				// Track votes..
+				else if (cv->vmCvar == &vote_allow_comp || cv->vmCvar == &vote_allow_gametype ||
+					cv->vmCvar == &vote_allow_kick || cv->vmCvar == &vote_allow_map ||
+					cv->vmCvar == &vote_allow_matchreset ||
+					cv->vmCvar == &vote_allow_mutespecs || cv->vmCvar == &vote_allow_nextmap ||
+					cv->vmCvar == &vote_allow_pub || cv->vmCvar == &vote_allow_referee ||
+					cv->vmCvar == &vote_allow_shuffleteamsxp || cv->vmCvar == &vote_allow_swapteams ||
+					cv->vmCvar == &vote_allow_friendlyfire || cv->vmCvar == &vote_allow_timelimit ||
+					cv->vmCvar == &vote_allow_warmupdamage || cv->vmCvar == &vote_allow_antilag ||
+					cv->vmCvar == &vote_allow_balancedteams || cv->vmCvar == &vote_allow_muting
+					) {
+					fVoteFlags = qtrue;
+				}
+				else {
+					fToggles = (G_checkServerToggle(cv->vmCvar) || fToggles);
+				}
+// -OSPx
 			}
 		}
 	}
+
+// OSPx
+	if (fVoteFlags) {
+		G_voteFlags();
+	}
+
+	if (fToggles) {
+		trap_SetConfigstring(CS_SERVERTOGGLES, va("%d", level.server_settings));
+	} 
+// -OSPx
 
 	if ( remapped ) {
 		G_RemapTeamShaders();
@@ -1218,10 +1293,25 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		}
 	}
 
-	// set some level globals
-	memset( &level, 0, sizeof( level ) );
+	// OSPx - Patched to account for Votes
+	// set some level globals	
+	i = level.server_settings;
+	{
+		qboolean oldspawning = level.spawning;
+		voteInfo_t votedata;
+
+		memcpy(&votedata, &level.voteInfo, sizeof(voteInfo_t));
+
+		memset(&level, 0, sizeof(level));
+
+		memcpy(&level.voteInfo, &votedata, sizeof(voteInfo_t));
+
+		level.spawning = oldspawning;
+	} // -OSPx
+
 	level.time = levelTime;
 	level.startTime = levelTime;
+	level.server_settings = i;	// OSPx
 
 	level.snd_fry = G_SoundIndex( "sound/player/fry.wav" );    // FIXME standing in lava / slime
 	level.bulletRicochetSound = G_SoundIndex( "bulletRicochet" );
