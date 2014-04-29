@@ -187,6 +187,10 @@ void CG_ParseWolfinfo( void ) {
 	if ( !cgs.localServer ) {
 		trap_Cvar_Set( "gamestate", va( "%i", cgs.gamestate ) );
 	}
+
+	// OSPx - ET port
+	// TTimo - make this available for ingame_callvote
+	trap_Cvar_Set("cg_ui_voteFlags", ((authLevel.integer == USR_REGULAR) ? Info_ValueForKey(info, "g_voteFlags") : "0"));
 }
 
 /*

@@ -431,9 +431,9 @@ If you have questions concerning this license or the applicable additional terms
 #define UI_SHOW_PLAYERMUTED     0x01000000
 #define UI_SHOW_PLAYERNOTMUTED  0x02000000
 
-// referee level
-#define RL_NONE                 0
-#define RL_REFEREE              1
-#define RL_RCON                 2
+// User status
+#define USR_REGULAR		0	// Regular user
+#define USR_REFEREE		1	// Voted in user (referee)
+#define USR_ADMIN		2	// Logged in user (Admin, from 1 to 5)
 // -OSPx
 

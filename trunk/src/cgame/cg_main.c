@@ -314,6 +314,8 @@ vmCvar_t cg_autoAction;
 vmCvar_t cg_useScreenshotJPEG;
 vmCvar_t cg_uinfo;
 
+vmCvar_t authLevel;
+
 // - Mappings
 vmCvar_t int_cl_maxpackets;
 vmCvar_t int_cl_timenudge;
@@ -548,6 +550,8 @@ cvarTable_t cvarTable[] = {
 	{ &cg_autoAction, "cg_autoAction", "0", CVAR_ARCHIVE },
 	{ &cg_useScreenshotJPEG, "cg_useScreenshotJPEG", "1", CVAR_ARCHIVE },
 	{ &cg_uinfo, "cg_uinfo", "0", CVAR_ROM | CVAR_USERINFO },
+
+	{ &authLevel, "authLevel", "0", CVAR_TEMP | CVAR_ROM },
 
 	{ &int_cl_maxpackets, "cl_maxpackets", "30", CVAR_ARCHIVE },
 	{ &int_cl_timenudge, "cl_timenudge", "0", CVAR_ARCHIVE },
