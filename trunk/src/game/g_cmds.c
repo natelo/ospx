@@ -195,37 +195,47 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 	int idnum;
 	char s2[MAX_STRING_CHARS];
 	char n2[MAX_STRING_CHARS];
+	qboolean fIsNumber = qtrue;
+
+	// See if its a number or string
+	for (idnum = 0; idnum < strlen(s) && s[idnum] != 0; idnum++) {
+		if (s[idnum] < '0' || s[idnum] > '9') {
+			fIsNumber = qfalse;
+			break;
+		}
+	}
+
+	// check for a name match
+	SanitizeString(s, s2, qtrue);
+	for (idnum = 0, cl = level.clients; idnum < level.maxclients; idnum++, cl++) {
+		if (cl->pers.connected != CON_CONNECTED) {
+			continue;
+		}
+
+		SanitizeString(cl->pers.netname, n2, qtrue);
+		if (!strcmp(n2, s2)) {
+			return(idnum);
+		}
+	}
 
 	// numeric values are just slot numbers
-	if ( s[0] >= '0' && s[0] <= '9' ) {
-		idnum = atoi( s );
-		if ( idnum < 0 || idnum >= level.maxclients ) {
-			trap_SendServerCommand( to - g_entities, va( "print \"Bad client slot: [lof]%i\n\"", idnum ) );
+	if (fIsNumber) {
+		idnum = atoi(s);
+		if (idnum < 0 || idnum >= level.maxclients) {
+			CPx(to - g_entities, va("print \"Bad client slot: [lof]%i\n\"", idnum));
 			return -1;
 		}
 
 		cl = &level.clients[idnum];
-		if ( cl->pers.connected != CON_CONNECTED ) {
-			trap_SendServerCommand( to - g_entities, va( "print \"Client[lof] %i [lon]is not active\n\"", idnum ) );
+		if (cl->pers.connected != CON_CONNECTED) {
+			CPx(to - g_entities, va("print \"Client[lof] %i [lon]is not active\n\"", idnum));
 			return -1;
 		}
-		return idnum;
+		return(idnum);
 	}
 
-	// check for a name match
-	SanitizeString( s, s2 );
-	for ( idnum = 0,cl = level.clients ; idnum < level.maxclients ; idnum++,cl++ ) {
-		if ( cl->pers.connected != CON_CONNECTED ) {
-			continue;
-		}
-		SanitizeString( cl->pers.netname, n2 );
-		if ( !strcmp( n2, s2 ) ) {
-			return idnum;
-		}
-	}
-
-	trap_SendServerCommand( to - g_entities, va( "print \"User [lof]%s [lon]is not on the server\n\"", s ) );
-	return -1;
+	CPx(to - g_entities, va("print \"User [lof]%s [lon]is not on the server\n\"", s));
+	return(-1);
 }
 
 /*
