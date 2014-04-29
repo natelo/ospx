@@ -453,6 +453,18 @@ typedef struct {
 #define FOLLOW_ACTIVE1  -1
 #define FOLLOW_ACTIVE2  -2
 
+// OSPx - Admin/Ref..
+typedef enum {
+	USER_REGULAR,
+	USER_REFEREE,	// Temporary, voted in (limited functionality mainly restricted to votes) players..
+	ADMIN_1,		// ADMIN_* can only be obtained by logging in.
+	ADMIN_2,
+	ADMIN_3,
+	ADMIN_4,
+	ADMIN_5
+} adminStatus_t;
+// -OSPx
+
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
 // time and reading them back at connection time.  Anything added here
@@ -476,6 +488,7 @@ typedef struct {
 	// OSPx
 	unsigned int uci;				// Country Flags
 	unsigned char	ip[4];			// IPs
+	adminStatus_t status;			// Admin, Ref..
 } clientSession_t;
 
 //
