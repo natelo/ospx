@@ -168,6 +168,25 @@ vmCvar_t g_spectatorInactivity;
 vmCvar_t g_showFlags;
 vmCvar_t server_autoconfig;
 
+// Voting
+vmCvar_t vote_allow_comp;
+vmCvar_t vote_allow_gametype;
+vmCvar_t vote_allow_kick;
+vmCvar_t vote_allow_map;
+vmCvar_t vote_allow_matchreset;
+vmCvar_t vote_allow_mutespecs;
+vmCvar_t vote_allow_nextmap;
+vmCvar_t vote_allow_pub;
+vmCvar_t vote_allow_referee;
+vmCvar_t vote_allow_shuffleteamsxp;
+vmCvar_t vote_allow_swapteams;
+vmCvar_t vote_allow_friendlyfire;
+vmCvar_t vote_allow_timelimit;
+vmCvar_t vote_allow_warmupdamage;
+vmCvar_t vote_allow_antilag;
+vmCvar_t vote_allow_balancedteams;
+vmCvar_t vote_allow_muting;
+
 // - System
 vmCvar_t z_serverflags;
 // -OSPx
@@ -310,6 +329,24 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },
 	{ &g_showFlags, "g_showFlags", "1", 0 },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
+
+	{ &vote_allow_comp, "vote_allow_comp", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_gametype, "vote_allow_gametype", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_kick, "vote_allow_kick", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_map, "vote_allow_map", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_matchreset, "vote_allow_matchreset", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_mutespecs, "vote_allow_mutespecs", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_nextmap, "vote_allow_nextmap", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_pub, "vote_allow_pub", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_referee, "vote_allow_referee", "0", 0, 0, qfalse, qfalse },
+	{ &vote_allow_shuffleteamsxp, "vote_allow_shuffleteamsxp", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_swapteams, "vote_allow_swapteams", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_friendlyfire, "vote_allow_friendlyfire", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_timelimit, "vote_allow_timelimit", "0", 0, 0, qfalse, qfalse },
+	{ &vote_allow_warmupdamage, "vote_allow_warmupdamage", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_antilag, "vote_allow_antilag", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_balancedteams, "vote_allow_balancedteams", "1", 0, 0, qfalse, qfalse },
+	{ &vote_allow_muting, "vote_allow_muting", "1", 0, 0, qfalse, qfalse },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse }
 // -OSPx

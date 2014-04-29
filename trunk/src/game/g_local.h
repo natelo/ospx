@@ -648,6 +648,21 @@ struct gclient_s {
 #define MAX_SPAWN_VARS          64
 #define MAX_SPAWN_VARS_CHARS    2048
 
+// OSPx - Votes
+#define VOTE_MAXSTRING	MAX_STRING_TOKENS     
+
+typedef struct voteInfo_s {
+	char voteString[MAX_STRING_CHARS];
+	int voteTime;						// level.time vote was called
+	int voteYes;
+	int voteNo;
+	int numVotingClients;				// set by CalculateRanks
+	int numVotingTeamClients[2];
+	int(*vote_fn)(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+	char vote_value[VOTE_MAXSTRING];	// Desired vote item setting.
+} voteInfo_t;
+// -OSPx
+
 typedef struct {
 	struct gclient_s    *clients;       // [maxclients]
 
@@ -774,8 +789,12 @@ typedef struct {
 	qboolean latchGametype;             // DHM - Nerve
 
 // OSPx
-	int dwBlueReinfOffset;	// Reinforcements offset
-	int dwRedReinfOffset;	// Reinforcements offset	
+	// Reinforcements offset
+	int dwBlueReinfOffset;
+	int dwRedReinfOffset;
+
+	// Votes
+	voteInfo_t voteInfo;
 // -OSPx
 
 } level_locals_t;
@@ -810,6 +829,8 @@ void StopFollowing( gentity_t *ent );
 void SetTeam( gentity_t *ent, char *s );
 void SetWolfData( gentity_t *ent, char *ptype, char *weap, char *grenade, char *skinnum );  // DHM - Nerve
 void Cmd_FollowCycle_f( gentity_t *ent, int dir );
+int ClientNumberFromString(gentity_t *to, char *s);
+void SanitizeString(char *in, char *out, qboolean fToLower);
 
 //
 // g_items.c
@@ -1256,6 +1277,24 @@ extern vmCvar_t g_spectatorInactivity;
 extern vmCvar_t g_showFlags;
 extern vmCvar_t server_autoconfig;
 
+extern vmCvar_t vote_allow_comp;
+extern vmCvar_t vote_allow_gametype;
+extern vmCvar_t vote_allow_kick;
+extern vmCvar_t vote_allow_map;
+extern vmCvar_t vote_allow_matchreset;
+extern vmCvar_t vote_allow_mutespecs;
+extern vmCvar_t vote_allow_nextmap;
+extern vmCvar_t vote_allow_pub;
+extern vmCvar_t vote_allow_referee;
+extern vmCvar_t vote_allow_shuffleteamsxp;
+extern vmCvar_t vote_allow_swapteams;
+extern vmCvar_t vote_allow_friendlyfire;
+extern vmCvar_t vote_allow_timelimit;
+extern vmCvar_t vote_allow_warmupdamage;
+extern vmCvar_t vote_allow_antilag;
+extern vmCvar_t vote_allow_balancedteams;
+extern vmCvar_t vote_allow_muting;
+
 extern vmCvar_t z_serverflags;
 // -OSPx
 
@@ -1490,14 +1529,11 @@ void G_UnTimeShiftClient(gentity_t *ent);
 void G_UnTimeShiftAllClients(gentity_t *skip);
 void G_HistoricalTrace(gentity_t* ent, trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask);
 
+//
 // 
 // OSPx - New stuff below 
 //
-
-// Macros
-#define AP( x ) trap_SendServerCommand( -1, x )					// Print to all
-#define CP( x ) trap_SendServerCommand( ent - g_entities, x )	// Print to an ent
-#define CPx( x, y ) trap_SendServerCommand( x, y )				// Print to id = x
+// ----------------------
 
 //
 // g_match.c
@@ -1526,6 +1562,51 @@ void G_ReadIP(gclient_t *client);
 void G_configSet(int dwMode, qboolean doComp);
 
 //
+// g_vote.c
+//
+int  G_voteCmdCheck(gentity_t *ent, char *arg, char *arg2, qboolean fRefereeCmd);
+void G_voteFlags(void);
+void G_voteHelp(gentity_t *ent, qboolean fShowVote);
+void G_playersMessage(gentity_t *ent);
+// Actual voting commands
+int G_Comp_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Gametype_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Kick_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Mute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_UnMute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Map_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Campaign_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_MapRestart_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_MatchReset_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Mutespecs_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Nextmap_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Pub_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Referee_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_ShuffleTeams_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_StartMatch_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_SwapTeams_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_FriendlyFire_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Timelimit_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Warmupfire_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_Unreferee_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_AntiLag_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_BalancedTeams_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+
+//
+// Macros
+//
+#define AP( x ) trap_SendServerCommand( -1, x )					// Print to all
+#define CP( x ) trap_SendServerCommand( ent - g_entities, x )	// Print to an ent
+#define CPx( x, y ) trap_SendServerCommand( x, y )				// Print to id = x
+
+//
 // Bit Flags
 //
-#define ZSF_COMP        0x01    // Have comp settings loaded for current gametype?
+#define ZSF_COMP		0x01    // Have comp settings loaded for current gametype?
+
+#define HELP_COLUMNS	4
+
+// HRESULTS
+#define G_OK			0
+#define G_INVALID		-1
+#define G_NOTFOUND		-2

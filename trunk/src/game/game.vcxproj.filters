@@ -180,6 +180,9 @@
     <ClCompile Include="g_config.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="g_vote.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.def">
