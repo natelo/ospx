@@ -1419,7 +1419,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	}
 
 	// OSPx - Ignored patch
-	if (!ent->client->sess.muted) {
+	if (ent->client->sess.muted) {
 		CPx(ent - g_entities, "cp \"You are ^1muted^7!\n\"2");
 		return;
 	}
