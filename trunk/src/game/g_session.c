@@ -50,7 +50,7 @@ void G_WriteClientSessionData( gclient_t *client ) {
 	const char  *s;
 	const char  *var;
 
-	s = va( "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",       // DHM - Nerve
+	s = va( "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",       // DHM - Nerve
 			client->sess.sessionTeam,
 			client->sess.spectatorTime,
 			client->sess.spectatorState,
@@ -73,6 +73,7 @@ void G_WriteClientSessionData( gclient_t *client ) {
 			client->sess.ip[2],
 			client->sess.ip[3],
 			client->sess.admin,
+			client->sess.incognito,
 			client->sess.ignored
 			);
 
@@ -118,6 +119,7 @@ void G_ReadSessionData( gclient_t *client ) {
 			(int *)&client->sess.ip[2],
 			(int *)&client->sess.ip[3],
 			(int *)&client->sess.admin,
+			(int *)&client->sess.incognito,
 			(int *)&client->sess.ignored
 			);
 
@@ -213,6 +215,7 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 	sess->ip[2] = 0;
 	sess->ip[3] = 0;
 	sess->admin = USER_REGULAR;
+	sess->incognito = qfalse;
 	sess->ignored = qfalse;
 	// -OSPx
 

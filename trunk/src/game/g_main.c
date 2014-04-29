@@ -164,6 +164,27 @@ vmCvar_t url;
 vmCvar_t g_dbgRevive;
 
 // OSPx
+// - Admins
+vmCvar_t a1_pass;
+vmCvar_t a2_pass;
+vmCvar_t a3_pass;
+vmCvar_t a4_pass;
+vmCvar_t a5_pass;
+vmCvar_t a1_tag;
+vmCvar_t a2_tag;
+vmCvar_t a3_tag;
+vmCvar_t a4_tag;
+vmCvar_t a5_tag;
+vmCvar_t a1_cmds;
+vmCvar_t a2_cmds;
+vmCvar_t a3_cmds;
+vmCvar_t a4_cmds;
+vmCvar_t a5_cmds;
+vmCvar_t a5_allowAll;
+vmCvar_t adm_help;
+vmCvar_t g_extendedLog;
+
+// - General
 vmCvar_t g_spectatorInactivity;
 vmCvar_t g_showFlags;
 vmCvar_t server_autoconfig;
@@ -307,6 +328,25 @@ cvarTable_t gameCvarTable[] = {
 	{&g_dbgRevive, "g_dbgRevive", "0", 0, 0, qfalse},
 
 // OSPx
+	{ &a1_pass, "a1_pass", "none", CVAR_ARCHIVE, 0, qfalse },
+	{ &a2_pass, "a2_pass", "none", CVAR_ARCHIVE, 0, qfalse },
+	{ &a3_pass, "a3_pass", "none", CVAR_ARCHIVE, 0, qfalse },
+	{ &a4_pass, "a4_pass", "none", CVAR_ARCHIVE, 0, qfalse },
+	{ &a5_pass, "a5_pass", "none", CVAR_ARCHIVE, 0, qfalse },
+	{ &a1_tag, "a1_tag", "^1Admin", CVAR_ARCHIVE, 0, qfalse },
+	{ &a2_tag, "a2_tag", "^jAdmin", CVAR_ARCHIVE, 0, qfalse },
+	{ &a3_tag, "a3_tag", "^2Adm!n", CVAR_ARCHIVE, 0, qfalse },
+	{ &a4_tag, "a4_tag", "^3Adm!n", CVAR_ARCHIVE, 0, qfalse },
+	{ &a5_tag, "a5_tag", "^dAdm!n", CVAR_ARCHIVE, 0, qfalse },
+	{ &a1_cmds, "a1_cmds", "", CVAR_ARCHIVE, 0, qfalse },
+	{ &a2_cmds, "a2_cmds", "", CVAR_ARCHIVE, 0, qfalse },
+	{ &a3_cmds, "a3_cmds", "", CVAR_ARCHIVE, 0, qfalse },
+	{ &a4_cmds, "a4_cmds", "", CVAR_ARCHIVE, 0, qfalse },
+	{ &a5_cmds, "a5_cmds", "", CVAR_ARCHIVE, 0, qfalse },
+	{ &a5_allowAll, "a5_allowAll", "0", CVAR_ARCHIVE, 0, qfalse },
+	{ &adm_help, "adm_help", "1", CVAR_ARCHIVE, 0, qfalse },
+	{ &g_extendedLog, "g_extendedLog", "1", CVAR_ARCHIVE, 0, qfalse },
+
 	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },
 	{ &g_showFlags, "g_showFlags", "1", 0 },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },

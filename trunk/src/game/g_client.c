@@ -1356,19 +1356,20 @@ void SaveIP_f(gclient_t * client, char * sip)
 	return;
 }
 
+
 /*
 ===========
 OSPx - To save some time..
 ============
 */
-char *clientIP(gclient_t * client, qboolean full)
+char *clientIP(gentity_t *ent, qboolean full)
 {
 	if (full) {
 		return va("%d.%d.%d.%d",
-			client->sess.ip[0], client->sess.ip[1], client->sess.ip[2], client->sess.ip[3]);
+			ent->client->sess.ip[0], ent->client->sess.ip[1], ent->client->sess.ip[2], ent->client->sess.ip[3]);
 	}
 	else {
-		return va("%d.%d.*.*", client->sess.ip[0], client->sess.ip[1]);
+		return va("%d.%d.*.*", ent->client->sess.ip[0], ent->client->sess.ip[1]);
 	}
 }
 
@@ -1597,9 +1598,9 @@ void ClientUserinfoChanged( int clientNum ) {
 			((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
 
 		// Print essentials and skip the garbage		
-		s = va("name\\%s\\team\\%s\\IP\\%s\\country\\%s\\ignored\\%s\\status\\%s",
-			client->pers.netname, team, clientIP(client, qtrue), client->sess.uci,
-			(client->sess.ignored ? "yes" : "no"), client->sess.admin);
+		s = va("name\\%s\\team\\%s\\IP\\%d.%d.%d.%d\\country\\%s\\ignored\\%s\\status\\%s",
+			client->pers.netname, team, client->sess.ip[0], client->sess.ip[1], client->sess.ip[2], 
+			client->sess.ip[3], client->sess.uci, (client->sess.ignored ? "yes" : "no"), client->sess.admin);
 	}
 	// Account for bots..
 	else {

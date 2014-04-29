@@ -489,6 +489,7 @@ typedef struct {
 	unsigned int uci;				// Country Flags
 	unsigned char	ip[4];			// IPs
 	adminStatus_t admin;			// Admin, ref..
+	qboolean incognito;				// Hidden admin
 	qboolean ignored;				// Ignored..
 } clientSession_t;
 
@@ -531,11 +532,16 @@ typedef struct {
 
 	qboolean bAutoReloadAux;		// TTimo - auxiliary storage for pmoveExt_t::bAutoReload, to achieve persistance
 
-	// OSPx	
+// OSPx	
 	unsigned int clientFlags;		// Client settings that need server involvement
 	unsigned int clientMaxPackets;	// Client com_maxpacket settings
 	unsigned int clientTimeNudge;	// Client cl_timenudge settings
 
+	// Admins
+	char cmd1[128];					//	->!command<-
+	char cmd2[128];					//    !command ->attribute<-
+	char cmd3[128];					//    !command attribute ->extra<-
+// -OSPx
 } clientPersistant_t;
 
 // OSPx - Antilag
@@ -823,6 +829,9 @@ void StopFollowing( gentity_t *ent );
 void SetTeam( gentity_t *ent, char *s );
 void SetWolfData( gentity_t *ent, char *ptype, char *weap, char *grenade, char *skinnum );  // DHM - Nerve
 void Cmd_FollowCycle_f( gentity_t *ent, int dir );
+void SanitizeString(char *in, char *out, qboolean fToLower);
+int ClientNumberFromString(gentity_t *to, char *s);
+int ClientNumberFromNameMatch(char *name, int *matches);
 
 //
 // g_items.c
@@ -1003,6 +1012,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 void AddScore( gentity_t *ent, int score );
 void CalculateRanks( void );
 qboolean SpotWouldTelefrag( gentity_t *spot );
+char *clientIP(gentity_t *ent, qboolean full);
 
 //
 // g_svcmds.c
@@ -1265,6 +1275,25 @@ extern vmCvar_t g_antilag;
 extern vmCvar_t g_dbgRevive;
 
 // OSPx
+extern vmCvar_t	a1_pass;
+extern vmCvar_t	a2_pass;
+extern vmCvar_t	a3_pass;
+extern vmCvar_t	a4_pass;
+extern vmCvar_t	a5_pass;
+extern vmCvar_t	a1_tag;
+extern vmCvar_t	a2_tag;
+extern vmCvar_t	a3_tag;
+extern vmCvar_t	a4_tag;
+extern vmCvar_t	a5_tag;
+extern vmCvar_t	a1_cmds;
+extern vmCvar_t	a2_cmds;
+extern vmCvar_t	a3_cmds;
+extern vmCvar_t	a4_cmds;
+extern vmCvar_t	a5_cmds;
+extern vmCvar_t	a5_allowAll;
+extern vmCvar_t	adm_help;
+extern vmCvar_t g_extendedLog;
+
 extern vmCvar_t g_spectatorInactivity;
 extern vmCvar_t g_showFlags;
 extern vmCvar_t server_autoconfig;
@@ -1503,14 +1532,11 @@ void G_UnTimeShiftClient(gentity_t *ent);
 void G_UnTimeShiftAllClients(gentity_t *skip);
 void G_HistoricalTrace(gentity_t* ent, trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask);
 
+//
 // 
 // OSPx - New stuff below 
 //
-
-// Macros
-#define AP( x ) trap_SendServerCommand( -1, x )					// Print to all
-#define CP( x ) trap_SendServerCommand( ent - g_entities, x )	// Print to an ent
-#define CPx( x, y ) trap_SendServerCommand( x, y )				// Print to id = x
+//
 
 //
 // g_match.c
@@ -1537,6 +1563,40 @@ void G_ReadIP(gclient_t *client);
 // g_config.c
 //
 void G_configSet(int dwMode, qboolean doComp);
+
+//
+// g_shared.c
+//
+void Q_decolorString(char *in, char *out);
+char *getTime(void);
+void Q_tokenize(char *str, char **splitstr, char *delim);
+qboolean Q_findToken(char *haystack, char *needle);
+char *Q_strReplace(char *haystack, char *needle, char *newp);
+
+//
+// g_admin.c
+//
+void admLog(char *info);
+char *sortTag(gentity_t *ent);
+char *usrTag(gentity_t *ent, qboolean inquiry);
+void ParseAdmStr(const char *strInput, char *strCmd, char *strArgs);
+qboolean cmds_admin(char cmd[MAX_TOKEN_CHARS], gentity_t *ent);
+void cmd_do_login(gentity_t *ent, qboolean silent);
+void cmd_do_logout(gentity_t *ent);
+int ClientNumberFromNameMatch(char *name, int *matches);
+
+//
+// g_files.c
+//
+void logEntry(char *filename, char *info);
+
+//
+// Macros
+//
+#define AP( x ) trap_SendServerCommand( -1, x )					// Print to all
+#define CP( x ) trap_SendServerCommand( ent - g_entities, x )	// Print to an ent
+#define CPx( x, y ) trap_SendServerCommand( x, y )				// Print to id = x
+#define ARRAY_LEN(x) (sizeof(x) / sizeof(*(x)))					// Saves some time..
 
 //
 // Bit Flags

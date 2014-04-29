@@ -244,6 +244,52 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 }
 
 /*
+===========
+OSPx - ClientNumberFromNameMatch
+
+Get client number from name
+===========
+*/
+int ClientNumberFromNameMatch(char *name, int *matches) {
+	int i, textLen;
+	char nm[32];
+	char c;
+	int index = 0;
+
+	Q_strncpyz(nm, name, sizeof(nm));
+	Q_CleanStr(nm);
+	textLen = strlen(nm);
+	c = *nm;
+
+	for (i = 0; i < level.maxclients; i++)
+	{
+		int j, len;
+		char playerName[32];
+
+		if ((!g_entities[i].client) || (g_entities[i].client->pers.connected != CON_CONNECTED))
+			continue;
+
+		Q_strncpyz(playerName, g_entities[i].client->pers.netname, sizeof(playerName));
+		Q_CleanStr(playerName);
+		len = strlen(playerName);
+
+		for (j = 0; j < len; j++)
+		{
+			if (tolower(c) == tolower(playerName[j]))
+			{
+				if (!Q_stricmpn(nm, playerName + j, textLen))
+				{
+					matches[index] = i;
+					index++;
+					break;
+				}
+			}
+		}
+	}
+	return index;
+}
+
+/*
 ==================
 Cmd_Give_f
 
@@ -993,6 +1039,36 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	char text[MAX_SAY_TEXT];
 	char location[64];
 	qboolean localize = qfalse;
+// OSPx
+	char *tag = "";
+	char arg[MAX_SAY_TEXT]; // ! & ? 
+	char cmd1[128];
+	char cmd2[128];
+	char cmd3[128];
+	
+	Q_strncpyz(text, chatText, sizeof(text));
+
+	// Admin commands
+	if (ent->client->sess.admin != USER_REGULAR) {
+		// Command
+		if ((text[0] == '?') || (text[0] == '!')) {
+			ParseAdmStr(text, cmd1, arg);
+			ParseAdmStr(arg, cmd2, cmd3);
+
+			Q_strncpyz(ent->client->pers.cmd1, cmd1, sizeof(ent->client->pers.cmd1));
+			Q_strncpyz(ent->client->pers.cmd2, cmd2, sizeof(ent->client->pers.cmd2));
+			Q_strncpyz(ent->client->pers.cmd3, cmd3, sizeof(ent->client->pers.cmd3));
+
+			cmds_admin(text[0] == '?' ? "?" : "!", ent);
+			return;
+		}
+	}
+
+	// Admin tags..
+	if (!ent->client->sess.incognito) {
+		tag = va("^7(%s)", usrTag(ent, qfalse));
+	}
+// -OSPx
 
 	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM ) {
 		mode = SAY_ALL;
@@ -1001,7 +1077,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	switch ( mode ) {
 	default:
 	case SAY_ALL:
-		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, chatText );
+		G_LogPrintf( "say: %s%s: %s\n", ent->client->pers.netname, tag, chatText ); // OSPx - Tag
 		Com_sprintf( name, sizeof( name ), "%s%c%c: ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_GREEN;
 		break;
@@ -1035,8 +1111,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		break;
 		// -NERVE - SMF
 	}
-
-	Q_strncpyz( text, chatText, sizeof( text ) );
 
 	if ( target ) {
 		G_SayTo( ent, target, mode, color, name, text, localize );
