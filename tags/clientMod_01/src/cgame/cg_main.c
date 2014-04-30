@@ -304,7 +304,9 @@ vmCvar_t cg_noVoice;
 vmCvar_t cg_zoomedFOV;
 vmCvar_t cg_zoomedSens;
 vmCvar_t cg_noAmmoAutoSwitch;
-
+vmCvar_t cg_coloredCrosshairNames;
+vmCvar_t vp_drawnames;
+vmCvar_t cg_drawNames;
 // -OSPx
 
 typedef struct {
@@ -527,6 +529,9 @@ cvarTable_t cvarTable[] = {
 	{ &cg_zoomedFOV, "cg_zoomedFOV", "90", CVAR_ARCHIVE },
 	{ &cg_zoomedSens, "cg_zoomedSens", ".3", CVAR_ARCHIVE },
 	{ &cg_noAmmoAutoSwitch, "cg_noAmmoAutoSwitch", "1", CVAR_ARCHIVE },
+	{ &cg_coloredCrosshairNames, "cg_coloredCrosshairNames", "1", CVAR_ARCHIVE },
+	{ &vp_drawnames, "vp_drawnames", "0", CVAR_ARCHIVE | CVAR_CHEAT },
+	{ &cg_drawNames, "cg_drawNames", "1", CVAR_ROM }
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );

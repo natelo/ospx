@@ -58,6 +58,63 @@ void Controls_GetConfig( void );
 ///////////////////////
 ///////////////////////
 
+/*
+OSPx - HUD names ETpro port
+*/
+int	numnames = 0;
+
+typedef struct {
+	float x;
+	float y;
+	float dist;
+	char name[MAX_NAME_LENGTH + 1];
+} etpro_name_t;
+
+etpro_name_t hudnames[128];
+
+void VP_ResetNames(void) {
+	numnames = 0;
+}
+int RealStrLen(char *s){
+	int ret = strlen(s);
+	for (; *s; s++) {
+		if (Q_IsColorString(s))
+			ret -= 2;
+	}
+	return ret < 50 ? ret : 50;
+}
+void VP_DrawNames(void) {
+	int i;
+	float fontsize;
+	float dist;
+
+	for (i = 0; i < numnames; i++)
+	{
+		//need to come up with better scaler
+		fontsize = cgs.media.charsetShader;
+		dist = hudnames[i].dist > 1000.0f ? 1000.0f : hudnames[i].dist;
+		dist /= 2000.0f;
+		fontsize -= (dist * fontsize);
+
+		CG_DrawStringExt((hudnames[i].x - ((RealStrLen(hudnames[i].name) * 6) >> 1)),
+			hudnames[i].y, hudnames[i].name, colorWhite, qfalse, qfalse, 6, 12, 50);
+	}
+}
+void VP_AddName(int x, int y, float dist, int clientNum) {
+
+	if (clientNum == cg.clientNum)
+		return;
+
+	hudnames[numnames].x = x;
+	hudnames[numnames].y = y;
+	hudnames[numnames].dist = dist;
+	Q_strncpyz(hudnames[numnames].name, cgs.clientinfo[clientNum].name, sizeof(hudnames[numnames].name));
+	numnames++;
+
+}
+
+// -OSPx 
+
 int CG_Text_Width( const char *text, float scale, int limit ) {
 	int count,len;
 	float out;
@@ -860,28 +917,21 @@ Reinforcements Offset
 =================
 */
 char *CG_CalculateReinfTime( void ) {
-	int msec, mins, seconds, tens;
+	int respawn = 0;
 	char *s = "0.00";
 
 	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED) {
-		msec = cg_redlimbotime.integer - (cg.time % cg_redlimbotime.integer);
+		respawn = (int)(1 + (float)(cg_redlimbotime.integer - (cg.time % cg_redlimbotime.integer)) * 0.001f);
 	}
 	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_BLUE)     {
-		msec = cg_bluelimbotime.integer - (cg.time % cg_bluelimbotime.integer);
-	}
-	else {
-		msec = 0;
+		respawn = (int)(1 + (float)(cg_bluelimbotime.integer - (cg.time % cg_bluelimbotime.integer)) * 0.001f);
 	}
 
-	if (msec) {
-		seconds = msec / 1000;
-		mins = seconds / 60;
-		seconds -= mins * 60;
-		tens = seconds / 10;
-		seconds -= tens * 10;
-
-		s = va("%2.0f:%i%i", (float)mins, tens, seconds + 1);
+	if (respawn)
+	{
+		s = va("%d", respawn);
 	}
+	
 	return s;
 }
 
@@ -908,13 +958,13 @@ static float CG_DrawRespawnTimer(float y) {
 	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR)
 		str = "";
 	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_RED)
-		str = va("Re: %s", CG_CalculateReinfTime());
+		str = va("Re: %-3s", CG_CalculateReinfTime());
 	else if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_BLUE)
-		str = va("Re: %s", CG_CalculateReinfTime());
+		str = va("Re: %-3s", CG_CalculateReinfTime());
 
 	w = CG_DrawStrlen(str) * TINYCHAR_WIDTH;
 
-	x = 46 + 3;
+	x = 68 + 3;
 	y = 480 - 245;
 
 	if (cgs.gamestate != GS_PLAYING) {
@@ -2155,7 +2205,13 @@ static void CG_DrawCrosshairNames( void ) {
 	w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 
 	// draw the name and class
-	CG_DrawSmallStringColor( 320 - w / 2, 170, s, color );
+	// OSPx - Colored names
+	if (cg_coloredCrosshairNames.integer) {
+		CG_DrawStringExt(320 - w / 2, 170, s, color, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 40);
+	}
+	else {
+		CG_DrawSmallStringColor(320 - w / 2, 170, s, color);
+	}
 
 	// draw the health bar
 	playerHealth = cg.identifyClientHealth;
@@ -2576,9 +2632,9 @@ static void CG_DrawWarmup( void ) {
 	}
 
 	if ( cgs.gametype == GT_WOLF_STOPWATCH ) {
-		s = va( "%s %i", CG_TranslateString( "(^3WARMUP^7) Match begins in:" ), sec + 1 );
+		s = va( "%s %i", CG_TranslateString( "(^3WARMUP^7) Match begins in:^3" ), sec + 1 );
 	} else {
-		s = va( "%s %i", CG_TranslateString( "(^3WARMUP^7) Match begins in:" ), sec + 1 );
+		s = va( "%s %i", CG_TranslateString( "(^3WARMUP^7) Match begins in:^3" ), sec + 1 );
 	}
 
 	w = CG_DrawStrlen( s );
@@ -2592,7 +2648,7 @@ static void CG_DrawWarmup( void ) {
 		const char  *cs;
 		int defender;
 
-		s = va( "%s %i", CG_TranslateString( "Stopwatch Round" ), cgs.currentRound + 1 );
+		s = va( "%s %i", CG_TranslateString( "Stopwatch Round ^3" ), cgs.currentRound + 1 );
 
 		cs = CG_ConfigString( CS_MULTI_INFO );
 		defender = atoi( Info_ValueForKey( cs, "defender" ) );
@@ -3327,6 +3383,61 @@ static void CG_ScreenFade( void ) {
 	}
 }
 
+// OSPx - Draw HUD Names
+void CG_DrawOnScreenNames(void)
+{
+	static vec3_t	mins = { -1, -1, -1 };
+	static vec3_t	maxs = { 1, 1, 1 };
+	vec4_t			white = { 1.0f, 1.0f, 1.0f, 1.0f };
+	specName_t		*spcNm;
+	trace_t			tr;
+	int				clientNum;
+	int				FadeOut = 0;
+	int				FadeIn = 0;
+
+	for (clientNum = 0; clientNum < cgs.maxclients; clientNum++) {
+
+		if (!cgs.clientinfo[clientNum].infoValid)
+			continue;
+
+		spcNm = &cg.specOnScreenNames[clientNum];
+		if (!spcNm || !spcNm->visible)
+			continue;
+
+		CG_Trace(&tr, cg.refdef.vieworg, mins, maxs, spcNm->origin, -1, CONTENTS_SOLID);
+
+		if (tr.fraction < 1.0f) {
+			spcNm->lastInvisibleTime = cg.time;
+		}
+		else {
+			spcNm->lastVisibleTime = cg.time;
+		}
+
+		FadeOut = cg.time - spcNm->lastVisibleTime;
+		FadeIn = cg.time - spcNm->lastInvisibleTime;
+
+		if (FadeIn) {
+			white[3] = (FadeIn > 500) ? 1.0 : FadeIn / 500.0f;
+			if (white[3] < spcNm->alpha)
+				white[3] = spcNm->alpha;
+		}
+		if (FadeOut) {
+			white[3] = (FadeOut > 500) ? 0.0 : 1.0 - FadeOut / 500.0f;
+			if (white[3] > spcNm->alpha)
+				white[3] = spcNm->alpha;
+		}
+		if (white[3] > 1.0)
+			white[3] = 1.0;
+
+		spcNm->alpha = white[3];
+		if (spcNm->alpha <= 0.0) continue;	// no alpha = nothing to draw..
+
+		CG_Text_Paint_ext2(spcNm->x, spcNm->y, spcNm->scale, white, spcNm->text, 0, 0, 0);
+		// expect update next frame again
+		spcNm->visible = qfalse;
+	}
+}
+
 // JPW NERVE
 void CG_Draw2D2( void ) {
 	qhandle_t weapon;
@@ -3534,6 +3645,13 @@ static void CG_Draw2D( void ) {
 		return;
 	}
 
+	// OSPx - Hud Names
+	if (vp_drawnames.integer)
+		VP_DrawNames();
+
+	VP_ResetNames();
+	// -OSPx
+
 	CG_DrawFlashBlendBehindHUD();
 
 #ifndef PRE_RELEASE_DEMO
@@ -3547,7 +3665,12 @@ static void CG_Draw2D( void ) {
 	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
 		CG_DrawSpectator();
 		CG_DrawCrosshair();
-		CG_DrawCrosshairNames();
+		
+		// OSPx - Draw Hud Names
+		if (cg_drawNames.integer)
+			CG_DrawOnScreenNames();
+		else
+			CG_DrawCrosshairNames();
 
 		// NERVE - SMF - we need to do this for spectators as well
 		if ( cgs.gametype >= GT_TEAM ) {
@@ -3607,6 +3730,9 @@ static void CG_Draw2D( void ) {
 		CG_DrawLimboMessage();
 		// -NERVE - SMF
 	}
+
+	// OSPx - Announcer
+	CG_DrawAnnouncer();
 
 	// Ridah, draw flash blends now
 	CG_DrawFlashBlend();
@@ -3736,6 +3862,375 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// draw status bar and other floating elements
 	CG_Draw2D();
+}
+
+/*
+
+OSPx - New stuff below
+
+Various ports from ET, wolfX..
+
+*/
+
+/*
+=====================
+CG_Text_PaintChar_Ext
+=====================
+*/
+void CG_Text_PaintChar_Ext(float x, float y, float w, float h, float scalex, float scaley, float s, float t, float s2, float t2, qhandle_t hShader) {
+	w *= scalex;
+	h *= scaley;
+	CG_AdjustFrom640(&x, &y, &w, &h);
+	trap_R_DrawStretchPic(x, y, w, h, s, t, s2, t2, hShader);
+}
+
+/*
+=====================
+CG_Text_Paint_ext2
+=====================
+*/
+void CG_Text_Paint_ext2(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style) {
+	int len, count;
+	vec4_t newColor;
+	glyphInfo_t *glyph;
+	float useScale;
+	fontInfo_t *font = &cgDC.Assets.textFont;
+
+	font = &cgDC.Assets.bigFont;
+
+	useScale = scale * font->glyphScale;
+
+	color[3] *= cg_hudAlpha.value;	// (SA) adjust for cg_hudalpha
+
+	if (text) {
+		const char *s = text;
+		trap_R_SetColor(color);
+		memcpy(&newColor[0], &color[0], sizeof(vec4_t));
+		len = strlen(text);
+		if (limit > 0 && len > limit) {
+			len = limit;
+		}
+		count = 0;
+		while (s && *s && count < len) {
+			glyph = &font->glyphs[(int)*s];
+			if (Q_IsColorString(s)) {
+				memcpy(newColor, g_color_table[ColorIndex(*(s + 1))], sizeof(newColor));
+				newColor[3] = color[3];
+				trap_R_SetColor(newColor);
+				s += 2;
+				continue;
+			}
+			else {
+				float yadj = useScale * glyph->top;
+				if (style == ITEM_TEXTSTYLE_SHADOWED || style == ITEM_TEXTSTYLE_SHADOWEDMORE) {
+					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
+					colorBlack[3] = newColor[3];
+					trap_R_SetColor(colorBlack);
+					CG_Text_PaintChar(x + ofs, y - yadj + ofs,
+						glyph->imageWidth,
+						glyph->imageHeight,
+						useScale,
+						glyph->s,
+						glyph->t,
+						glyph->s2,
+						glyph->t2,
+						glyph->glyph);
+					colorBlack[3] = 1.0;
+					trap_R_SetColor(newColor);
+				}
+				CG_Text_PaintChar(x, y - yadj,
+					glyph->imageWidth,
+					glyph->imageHeight,
+					useScale,
+					glyph->s,
+					glyph->t,
+					glyph->s2,
+					glyph->t2,
+					glyph->glyph);
+				x += (glyph->xSkip * useScale) + adjust;
+				s++;
+				count++;
+			}
+		}
+		trap_R_SetColor(NULL);
+	}
+}
+
+/*
+=====================
+CG_Text_Width_ext2
+=====================
+*/
+int CG_Text_Width_ext2(const char *text, float scale, int limit) {
+	int count, len;
+	float out;
+	glyphInfo_t *glyph;
+	float useScale;
+	const char *s = text;
+	fontInfo_t *font = &cgDC.Assets.textFont;
+
+	font = &cgDC.Assets.bigFont;
+
+	useScale = scale * font->glyphScale;
+	out = 0;
+	if (text) {
+		len = strlen(text);
+		if (limit > 0 && len > limit) {
+			len = limit;
+		}
+		count = 0;
+		while (s && *s && count < len) {
+			if (Q_IsColorString(s)) {
+				s += 2;
+				continue;
+			}
+			else {
+				glyph = &font->glyphs[(int)*s];
+				out += glyph->xSkip;
+				s++;
+				count++;
+			}
+		}
+	}
+	return out * useScale;
+}
+
+/*
+=====================
+CG_Text_Height_ext2
+=====================
+*/
+int CG_Text_Height_ext2(const char *text, float scale, int limit) {
+	int len, count;
+	float max;
+	glyphInfo_t *glyph;
+	float useScale;
+	const char *s = text;
+	fontInfo_t *font = &cgDC.Assets.textFont;
+
+	font = &cgDC.Assets.bigFont;
+
+	useScale = scale * font->glyphScale;
+	max = 0;
+	if (text) {
+		len = strlen(text);
+		if (limit > 0 && len > limit) {
+			len = limit;
+		}
+		count = 0;
+		while (s && *s && count < len) {
+			if (Q_IsColorString(s)) {
+				s += 2;
+				continue;
+			}
+			else {
+				glyph = &font->glyphs[(int)*s];
+				if (max < glyph->height) {
+					max = glyph->height;
+				}
+				s++;
+				count++;
+			}
+		}
+	}
+	return max * useScale;
+}
+
+/*
+=====================
+CG_Text_Paint_Ext
+=====================
+*/
+void CG_Text_Paint_Ext(float x, float y, float scalex, float scaley, vec4_t color, const char *text, float adjust, int limit, int style, fontInfo_t* font) {
+	int len, count;
+	vec4_t newColor;
+	glyphInfo_t *glyph;
+
+	scalex *= font->glyphScale;
+	scaley *= font->glyphScale;
+
+	if (text) {
+		const char *s = text;
+		trap_R_SetColor(color);
+		memcpy(&newColor[0], &color[0], sizeof(vec4_t));
+		len = strlen(text);
+		if (limit > 0 && len > limit) {
+			len = limit;
+		}
+		count = 0;
+		while (s && *s && count < len) {
+			glyph = &font->glyphs[(unsigned char)*s];
+			if (Q_IsColorString(s)) {
+				if (*(s + 1) == COLOR_NULL) {
+					memcpy(newColor, color, sizeof(newColor));
+				}
+				else {
+					memcpy(newColor, g_color_table[ColorIndex(*(s + 1))], sizeof(newColor));
+					newColor[3] = color[3];
+				}
+				trap_R_SetColor(newColor);
+				s += 2;
+				continue;
+			}
+			else {
+				float yadj = scaley * glyph->top;
+				if (style == ITEM_TEXTSTYLE_SHADOWED || style == ITEM_TEXTSTYLE_SHADOWEDMORE) {
+					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
+					colorBlack[3] = newColor[3];
+					trap_R_SetColor(colorBlack);
+					CG_Text_PaintChar_Ext(x + (glyph->pitch * scalex) + ofs, y - yadj + ofs, glyph->imageWidth, glyph->imageHeight, scalex, scaley, glyph->s, glyph->t, glyph->s2, glyph->t2, glyph->glyph);
+					colorBlack[3] = 1.0;
+					trap_R_SetColor(newColor);
+				}
+				CG_Text_PaintChar_Ext(x + (glyph->pitch * scalex), y - yadj, glyph->imageWidth, glyph->imageHeight, scalex, scaley, glyph->s, glyph->t, glyph->s2, glyph->t2, glyph->glyph);
+				x += (glyph->xSkip * scalex) + adjust;
+				s++;
+				count++;
+			}
+		}
+		trap_R_SetColor(NULL);
+	}
+}
+
+/*
+=====================
+CG_Text_Height_Ext
+=====================
+*/
+int CG_Text_Height_Ext(const char *text, float scale, int limit, fontInfo_t* font) {
+	int len, count;
+	float max;
+	glyphInfo_t *glyph;
+	float useScale;
+	const char *s = text;
+
+	useScale = scale * font->glyphScale;
+	max = 0;
+	if (text) {
+		len = strlen(text);
+		if (limit > 0 && len > limit) {
+			len = limit;
+		}
+		count = 0;
+		while (s && *s && count < len) {
+			if (Q_IsColorString(s)) {
+				s += 2;
+				continue;
+			}
+			else {
+				glyph = &font->glyphs[(unsigned char)*s];
+				if (max < glyph->height) {
+					max = glyph->height;
+				}
+				s++;
+				count++;
+			}
+		}
+	}
+	return max * useScale;
+}
+
+/*
+=====================
+CG_Text_Width_Ext
+=====================
+*/
+int CG_Text_Width_Ext(const char *text, float scale, int limit, fontInfo_t* font) {
+	int count, len;
+	glyphInfo_t *glyph;
+	const char *s = text;
+	float out, useScale = scale * font->glyphScale;
+
+	out = 0;
+	if (text) {
+		len = strlen(text);
+		if (limit > 0 && len > limit) {
+			len = limit;
+		}
+		count = 0;
+		while (s && *s && count < len) {
+			if (Q_IsColorString(s)) {
+				s += 2;
+				continue;
+			}
+			else {
+				glyph = &font->glyphs[(unsigned char)*s];
+				out += glyph->xSkip;
+				s++;
+				count++;
+			}
+		}
+	}
+	return out * useScale;
+}
+
+
+/*
+=====================
+CG_DrawAnnouncer
+
+Ported from ET
+=====================
+*/
+
+void CG_DrawAnnouncer(void)
+{
+	int		x, y, w, h;
+	float	scale, fade;
+	vec4_t	color;
+
+	if (cg.centerPrintAnnouncerTime <= cg.time)
+		return;
+
+	fade = (float)(cg.centerPrintAnnouncerTime - cg.time) / cg.centerPrintAnnouncerDuration;
+
+	color[0] = cg.centerPrintAnnouncerColor[0];
+	color[1] = cg.centerPrintAnnouncerColor[1];
+	color[2] = cg.centerPrintAnnouncerColor[2];
+
+	switch (cg.centerPrintAnnouncerMode){
+	default:
+	case ANNOUNCER_NORMAL:
+		color[3] = fade;
+		break;
+	case ANNOUNCER_SINE:
+		color[3] = sin(M_PI * fade);
+		break;
+	case ANNOUNCER_INVERSE_SINE:
+		color[3] = 1 - sin(M_PI * fade);
+		break;
+	case ANNOUNCER_TAN:
+		color[3] = tan(M_PI * fade);
+	}
+
+	scale = (1.1f - color[3]) * cg.centerPrintAnnouncerScale;
+
+	h = CG_Text_Height_Ext(cg.centerPrintAnnouncer, scale, 0, &cgDC.Assets.textFont);
+
+	y = (SCREEN_HEIGHT - h) / 2;
+
+	w = CG_Text_Width_Ext(cg.centerPrintAnnouncer, scale, 0, &cgDC.Assets.textFont);
+
+	x = (SCREEN_WIDTH - w) / 2;
+
+	CG_Text_Paint_Ext(x, y, scale, scale, color, cg.centerPrintAnnouncer, 0, 0, 0, &cgDC.Assets.textFont);
+}
+
+void CG_AddAnnouncer(char *text, sfxHandle_t sound, float scale, int duration, float r, float g, float b, int mode)
+{
+	if (sound)
+		trap_S_StartLocalSound(sound, CHAN_ANNOUNCER);
+
+	if (text){
+		cg.centerPrintAnnouncer = text;
+		cg.centerPrintAnnouncerTime = cg.time + duration;
+		cg.centerPrintAnnouncerScale = scale;
+		cg.centerPrintAnnouncerDuration = duration;
+		cg.centerPrintAnnouncerColor[0] = r;
+		cg.centerPrintAnnouncerColor[1] = g;
+		cg.centerPrintAnnouncerColor[2] = b;
+		cg.centerPrintAnnouncerMode = mode;
+	}
 }
 
 

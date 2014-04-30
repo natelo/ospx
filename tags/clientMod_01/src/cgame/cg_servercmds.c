@@ -759,6 +759,13 @@ static void CG_MapRestart( void ) {
 		}
 	}
 #endif
+
+	// OSPx - Fight Announcement 
+	if (cg.warmup == 0)
+		// Poor man's solution...replace font one of this days as this is ridicoulus.	:C		
+		CG_AddAnnouncer("F IGH T !", cgs.media.countFightSound, 1.6f, 1200, 0.5f, 0.0f, 0.0f, ANNOUNCER_NORMAL);
+	// -OSPx
+
 	trap_Cvar_Set( "cg_thirdPerson", "0" );
 }
 
@@ -1443,7 +1450,7 @@ static void CG_ServerCommand( void ) {
 			}
 
 			// OSPx - Client logging
-			if (cg_printObjectiveInfo.integer > 0 && (args == 4 || atoi(CG_Argv(2)) > 1)) {
+			if (cg_printObjectiveInfo.integer > 0 && (args == 4 || atoi(CG_Argv(2)) > 1) && !cg.warmup) {
 				CG_Printf("[cgnotify]*** ^zINFO: ^n%s\n", Q_CleanStr((char *)CG_LocalizeServerCommand(CG_Argv(1))));
 			}
 
