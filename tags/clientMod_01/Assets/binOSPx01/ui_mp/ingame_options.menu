@@ -412,7 +412,7 @@
 			name view
 			type ITEM_TYPE_YESNO				
 			group grpOptions
-			text "Solid Crosshair:"
+			text "Crosshair Pulsing:"
 			rect 99 135 256 12
 			cvar "cg_crosshairPulse"			
 			textalign ITEM_ALIGN_RIGHT
