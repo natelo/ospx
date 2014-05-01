@@ -1451,7 +1451,7 @@ static void CG_ServerCommand( void ) {
 
 			// OSPx - Client logging
 			if (cg_printObjectiveInfo.integer > 0 && (args == 4 || atoi(CG_Argv(2)) > 1) && !cg.warmup) {
-				CG_Printf("[cgnotify]*** ^zINFO: ^n%s\n", Q_CleanStr((char *)CG_LocalizeServerCommand(CG_Argv(1))));
+				CG_Printf("[cgnotify]*** INFO: ^3%s\n", Q_CleanStr((char *)CG_LocalizeServerCommand(CG_Argv(1))));
 			}
 
 			CG_PriorityCenterPrint( s, SCREEN_HEIGHT - ( SCREEN_HEIGHT * 0.25 ), SMALLCHAR_WIDTH, atoi( CG_Argv( 2 ) ) );
