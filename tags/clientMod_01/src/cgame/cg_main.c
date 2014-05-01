@@ -299,6 +299,7 @@ vmCvar_t cg_printObjectiveInfo;
 vmCvar_t cg_muzzleFlash;
 vmCvar_t cg_complaintPopUp;
 vmCvar_t cg_drawReinforcementTime;
+vmCvar_t cg_reinforcementTimeColor;
 vmCvar_t cg_noChat;
 vmCvar_t cg_noVoice;
 vmCvar_t cg_zoomedFOV;
@@ -524,6 +525,7 @@ cvarTable_t cvarTable[] = {
 	{ &cg_muzzleFlash, "cg_muzzleFlash", "1", CVAR_ARCHIVE },
 	{ &cg_complaintPopUp, "cg_complaintPopUp", "1", CVAR_ARCHIVE },
 	{ &cg_drawReinforcementTime, "cg_drawReinforcementTime", "1", CVAR_ARCHIVE },
+	{ &cg_reinforcementTimeColor, "cg_reinforcementTimeColor", "yellow", CVAR_ARCHIVE },
 	{ &cg_noChat, "cg_noChat", "0", CVAR_ARCHIVE },
 	{ &cg_noVoice, "cg_noVoice", "0", CVAR_ARCHIVE },
 	{ &cg_zoomedFOV, "cg_zoomedFOV", "90", CVAR_ARCHIVE },
@@ -569,6 +571,9 @@ void CG_RegisterCvars( void ) {
 	// Crosshairs
 	BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
 	BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
+
+	// Reinforcements color
+	BG_setCrosshair(cg_reinforcementTimeColor.string, cg.reinforcementColor, 1.0, "cg_reinforcementTimeColor");
 // -OSPx
 }
 
@@ -603,13 +608,19 @@ void CG_UpdateCvars( void ) {
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Update( cv->vmCvar );
 
-		// OSPx - Crosshairs
+// OSPx 
+		// Crosshairs
 		if (cv->vmCvar == &cg_crosshairColor || cv->vmCvar == &cg_crosshairAlpha) {
 			BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
 		}
 		else if (cv->vmCvar == &cg_crosshairColorAlt || cv->vmCvar == &cg_crosshairAlphaAlt)     {
 			BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
-		} // -OSPx
+		} 
+		// Reinforcements
+		else if (cv->vmCvar == &cg_reinforcementTimeColor) {
+			BG_setCrosshair(cg_reinforcementTimeColor.string, cg.reinforcementColor, 1.0, "cg_reinforcementTimeColor");
+		}
+// -OSPx
 	}
 
 	// if force model changed

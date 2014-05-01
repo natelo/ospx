@@ -1025,6 +1025,9 @@ typedef struct {
 	// Draw names on hud
 	qboolean	renderingFreeCam;
 	specName_t	specOnScreenNames[MAX_CLIENTS];
+
+	// Reinforcements 
+	vec4_t reinforcementColor;
 // -OSPx
 
 	pmoveExt_t pmext;
@@ -1827,6 +1830,7 @@ extern vmCvar_t cg_printObjectiveInfo;
 extern vmCvar_t cg_muzzleFlash;
 extern vmCvar_t cg_complaintPopUp;
 extern vmCvar_t cg_drawReinforcementTime;
+extern vmCvar_t cg_reinforcementTimeColor;
 extern vmCvar_t cg_noChat;
 extern vmCvar_t cg_noVoice;
 extern vmCvar_t cg_zoomedFOV;
