@@ -2110,7 +2110,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 void CG_DrawWeaponSelect( void );
 void CG_DrawHoldableSelect( void );
 
-void CG_OutOfAmmoChange( qboolean allowforceswitch );
+void CG_OutOfAmmoChange( void );
 void CG_HoldableUsedupChange( void ); //----(SA)	added
 
 //----(SA) added to header to access from outside cg_weapons.c
