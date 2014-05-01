@@ -825,6 +825,8 @@ static float CG_DrawTeamOverlay( float y ) {
 	for ( i = 0; i < numSortedTeamPlayers; i++ ) {
 		ci = cgs.clientinfo + sortedTeamPlayers[i];
 		if ( ci->infoValid && ci->team == cg.snap->ps.persistant[PERS_TEAM] ) {
+			// OSPx - Add * in front or revivable players..
+			char *isRevivable = "";
 
 			// NERVE - SMF
 			// determine class type
@@ -865,11 +867,15 @@ static float CG_DrawTeamOverlay( float y ) {
 				pcolor = damagecolor;
 			} else {
 				pcolor = deathcolor;
+
+				// OSPx - *
+				if (!(cg.snap->ps.pm_flags & PMF_LIMBO))
+					isRevivable = "*";
 			}
 			// jpw
 
-			CG_DrawStringExt( xx, y,
-							  ci->name, pcolor, qtrue, qfalse,
+			CG_DrawStringExt( xx, y, // OSPx - Patched for *
+							  va("%s%s", isRevivable, ci->name), pcolor, qtrue, qfalse,
 							  TINYCHAR_WIDTH, TINYCHAR_HEIGHT, TEAM_OVERLAY_MAXNAME_WIDTH );
 
 			if ( lwidth ) {
