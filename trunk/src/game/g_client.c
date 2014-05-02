@@ -1585,10 +1585,9 @@ void ClientUserinfoChanged( int clientNum ) {
 			client->sess.uci, (client->sess.ignored ? 1 : 0), client->sess.admin);
 	}
 
-	//----(SA) end
-
+	//----(SA) end	
 	trap_SetConfigstring(CS_PLAYERS + clientNum, s);
-
+	
 	// OSPx - We need to send client private info (ip..) only to log and not a configstring,
 	// as \configstrings reveals all user data in it which is something we don't want..
 	if (!(ent->r.svFlags & SVF_BOT)) {
@@ -1598,7 +1597,7 @@ void ClientUserinfoChanged( int clientNum ) {
 			((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
 
 		// Print essentials and skip the garbage		
-		s = va("name\\%s\\team\\%s\\IP\\%d.%d.%d.%d\\country\\%s\\ignored\\%s\\status\\%s",
+		s = va("name\\%s\\team\\%s\\IP\\%d.%d.%d.%d\\country\\%d\\ignored\\%s\\status\\%d",
 			client->pers.netname, team, client->sess.ip[0], client->sess.ip[1], client->sess.ip[2], 
 			client->sess.ip[3], client->sess.uci, (client->sess.ignored ? "yes" : "no"), client->sess.admin);
 	}
@@ -1611,10 +1610,8 @@ void ClientUserinfoChanged( int clientNum ) {
 
 		s = va("Bot: name\\%s\\team\\%s", client->pers.netname, team);
 	}
-
-	// this is not the userinfo actually, it's the config string
+	
 	G_LogPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, s );
-	G_DPrintf( "ClientUserinfoChanged: %i :: %s\n", clientNum, s );
 }
 
 /*
