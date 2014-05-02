@@ -114,10 +114,10 @@ void G_ReadSessionData( gclient_t *client ) {
 			&client->sess.latchPlayerItem,  // DHM - Nerve
 			&client->sess.latchPlayerSkin,	// DHM - Nerve
 			&client->sess.uci,
-			(int *)&client->sess.ip[0],
-			(int *)&client->sess.ip[1],
-			(int *)&client->sess.ip[2],
-			(int *)&client->sess.ip[3],
+			&client->sess.ip[0],
+			&client->sess.ip[1],
+			&client->sess.ip[2],
+			&client->sess.ip[3],
 			(int *)&client->sess.admin,
 			(int *)&client->sess.incognito,
 			(int *)&client->sess.ignored
@@ -209,7 +209,7 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 	// dhm - end
 
 	// OSPx
-	sess->uci = 0;
+	sess->uci = 255;
 	sess->ip[0] = 0;
 	sess->ip[1] = 0;
 	sess->ip[2] = 0;

@@ -1573,16 +1573,16 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	if (ent->r.svFlags & SVF_BOT) {
 
-		s = va("n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\country\\255\\mu\\0\\st\\0",
+		s = va("n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\country\\255\\mu\\0",
 			client->pers.netname, client->sess.sessionTeam, model, head, c1,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
 			Info_ValueForKey(userinfo, "skill"));
 	}
 	else {
-		s = va("n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i\\mu\\%i\\st\\%i",
+		s = va("n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i\\mu\\%i\\",
 			client->pers.netname, client->sess.sessionTeam, model, head, c1,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
-			client->sess.uci, (client->sess.ignored ? 1 : 0), client->sess.admin);
+			client->sess.uci, (client->sess.ignored ? 1 : 0));
 	}
 
 	//----(SA) end	
@@ -1597,9 +1597,10 @@ void ClientUserinfoChanged( int clientNum ) {
 			((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
 
 		// Print essentials and skip the garbage		
-		s = va("name\\%s\\team\\%s\\IP\\%d.%d.%d.%d\\country\\%d\\ignored\\%s\\status\\%d",
+		s = va("name\\%s\\team\\%s\\IP\\%d.%d.%d.%d\\country\\%i\\ignored\\%s\\status\\%i\\timenudge\\%i\\maxpackets\\%i",
 			client->pers.netname, team, client->sess.ip[0], client->sess.ip[1], client->sess.ip[2], 
-			client->sess.ip[3], client->sess.uci, (client->sess.ignored ? "yes" : "no"), client->sess.admin);
+			client->sess.ip[3], client->sess.uci, (client->sess.ignored ? "yes" : "no"), client->sess.admin,
+			client->pers.clientTimeNudge, client->pers.clientMaxPackets);
 	}
 	// Account for bots..
 	else {

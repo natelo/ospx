@@ -24,9 +24,6 @@ void admLog(char *info) {
 	logEntry(ADMACT, va("Time: %s\n%s%s", getTime(), info, LOGLINE));
 }
 
-// Admin Activity
-
-
 /*
 ===========
 Returns user Tag based upon user status..
@@ -93,11 +90,11 @@ void cmd_doLogin(gentity_t *ent, qboolean silent) {
 	trap_Argv(1, str, sizeof(str));
 
 	// Make sure user is not already logged in.
-	if (ent->client->sess.admin != USER_REGULAR) {
+	if (ent->client->sess.admin >= ADMIN_1) {
 		CP("print \"You are already logged in^1!\n\"");
 		return;
 	}
-
+	
 	// Prevent bogus logins	
 	if ((!Q_stricmp(str, "\0"))
 		|| (!Q_stricmp(str, ""))
@@ -384,56 +381,51 @@ qboolean do_cmds(gentity_t *ent) {
 	admCmds(ent->client->pers.cmd1, alt, cmd, qfalse);
 	
 	// Any other command
-	if (canUse(ent, qfalse))			{ cmd_custom(ent, cmd); return qtrue; }
+	if (canUse(ent, qfalse))			{ cmd_custom(ent); return qtrue; }
 
 	// It failed on all checks..
 	else { CP(va("print \"Command ^1%s ^7was not found^1!\n\"", cmd)); return qfalse; }
 
 }
 
-/*
-===========
-Admin help
-===========
-*/
+
 typedef struct {
-	char *command;
-	char *help;
-	char *usage;
-} helpCmd_reference_t;
+	char *command;	
+	void( *pCommand )(gentity_t *ent);
+	const char *cHelp;
+	const char *cUsage;
+} cmd_reference_t;
 
-#define _HELP(x,y,z) {x, y, z},
-/**
-* Fairly straight forward approach _HELP(COMMAND, DESCRIPTION, USAGE)
-* Alternatively, usage can be empty.
-* Add new as needed..
-*/
-static const helpCmd_reference_t helpInfo[] = {
-	_HELP("help", "Prints help about specific command.", "?COMMAND")	
-	// --> Add new ones after this line..
-
-	{
-		NULL, NULL, NULL
-	}
+static const cmd_reference_t userCmd[] = {
+	
+	{0, NULL, 0, 0 }
 };
 
-qboolean do_help(gentity_t *ent) {
+qboolean userCommands(gentity_t *ent, qboolean pHelp) {
 	char alt[128];
 	char cmd[128];
 	unsigned int i, \
-		aHelp = ARRAY_LEN(helpInfo);
-	const helpCmd_reference_t *hCM;
+		uCmd = ARRAY_LEN(userCmd);
+	const cmd_reference_t *uCM;
 	qboolean wasUsed = qfalse;
 
 	admCmds(ent->client->pers.cmd1, alt, cmd, qtrue);
 
-	for (i = 0; i < aHelp; i++) {
-		hCM = &helpInfo[i];
-		if (NULL != hCM->command && 0 == Q_stricmp(cmd, hCM->command)) {
-			CP(va("print \"^3%s %s %s\n\"",
-				va(hCM->usage ? "Help ^7:" : "Help^7:"),
-				hCM->help,
-				va("%s", (hCM->usage ? va("\n^3Usage^7: %s\n", hCM->usage) : ""))));
+	for (i = 0; i < uCmd; i++) {
+		uCM = &userCmd[i];
+		if (NULL != uCM->command && 0 == Q_stricmp(cmd, uCM->command)) {
+
+			// Player request info about command
+			if (pHelp) {
+				CP(va("print \"^3%s %s %s\n\"",
+					va(uCM->cUsage ? "Help ^7:" : "Help^7:"),
+					uCM->cHelp,
+					va("%s", (uCM->cUsage ? va("\n^3Usage^7: %s\n", uCM->cUsage) : ""))));
+			}
+			// Player executed command..
+			else {
+				uCM->pCommand(ent);
+			}
 			wasUsed = qtrue;
 		}
 	}
@@ -447,13 +439,9 @@ Commands
 */
 qboolean cmds_admin(char cmd[MAX_TOKEN_CHARS], gentity_t *ent) {
 
-	// We're dealing with command
-	if (Q_stricmp(cmd, "!") == 0) {
-		return do_cmds(ent);
+	if (Q_stricmp(cmd, "!") == 0 || Q_stricmp(cmd, "?") == 0) {
+		return userCommands(ent, (Q_stricmp(cmd, "!") == 0 ? qfalse : qtrue));
 	}
-	// We're dealing with help
-	else if (Q_stricmp(cmd, "?") == 0) {
-		return do_help(ent);
-	}
+
 	return qfalse;
 }

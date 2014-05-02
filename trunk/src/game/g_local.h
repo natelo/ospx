@@ -487,7 +487,7 @@ typedef struct {
 
 	// OSPx
 	unsigned int uci;				// Country Flags
-	unsigned char ip[4];			// IPs
+	unsigned int ip[4];				// IP
 	adminStatus_t admin;			// Admin, ref..
 	qboolean incognito;				// Hidden admin
 	qboolean ignored;				// Ignored..

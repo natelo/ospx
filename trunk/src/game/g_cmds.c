@@ -2627,7 +2627,7 @@ void ClientCommand( int clientNum ) {
 			Cmd_CallVote_f(ent);
 		}
 		else {
-			CP("print \"You are ^jignored^7!\n\"");
+			CP("print \"You are ^1ignored^7!\n\"");
 			return;
 		}
 	} else if ( Q_stricmp( cmd, "vote" ) == 0 )  {
