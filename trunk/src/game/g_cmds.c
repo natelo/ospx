@@ -2501,11 +2501,19 @@ void ClientCommand( int clientNum ) {
 			Cmd_Say_f(ent, SAY_ALL, qfalse);
 			return;
 		}
+		else {
+			CP("print \"You are ^1ignored^7!\n\"");
+			return;
+		}
 	}
 	if ( Q_stricmp( cmd, "say_team" ) == 0 ) {
 		// OSPx - Ignored
 		if (!ent->client->sess.ignored) {
 			Cmd_Say_f(ent, SAY_TEAM, qfalse);
+			return;
+		}
+		else {
+			CP("print \"You are ^1ignored^7!\n\"");
 			return;
 		}
 	}
@@ -2516,11 +2524,19 @@ void ClientCommand( int clientNum ) {
 			Cmd_Say_f(ent, SAY_LIMBO, qfalse);
 			return;
 		}
+		else {
+			CP("print \"You are ^1ignored^7!\n\"");
+			return;
+		}
 	}
 	if ( Q_stricmp( cmd, "vsay" ) == 0 ) {
 		// OSPx - Ignored
 		if (!ent->client->sess.ignored) {
 			Cmd_Voice_f(ent, SAY_ALL, qfalse, qfalse);
+			return;
+		}
+		else {
+			CP("print \"You are ^1ignored^7!\n\"");
 			return;
 		}
 	}
@@ -2530,6 +2546,10 @@ void ClientCommand( int clientNum ) {
 			Cmd_Voice_f(ent, SAY_TEAM, qfalse, qfalse);
 			return;
 		}
+		else {
+			CP("print \"You are ^1ignored^7!\n\"");
+			return;
+		}
 	}
 	// -NERVE - SMF
 
@@ -2537,6 +2557,10 @@ void ClientCommand( int clientNum ) {
 		// OSPx - Ignored
 		if (!ent->client->sess.ignored) {
 			Cmd_Tell_f(ent);
+			return;
+		}
+		else {
+			CP("print \"You are ^1ignored^7!\n\"");
 			return;
 		}
 	}
@@ -2601,6 +2625,10 @@ void ClientCommand( int clientNum ) {
 		// OSPx - Ignored
 		if (!ent->client->sess.ignored) {
 			Cmd_CallVote_f(ent);
+		}
+		else {
+			CP("print \"You are ^jignored^7!\n\"");
+			return;
 		}
 	} else if ( Q_stricmp( cmd, "vote" ) == 0 )  {
 		Cmd_Vote_f( ent );
