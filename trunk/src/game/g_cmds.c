@@ -1065,7 +1065,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	}
 
 	// Admin tags..
-	if (!ent->client->sess.incognito) {
+	if (!ent->client->sess.incognito && ent->client->sess.admin) {
 		tag = va("^7(%s)", usrTag(ent, qfalse));
 	}
 // -OSPx
@@ -1077,8 +1077,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	switch ( mode ) {
 	default:
 	case SAY_ALL:
-		G_LogPrintf( "say: %s%s: %s\n", ent->client->pers.netname, tag, chatText ); // OSPx - Tag
-		Com_sprintf( name, sizeof( name ), "%s%c%c: ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, chatText );	// OSPx - Tag
+		Com_sprintf(name, sizeof(name), "%s%s%c%c: ", ent->client->pers.netname, tag, Q_COLOR_ESCAPE, COLOR_WHITE);
 		color = COLOR_GREEN;
 		break;
 	case SAY_TEAM:
@@ -2550,6 +2550,21 @@ void ClientCommand( int clientNum ) {
 		Cmd_Team_f( ent );
 		return;
 	}
+
+// OSPx
+	if (Q_stricmp(cmd, "login") == 0) {
+		cmd_doLogin(ent, qfalse);
+		return;
+	}
+	if (Q_stricmp(cmd, "@login") == 0) {
+		cmd_doLogin(ent, qtrue);
+		return;
+	}
+	if (Q_stricmp(cmd, "logout") == 0) {
+		cmd_doLogout(ent);
+		return;
+	}
+// -OSPx
 
 	// ignore all other commands when at intermission
 	if ( level.intermissiontime ) {

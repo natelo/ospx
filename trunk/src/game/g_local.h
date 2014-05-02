@@ -487,7 +487,7 @@ typedef struct {
 
 	// OSPx
 	unsigned int uci;				// Country Flags
-	unsigned char	ip[4];			// IPs
+	unsigned char ip[4];			// IPs
 	adminStatus_t admin;			// Admin, ref..
 	qboolean incognito;				// Hidden admin
 	qboolean ignored;				// Ignored..
@@ -1581,9 +1581,14 @@ char *sortTag(gentity_t *ent);
 char *usrTag(gentity_t *ent, qboolean inquiry);
 void ParseAdmStr(const char *strInput, char *strCmd, char *strArgs);
 qboolean cmds_admin(char cmd[MAX_TOKEN_CHARS], gentity_t *ent);
-void cmd_do_login(gentity_t *ent, qboolean silent);
-void cmd_do_logout(gentity_t *ent);
+void cmd_doLogin(gentity_t *ent, qboolean silent);
+void cmd_doLogout(gentity_t *ent);
 int ClientNumberFromNameMatch(char *name, int *matches);
+
+//
+// g_admin_cmds.c
+//
+void cmd_custom(gentity_t *ent);
 
 //
 // g_files.c
