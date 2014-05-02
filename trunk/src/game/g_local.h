@@ -1580,7 +1580,7 @@ void admLog(char *info);
 char *sortTag(gentity_t *ent);
 char *usrTag(gentity_t *ent, qboolean inquiry);
 void ParseAdmStr(const char *strInput, char *strCmd, char *strArgs);
-qboolean cmds_admin(char cmd[MAX_TOKEN_CHARS], gentity_t *ent);
+qboolean cmds_admin(gentity_t *ent, qboolean dHelp);
 void cmd_doLogin(gentity_t *ent, qboolean silent);
 void cmd_doLogout(gentity_t *ent);
 int ClientNumberFromNameMatch(char *name, int *matches);

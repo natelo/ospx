@@ -78,145 +78,10 @@ char *sortTag(gentity_t *ent) {
 
 /*
 ===========
-Login
-===========
-*/
-void cmd_doLogin(gentity_t *ent, qboolean silent) {
-	char str[MAX_TOKEN_CHARS];
-	qboolean error;
-	char *log;
-
-	error = qfalse;
-	trap_Argv(1, str, sizeof(str));
-
-	// Make sure user is not already logged in.
-	if (ent->client->sess.admin >= ADMIN_1) {
-		CP("print \"You are already logged in^1!\n\"");
-		return;
-	}
-	
-	// Prevent bogus logins	
-	if ((!Q_stricmp(str, "\0"))
-		|| (!Q_stricmp(str, ""))
-		|| (!Q_stricmp(str, "\""))
-		|| (!Q_stricmp(str, "none")))
-	{
-		CP("print \"Incorrect password^1!\n\"");
-		// No log here to avoid login by error..
-		return;
-	}
-
-	// Else let's see if there's a password match.
-	if ((Q_stricmp(str, a1_pass.string) == 0)
-		|| (Q_stricmp(str, a2_pass.string) == 0)
-		|| (Q_stricmp(str, a3_pass.string) == 0)
-		|| (Q_stricmp(str, a4_pass.string) == 0)
-		|| (Q_stricmp(str, a5_pass.string) == 0))
-	{
-		// Always start with lower level as if owner screws it up 
-		// and sets the same passes for more levels, the lowest is the safest bet.
-		if (Q_stricmp(str, a1_pass.string) == 0) {
-			ent->client->sess.admin = ADMIN_1;
-		}
-		else if (Q_stricmp(str, a2_pass.string) == 0) {
-			ent->client->sess.admin = ADMIN_2;
-		}
-		else if (Q_stricmp(str, a3_pass.string) == 0) {
-			ent->client->sess.admin = ADMIN_3;
-		}
-		else if (Q_stricmp(str, a4_pass.string) == 0) {
-			ent->client->sess.admin = ADMIN_4;
-		}
-		else if (Q_stricmp(str, a5_pass.string) == 0) {
-			ent->client->sess.admin = ADMIN_5;
-		}
-		else {
-			error = qtrue;
-		}
-		// Something went to hell..
-		if (error == qtrue) {
-			// User shouldn't be anything but regular so make sure..
-			ent->client->sess.admin = USER_REGULAR;
-			CP("print \"Error has occured while trying to log you in^1!\n\"");
-			return;
-		}
-
-		// We came so far so go with it..
-		if (silent) {
-			CP("print \"Silent Login successful^2!\n\"");
-			ent->client->sess.incognito = 1; // Hide them
-
-			// Log it
-			log = va("Time: %s\nPlayer %s (IP: %s) has silently logged in as %s.%s",
-				getTime(),
-				ent->client->pers.netname,
-				clientIP(ent, qtrue),
-				sortTag(ent),
-				LOGLINE);
-
-			if (g_extendedLog.integer)
-				logEntry(ADMLOG, log);
-		}
-		else {
-			AP(va("chat \"^7console: %s ^7has logged in as %s^7!\n\"", ent->client->pers.netname, sortTag(ent)));
-
-			// Log it
-			log = va("Time: %s\nPlayer %s (IP: %s) has logged in as %s.%s",
-				getTime(),ent->client->pers.netname, clientIP(ent, qtrue), sortTag(ent), LOGLINE);
-
-			if (g_extendedLog.integer)
-				logEntry(ADMLOG, log);
-		}
-		return;
-	}
-	else
-	{
-		CP("print \"Incorrect password^1!\n\"");
-
-		// Log it
-		log = va("Time: %s\nPlayer %s (IP: %s) has tried to login using password: %s%s",
-			getTime(), ent->client->pers.netname, clientIP(ent, qtrue), str, LOGLINE );
-
-		if (g_extendedLog.integer)
-			logEntry(PASSLOG, log);
-
-		return;
-	}
-}
-
-/*
-===========
-Logout
-===========
-*/
-void cmd_doLogout(gentity_t *ent) {
-	// If user is not logged in do nothing
-	if (ent->client->sess.admin == USER_REGULAR) {
-		return;
-	}
-	else {
-		// Admin is hidden so don't print 
-		if (ent->client->sess.incognito)
-			CP("print \"You have successfully logged out^3!\n\"");
-		else
-			AP(va("chat \"console: %s ^7has logged out^3!\n\"", ent->client->pers.netname));
-
-		// Log them out now
-		ent->client->sess.admin = USER_REGULAR;
-
-		// Set incognito to visible..
-		ent->client->sess.incognito = 0;
-
-		return;
-	}
-}
-
-/*
-===========
 Deals with ! & ?
 ===========
 */
-void admCmds(const char *strCMD1, char *strCMD2, char *strCMD3, qboolean cmd){
+void admCmds(const char *strCMD1, char *strCMD2, char *strCMD3, qboolean help){
 
 	int i = 0, j = 0;
 	int foundcolon = 0;
@@ -225,7 +90,7 @@ void admCmds(const char *strCMD1, char *strCMD2, char *strCMD3, qboolean cmd){
 	{
 		if (!foundcolon)
 		{
-			if (cmd) {
+			if (help) {
 				if (strCMD1[i] == '?') {
 					foundcolon = 1;
 					strCMD2[i] = 0;
@@ -286,25 +151,10 @@ void ParseAdmStr(const char *strInput, char *strCmd, char *strArgs)
 
 /*
 ===========
-Can't use command msg..
-===========
-*/
-void cantUse(gentity_t *ent) {
-	char alt[128];
-	char cmd[128];
-
-	admCmds(ent->client->pers.cmd1, alt, cmd, qfalse);
-
-	CP(va("print \"Command ^1%s ^7is not allowed for your level^1!\n\"", cmd));
-	return;
-}
-
-/*
-===========
 Determine if admin level allows command
 ===========
 */
-qboolean canUse(gentity_t *ent, qboolean isCmd) {
+qboolean canUse(gentity_t *ent, qboolean dHelp) {
 	char *list = "";
 	char alt[128];
 	char cmd[128];
@@ -325,11 +175,8 @@ qboolean canUse(gentity_t *ent, qboolean isCmd) {
 	case ADMIN_4:
 		list = a4_cmds.string;
 		break;
-	case ADMIN_5:
-		if (a5_allowAll.integer && isCmd) 
-			return qtrue;
-		else
-			list = a5_cmds.string; 
+	case ADMIN_5:		
+		list = a5_cmds.string; 
 		break;
 	}
 
@@ -340,82 +187,45 @@ qboolean canUse(gentity_t *ent, qboolean isCmd) {
 
 /*
 ===========
-List commands
+Admin structure
 ===========
 */
-void cmd_listCmds(gentity_t *ent) {
-	char *cmds;
-
-	if (!adm_help.integer) {
-		CP("print \"Admin commands list is disabled on this server^1!\n\"");
-		return;
-	}
-
-	cmds = "";
-
-	if (ent->client->sess.admin == ADMIN_1)
-		CP(va("print \"^3Available commands are:^7\n%s\n^3Use ? for help with command. E.g. ?incognito.\n\"", a1_cmds.string));
-	else if (ent->client->sess.admin == ADMIN_2)
-		CP(va("print \"^3Available commands are:^7\n%s\n^3Use ? for help with command. E.g. ?incognito.\n\"", a2_cmds.string));
-	else if (ent->client->sess.admin == ADMIN_3)
-		CP(va("print \"^3Available commands are:^7\n%s\n^3Use ? for help with command. E.g. ?incognito.\n\"", a3_cmds.string));
-	else if (ent->client->sess.admin == ADMIN_4)
-		CP(va("print \"^3Available commands are:^7\n%s\n^3Use ? for help with command. E.g. ?incognito.\n\"", a4_cmds.string));
-	else if (ent->client->sess.admin == ADMIN_5 && !a5_allowAll.integer)
-		CP(va("print \"^3Available commands are:^7\n%s\n^3Use ? for help with command. E.g. ?incognito.\n\"", a5_cmds.string));
-	else if (ent->client->sess.admin == ADMIN_5 && a5_allowAll.integer)
-		CP(va("print \"^3Available commands are:^7\n%s\n^5Additional server commands:^7\n%s\n^3Use ? for help with command. E.g. ?incognito.\n\"", cmds, a5_cmds.string));
-
-	return;
-}
-
-/*
-===========
-Admin commands
-===========
-*/
-qboolean do_cmds(gentity_t *ent) {
-	char alt[128];
-	char cmd[128];
-
-	admCmds(ent->client->pers.cmd1, alt, cmd, qfalse);
-	
-	// Any other command
-	if (canUse(ent, qfalse))			{ cmd_custom(ent); return qtrue; }
-
-	// It failed on all checks..
-	else { CP(va("print \"Command ^1%s ^7was not found^1!\n\"", cmd)); return qfalse; }
-
-}
-
-
 typedef struct {
 	char *command;	
-	void( *pCommand )(gentity_t *ent);
-	const char *cHelp;
+	void( *pCommand )(gentity_t *ent, qboolean fParam);
+	qboolean fParam;
 	const char *cUsage;
+	const char *cHelp;	
 } cmd_reference_t;
 
 static const cmd_reference_t userCmd[] = {
-	
-	{0, NULL, 0, 0 }
+	{ "help",		NULL,			qfalse, "?command", "Shows property and usage info of specified command." },	
+	{ 0,			NULL,			qfalse,	0,			0 }
 };
 
-qboolean userCommands(gentity_t *ent, qboolean pHelp) {
-	char alt[128];
-	char cmd[128];
+/*
+===========
+Commands Structure
+
+NOTE: Commented it to so it's easier for ones reviewing it..
+===========
+*/
+qboolean userCommands(gentity_t *ent, char *cmd, qboolean pHelp) {	
 	unsigned int i, \
 		uCmd = ARRAY_LEN(userCmd);
 	const cmd_reference_t *uCM;
 	qboolean wasUsed = qfalse;
 
-	admCmds(ent->client->pers.cmd1, alt, cmd, qtrue);
-
 	for (i = 0; i < uCmd; i++) {
 		uCM = &userCmd[i];
 		if (NULL != uCM->command && 0 == Q_stricmp(cmd, uCM->command)) {
 
-			// Player request info about command
+			// Helpers have no function..but they exist for some
+			// reason, so print usage info as chances are it's help..
+			if (uCM->pCommand == NULL)
+				pHelp = qtrue;
+
+			// Player requested info about a command
 			if (pHelp) {
 				CP(va("print \"^3%s %s %s\n\"",
 					va(uCM->cUsage ? "Help ^7:" : "Help^7:"),
@@ -423,9 +233,10 @@ qboolean userCommands(gentity_t *ent, qboolean pHelp) {
 					va("%s", (uCM->cUsage ? va("\n^3Usage^7: %s\n", uCM->cUsage) : ""))));
 			}
 			// Player executed command..
-			else {
-				uCM->pCommand(ent);
+			else {				
+				uCM->pCommand(ent, uCM->fParam);
 			}
+
 			wasUsed = qtrue;
 		}
 	}
@@ -434,14 +245,49 @@ qboolean userCommands(gentity_t *ent, qboolean pHelp) {
 
 /*
 ===========
-Commands
+Command's Entry Point
+
+NOTE: Commented it to so it's easier for ones reviewing it..
 ===========
 */
-qboolean cmds_admin(char cmd[MAX_TOKEN_CHARS], gentity_t *ent) {
+qboolean cmds_admin(gentity_t *ent, qboolean dHelp) {
+	char alt[128];
+	char cmd[128];
 
-	if (Q_stricmp(cmd, "!") == 0 || Q_stricmp(cmd, "?") == 0) {
-		return userCommands(ent, (Q_stricmp(cmd, "!") == 0 ? qfalse : qtrue));
+	admCmds(ent->client->pers.cmd1, alt, cmd, dHelp);
+
+	// Allow ?help at any time..
+	if (Q_stricmp(cmd, "help") == 0) {
+		return userCommands(ent, cmd, qtrue);
 	}
+	// Command is allowed (found in a*_cmds string..)
+	else if (canUse(ent, dHelp))
+	{
+		// Command was not in Admin structure
+		if (!userCommands(ent, cmd, dHelp))
+			// Chances are that it's a default (e.g. g_speed) 
+			// server command as those can be set as well..
+			// NOTE: simpleton function really..
+			cmd_custom(ent);
+		
+		return qtrue;
+	}
+	// a5_allowAll enabled allows for client to execute 
+	// any existing command while a5_cmds can then be used
+	// for any server related commands (e.g. g_allowvote..)
+	else if (ent->client->sess.admin == ADMIN_5	&& a5_allowAll.integer)
+	{		
+		// Admin feature is not meant to work as rcon (full access) so if it's not
+		// in a5_cmds string and not in Admin structure, it's either a typo or not allowed. 
+		if (userCommands(ent, cmd, dHelp))
+			CP(va("print \"Command ^1%s ^7is not allowed for your level^1!\n\"", cmd));
 
-	return qfalse;
+		return qtrue;
+	}
+	else
+	{
+		// Was not found due typo, insufficient level..whatever just bail out
+		CP(va("print \"Command ^1%s ^7is not allowed for your level^1!\n\"", cmd));
+	}
+	return qfalse;;
 }

@@ -1059,7 +1059,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 			Q_strncpyz(ent->client->pers.cmd2, cmd2, sizeof(ent->client->pers.cmd2));
 			Q_strncpyz(ent->client->pers.cmd3, cmd3, sizeof(ent->client->pers.cmd3));
 
-			cmds_admin(text[0] == '?' ? "?" : "!", ent);
+			cmds_admin(ent, text[0] == '?' ? qtrue : qfalse);
 			return;
 		}
 	}
