@@ -364,6 +364,12 @@ void Weapon_Syringe( gentity_t *ent ) {
 				// DHM - Nerve :: Mark that the medicine was indeed dispensed
 				usedSyringe = qtrue;
 
+				// OSPx - Stats
+				if (g_gamestate.integer == GS_PLAYING) {
+					ent->client->sess.aWeaponStats[WS_SYRINGE].hits++;
+					ent->client->sess.revives++;
+				}
+
 				// sound
 				te = G_TempEntity( traceEnt->r.currentOrigin, EV_GENERAL_SOUND );
 				te->s.eventParm = G_SoundIndex( "sound/multiplayer/vo_revive.wav" );
@@ -1015,6 +1021,10 @@ void Weapon_Artillery( gentity_t *ent ) {
 		}
 		ent->client->ps.classWeaponTime = level.time;
 	}
+
+	// OSPx - Stats
+	if (g_gamestate.integer == GS_PLAYING)
+		ent->client->sess.aWeaponStats[WS_ARTILLERY].atts++;
 
 }
 
@@ -2337,6 +2347,7 @@ FireWeapon
 void FireWeapon( gentity_t *ent ) {
 	float aimSpreadScale;
 	vec3_t viewang;  // JPW NERVE
+	int shots = 1;	 // OSPx - Stats
 
 	// Rafael mg42
 	if ( ent->client->ps.persistant[PERS_HWEAPON_USE] && ent->active ) {
@@ -2490,6 +2501,10 @@ void FireWeapon( gentity_t *ent ) {
 	default:
 		break;
 	}
+
+	// OSPx - Stats
+	if (g_gamestate.integer == GS_PLAYING)
+		ent->client->sess.aWeaponStats[BG_WeapStatForWeapon(ent->s.weapon)].atts += shots;
 }
 
 

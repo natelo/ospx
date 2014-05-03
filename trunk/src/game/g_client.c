@@ -2043,6 +2043,10 @@ void ClientSpawn( gentity_t *ent, qboolean revived ) {
 	ent->watertype = 0;
 	ent->flags = 0;
 
+	// OSPx
+	ent->client->pers.life_kills = 0;
+	// -OSPx
+
 	VectorCopy( playerMins, ent->r.mins );
 	VectorCopy( playerMaxs, ent->r.maxs );
 

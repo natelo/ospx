@@ -1201,7 +1201,9 @@ typedef enum {
 	MOD_ENGINEER,   // not sure if we'll use
 	MOD_MEDIC,      // these like this or not
 //
-	MOD_BAT
+	MOD_BAT,
+
+	MOD_NUM_MODS	// OSPx
 
 } meansOfDeath_t;
 
@@ -1740,5 +1742,45 @@ void BG_setCrosshair(char *colString, float *col, float alpha, char *cvarName);
 #define CGF_STATSDUMP       0x02
 #define CGF_AUTOACTIVATE    0x04
 #define CGF_PREDICTITEMS    0x08
+
+// Stats
+typedef enum extWeaponStats_s
+{
+	WS_KNIFE,               // 0
+	WS_LUGER,               // 1
+	WS_COLT,                // 2
+	WS_MP40,                // 3
+	WS_THOMPSON,            // 4
+	WS_STEN,                // 5
+	WS_FG42,                // 6	-- Also includes WS_BAR (allies version of fg42)
+	WS_PANZERFAUST,         // 7
+	WS_FLAMETHROWER,        // 8
+	WS_GRENADE,             // 9	-- Includes axis and allies grenade types
+	WS_MORTAR,              // 10
+	WS_DYNAMITE,            // 11
+	WS_AIRSTRIKE,           // 12	-- Lt. smoke grenade attack
+	WS_ARTILLERY,           // 13	-- Lt. binocular attack
+	WS_SYRINGE,             // 14	-- Medic syringe uses/successes
+	WS_SMOKE,               // 15
+	WS_MG42,                // 16
+	WS_RIFLE,				// 17 - equivalent american weapon to german mauser
+	WS_VENOM,				// 18						
+	WS_MAX
+} extWeaponStats_t;
+
+typedef struct {
+	qboolean fHasHeadShots;
+	const char *pszCode;
+	const char *pszName;
+} weap_ws_t;
+
+extern const weap_ws_t aWeaponInfo[WS_MAX];
+
+typedef struct weap_ws_convert_s {
+	weapon_t iWeapon;
+	extWeaponStats_t iWS;
+} weap_ws_convert_t;
+
+extWeaponStats_t BG_WeapStatForWeapon(weapon_t iWeaponID);
 
 // -OSPx

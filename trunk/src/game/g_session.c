@@ -50,6 +50,11 @@ void G_WriteClientSessionData( gclient_t *client ) {
 	const char  *s;
 	const char  *var;
 
+	// OSPx - Reset stats
+	if (level.fResetStats) {
+		G_deleteStats(client - level.clients);
+	}
+
 	s = va( "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",       // DHM - Nerve
 			client->sess.sessionTeam,
 			client->sess.spectatorTime,
@@ -122,6 +127,16 @@ void G_ReadSessionData( gclient_t *client ) {
 			(int *)&client->sess.incognito,
 			(int *)&client->sess.ignored
 			);
+
+	// OSPx - Pull and parse weapon stats
+	*s = 0;
+	trap_Cvar_VariableStringBuffer(va("wstats%i", (int)(client - level.clients)), s, sizeof(s));
+	if (*s) {
+		G_parseStats(s);
+		if (g_gamestate.integer == GS_PLAYING) {
+			client->sess.rounds++;
+		}
+	}
 
 	// NERVE - SMF
 	if ( g_altStopwatchMode.integer ) {
@@ -217,6 +232,7 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 	sess->admin = USER_REGULAR;
 	sess->incognito = qfalse;
 	sess->ignored = qfalse;
+	G_deleteStats(client - level.clients);
 	// -OSPx
 
 	G_WriteClientSessionData( client );
@@ -240,8 +256,29 @@ void G_InitWorldSession( void ) {
 	// client sessions
 	if ( g_gametype.integer != gt ) {
 		level.newSession = qtrue;
+		level.fResetStats = qtrue; // OSPx - Stats
 		G_Printf( "Gametype changed, clearing session data.\n" );
 	}
+	// OSPx - Stats
+	else {
+		char *tmp = s;
+		qboolean test = (g_altStopwatchMode.integer != 0 || g_currentRound.integer == 1);
+
+
+#define GETVAL( x ) if ( ( tmp = strchr( tmp, ' ' ) ) == NULL ) {return;} \
+					x = atoi(++tmp);
+
+		// Reset Stats
+		if ((tmp = strchr(va("%s", tmp), ' ')) != NULL) {
+			tmp++;
+			trap_GetServerinfo(s, sizeof(s));
+			if (Q_stricmp(tmp, Info_ValueForKey(s, "mapname"))) {
+				level.fResetStats = qtrue;
+				G_Printf("Map changed, clearing player stats.\n");
+			}
+		}
+
+	} // -OSPx
 }
 
 /*
@@ -258,6 +295,15 @@ void G_WriteSessionData( void ) {
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
 			G_WriteClientSessionData( &level.clients[i] );
+		}
+	}
+
+	// OSPx - Keep stats for all players in sync
+	for (i = 0; !level.fResetStats && i < level.numConnectedClients; i++) {
+		if ((g_gamestate.integer == GS_WARMUP_COUNTDOWN &&
+			((g_gametype.integer == GT_WOLF_STOPWATCH && level.clients[level.sortedClients[i]].sess.rounds >= 2) ||
+			(g_gametype.integer != GT_WOLF_STOPWATCH && level.clients[level.sortedClients[i]].sess.rounds >= 1)))) {
+			level.fResetStats = qtrue;
 		}
 	}
 }

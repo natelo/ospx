@@ -4160,3 +4160,30 @@ void BG_setCrosshair(char *colString, float *col, float alpha, char *cvarName) {
 
 // consts to offset random reinforcement seeds
 const unsigned int aReinfSeeds[MAX_REINFSEEDS] = { 11, 3, 13, 7, 2, 5, 1, 17 };
+
+// OSPx - Stats (It matches extWeaponStats_t in bg_public.h)
+// I think i'm missing few...sniper?
+//
+//
+// Weapon full names + headshot capability
+const weap_ws_t aWeaponInfo[WS_MAX] = {
+	{ qfalse, "KNIF", "Knife" },  // 0
+	{ qtrue, "LUGR", "Luger" },  // 1
+	{ qtrue, "COLT", "Colt" },  // 2
+	{ qtrue, "MP40", "MP-40" },  // 3
+	{ qtrue, "TMPS", "Thompson" },  // 4
+	{ qtrue, "STEN", "Sten" },  // 5
+	{ qtrue, "FG42", "FG-42" },  // 6
+	{ qtrue, "PNZR", "Panzer" },      // 7
+	{ qtrue, "FLAM", "F.Thrower" },  // 8
+	{ qfalse, "GRND", "Grenade" },  // 9
+	{ qfalse, "MRTR", "Mortar" },	  // 10
+	{ qfalse, "DYNA", "Dynamite" },  // 11
+	{ qfalse, "ARST", "Airstrike" },  // 12
+	{ qfalse, "ARTY", "Artillery" },  // 13
+	{ qfalse, "SRNG", "Syringe" },  // 14
+	{ qfalse, "SMOK", "SmokeScrn" },  // 15
+	{ qtrue, "MG42", "MG-42 Gun" },  // 16
+	{ qtrue, "RIFL", "Mauser" },	  // 17
+	{ qtrue, "VENM", "Venom" },		  // 18
+};

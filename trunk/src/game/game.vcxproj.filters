@@ -192,6 +192,12 @@
     <ClCompile Include="g_admin_cmds.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="g_stats.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bg_stats.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.def">

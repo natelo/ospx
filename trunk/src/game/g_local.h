@@ -453,7 +453,8 @@ typedef struct {
 #define FOLLOW_ACTIVE1  -1
 #define FOLLOW_ACTIVE2  -2
 
-// OSPx - Admin/Ref..
+// OSPx
+// - Admin/Ref..
 typedef enum {
 	USER_REGULAR,
 	USER_REFEREE,	// Temporary, voted in (limited functionality mainly restricted to votes) players..
@@ -463,6 +464,15 @@ typedef enum {
 	ADMIN_4,
 	ADMIN_5
 } adminStatus_t;
+
+// - Weapon stat counters
+typedef struct {
+	unsigned int atts;
+	unsigned int deaths;
+	unsigned int headshots;
+	unsigned int hits;
+	unsigned int kills;
+} weapon_stat_t;
 // -OSPx
 
 // client data that stays across multiple levels or tournament restarts
@@ -485,12 +495,33 @@ typedef struct {
 	int latchPlayerItem;            // DHM - Nerve :: for GT_WOLF not archived
 	int latchPlayerSkin;            // DHM - Nerve :: for GT_WOLF not archived
 
-	// OSPx
-	unsigned int uci;				// Country Flags
-	unsigned int ip[4];				// IP
-	adminStatus_t admin;			// Admin, ref..
-	qboolean incognito;				// Hidden admin
-	qboolean ignored;				// Ignored..
+// OSPx
+	unsigned int uci;						// Country Flags
+	unsigned int ip[4];						// IP
+	adminStatus_t admin;					// Admin, ref..
+	qboolean incognito;						// Hidden admin
+	qboolean ignored;						// Ignored..
+
+	// Stats
+	int damage_given;
+	int damage_received;
+	int deaths;
+	int kills;
+	int rounds;
+	int suicides;
+	int team_damage;
+	int team_kills;
+	int headshots;
+	int med_given;
+	int ammo_given;
+	int gibs;
+	int poisoned;
+	int revives;
+	int acc_shots; 
+	int acc_hits;
+	int killPeak;
+	weapon_stat_t aWeaponStats[WS_MAX + 1];	
+// -OSPx
 } clientSession_t;
 
 #define MAX_NETNAME         36
@@ -541,6 +572,9 @@ typedef struct {
 	char cmd1[128];					//	->!command<-
 	char cmd2[128];					//    !command ->attribute<-
 	char cmd3[128];					//    !command attribute ->extra<-
+
+	// Stats
+	int life_kills;
 // -OSPx
 } clientPersistant_t;
 
@@ -793,8 +827,13 @@ typedef struct {
 	qboolean latchGametype;             // DHM - Nerve
 
 // OSPx
-	int dwBlueReinfOffset;	// Reinforcements offset
-	int dwRedReinfOffset;	// Reinforcements offset	
+	// Reinforcements offset
+	int dwBlueReinfOffset;
+	int dwRedReinfOffset;
+
+	// Stats
+	qboolean fResetStats;	
+	int sortedStats[MAX_CLIENTS];
 // -OSPx
 
 } level_locals_t;
@@ -1597,6 +1636,14 @@ void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore);
 // g_files.c
 //
 void logEntry(char *filename, char *info);
+
+//
+// g_stats.c
+//
+void G_deleteStats(int nClient);
+void G_parseStats(char *pszStatsInfo);
+void G_addStats(gentity_t *targ, gentity_t *attacker, int dmg_ref, int mod);
+void G_addStatsHeadShot(gentity_t *attacker, int mod);
 
 //
 // Macros

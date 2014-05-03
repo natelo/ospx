@@ -262,10 +262,13 @@ char    *modNames[] = {
 // JPW NERVE
 	"MOD_LT_ARTILLERY",
 	"MOD_LT_AIRSTRIKE",
-	"MOD_ENGINEER",  // not sure if we'll use
-	"MOD_MEDIC",     // these like this or not
+	"MOD_ENGINEER", // not sure if we'll use
+	"MOD_MEDIC",    // these like this or not
+
+	"MOD_BAT",
+	
 // jpw
-	"MOD_BAT"
+	"MOD_NUM_MODS"	// OSPx
 };
 
 /*
@@ -294,6 +297,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if ( level.intermissiontime ) {
 		return;
 	}
+
+	// OSPx - Stats
+	G_addStats(self, attacker, damage, meansOfDeath);
 
 	self->client->ps.pm_type = PM_DEAD;
 
@@ -325,6 +331,13 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	G_LogPrintf( "Kill: %i %i %i: %s killed %s by %s\n",
 				 killer, self->s.number, meansOfDeath, killerName,
 				 self->client->pers.netname, obit );
+
+	// OSPx - Life Stats for Max Kills Peak
+	if (attacker && attacker->client) {		
+		if (!OnSameTeam(attacker, self)) {
+			attacker->client->pers.life_kills++;
+		}
+	}
 
 	// broadcast the death event to everyone
 	ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );
@@ -1087,6 +1100,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		}
 
 		targ->client->ps.eFlags |= EF_HEADSHOT;
+
+		// OSPx - Stats
+		if (client && attacker && attacker->client
+			&& attacker->client->sess.sessionTeam != targ->client->sess.sessionTeam) {
+			G_addStatsHeadShot(attacker, mod);
+		}
 	}
 
 	if ( g_debugDamage.integer ) {
@@ -1145,6 +1164,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		if ( targ->health <= 0 ) {
 			if ( client ) {
 				targ->flags |= FL_NO_KNOCKBACK;
+
+				// OSPx - Stats			
+				if (targ->client->ps.pm_type == PM_DEAD) {
+					G_addStats(targ, attacker, take, mod);
+				} 
+
 // JPW NERVE -- repeated shooting sends to limbo
 				if ( g_gametype.integer >= GT_WOLF ) {
 					if ( ( targ->health < FORCE_LIMBO_HEALTH ) && ( targ->health > GIB_HEALTH ) && ( !( targ->client->ps.pm_flags & PMF_LIMBO ) ) ) {
@@ -1188,6 +1213,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			if ( targ->s.number >= MAX_CLIENTS ) {
 				G_Script_ScriptEvent( targ, "pain", va( "%d %d", targ->health, targ->health + take ) );
 			}
+		
+		} // OSPx - update weapon/dmg stats
+		else {
+			G_addStats(targ, attacker, take, mod);
 		}
 
 		//G_ArmorDamage(targ);	//----(SA)	moved out to separate routine

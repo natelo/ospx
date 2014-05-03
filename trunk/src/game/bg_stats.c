@@ -24,45 +24,65 @@ In addition, the RTCW MP Source Code is also subject to certain additional terms
 If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 ===========================================================================
-OSPX - g_match.c
 
-Handle match related stuff, much like in et..
+OSPx - Port from ET
 
-Created: 11.Mar/14
-===========================================================================
+================================
 */
-#include "g_local.h"
 
-/*
-=================
-Match settings
+#include "../game/q_shared.h"
+#include "bg_public.h"
 
-Pretty much a dump from et..
-=================
-*/
-void G_loadMatchGame(void) {
-	unsigned int i, dwBlueOffset, dwRedOffset;
-	unsigned int aRandomValues[MAX_REINFSEEDS];
-	char strReinfSeeds[MAX_STRING_CHARS];
+//	--> WP_* to WS_* conversion
+static const weap_ws_convert_t aWeapID[WP_NUM_WEAPONS] = {
 
-	if (server_autoconfig.integer && (!(z_serverflags.integer & ZSF_COMP) || level.newSession)) {
-		G_configSet(g_gametype.integer, (server_autoconfig.integer == 1));
-		trap_Cvar_Set("z_serverflags", va("%d", z_serverflags.integer | ZSF_COMP));
+	{ WP_NONE,              WS_MAX },           // 0
+
+	// German weapons
+	{ WP_KNIFE,             WS_KNIFE },
+	{ WP_LUGER,             WS_LUGER },
+	{ WP_MP40,              WS_MP40 },
+	{ WP_GRENADE_LAUNCHER,  WS_GRENADE },       // 5
+	{ WP_PANZERFAUST,       WS_PANZERFAUST },
+	{ WP_FLAMETHROWER,      WS_FLAMETHROWER },
+	{ WP_VENOM,				WS_VENOM },
+
+	// American equivalents
+	{ WP_COLT,              WS_COLT },          // 10
+	{ WP_THOMPSON,          WS_THOMPSON },
+	{ WP_GRENADE_PINEAPPLE, WS_GRENADE },
+	{ WP_STEN,              WS_STEN },
+	{ WP_MEDIC_SYRINGE,     WS_SYRINGE },
+	{ WP_AMMO,              WS_MAX },
+	{ WP_ARTY,              WS_ARTILLERY },
+
+	{ WP_SILENCER,          WS_LUGER },         // 20
+	{ WP_DYNAMITE,          WS_DYNAMITE },
+	{ WP_SMOKETRAIL,        WS_ARTILLERY },
+	{ VERYBIGEXPLOSION,     WS_MAX },
+	{ WP_MEDKIT,            WS_MAX },
+	{ WP_BINOCULARS,        WS_MAX },
+
+	{ WP_PLIERS,            WS_MAX },
+	{ WP_MAUSER,			WS_RIFLE },
+	{ WP_SNIPERRIFLE,       WS_RIFLE },
+	
+	{ WP_FG42,              WS_FG42 },
+	{ WP_FG42SCOPE,         WS_FG42 },
+	
+	{ WP_MORTAR,            WS_MORTAR }
+};
+
+
+// Get right stats index based on weapon id
+extWeaponStats_t BG_WeapStatForWeapon( weapon_t iWeaponID ) {
+	weapon_t i;
+
+	for ( i = WP_NONE; i < WP_NUM_WEAPONS; i++ ) {
+		if ( iWeaponID == aWeapID[i].iWeapon ) {
+			return aWeapID[i].iWS;
+		}
 	}
 
-	// Set up the random reinforcement seeds for both teams and send to clients
-	dwBlueOffset = rand() % MAX_REINFSEEDS;
-	dwRedOffset = rand() % MAX_REINFSEEDS;
-	strcpy(strReinfSeeds, va("%d %d", (dwBlueOffset << REINF_BLUEDELT) + (rand() % (1 << REINF_BLUEDELT)),
-		(dwRedOffset << REINF_REDDELT) + (rand() % (1 << REINF_REDDELT))));
-
-	for (i = 0; i < MAX_REINFSEEDS; i++) {
-		aRandomValues[i] = (rand() % REINF_RANGE) * aReinfSeeds[i];
-		strcat(strReinfSeeds, va(" %d", aRandomValues[i]));
-	}
-
-	level.dwBlueReinfOffset = 1000 * aRandomValues[dwBlueOffset] / aReinfSeeds[dwBlueOffset];
-	level.dwRedReinfOffset = 1000 * aRandomValues[dwRedOffset] / aReinfSeeds[dwRedOffset];
-
-	trap_SetConfigstring(CS_REINFSEEDS, strReinfSeeds);
+	return WS_MAX;
 }
