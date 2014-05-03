@@ -488,7 +488,8 @@ static void WM_DrawClientScore( int x, int y, score_t *score, float *color, floa
 
 		totalwidth = INFO_CLASS_WIDTH + INFO_SCORE_WIDTH + INFO_LATENCY_WIDTH - 8;
 
-		s = CG_TranslateString( "^3SPECTATOR" );
+		// OSPx - Show ping for spectators as well
+		s = va("^3(%i) %s", score->ping, CG_TranslateString("SPECTATOR"));
 		w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 
 		CG_DrawSmallString( tempx + totalwidth - w, y, s, fade );
