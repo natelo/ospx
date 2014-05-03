@@ -7653,7 +7653,7 @@ cvarTable_t cvarTable[] = {
 	{ &ui_crosshairAlphaAlt, "cg_crosshairAlphaAlt", "1.0", CVAR_ARCHIVE },
 	{ &ui_crosshairAlpha, "cg_crosshairAlpha", "1.0", CVAR_ARCHIVE },
 
-	{ NULL, "server_autoconfig", "0", CVAR_ARCHIVE },
+	//{ NULL, "server_autoconfig", "0", CVAR_ARCHIVE },
 // -OSPx
 
 	{ &ui_hudAlpha, "cg_hudAlpha", "1.0", CVAR_ARCHIVE }
