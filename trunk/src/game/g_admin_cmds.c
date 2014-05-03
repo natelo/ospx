@@ -26,7 +26,7 @@ void cmd_doLogin(gentity_t *ent, qboolean silent) {
 
 	// Make sure user is not already logged in.
 	if (ent->client->sess.admin >= ADMIN_1) {
-		CP("print \"You are already logged in^1!\n\"");
+		CP("print \"^1Error: ^7You are already logged in!\n\"");
 		return;
 	}
 
@@ -36,7 +36,7 @@ void cmd_doLogin(gentity_t *ent, qboolean silent) {
 		|| (!Q_stricmp(str, "\""))
 		|| (!Q_stricmp(str, "none")))
 	{
-		CP("print \"Incorrect password^1!\n\"");
+		CP("print \"^1Error: ^7Incorrect password!\n\"");
 		// No log here to avoid login by error..
 		return;
 	}
@@ -72,13 +72,13 @@ void cmd_doLogin(gentity_t *ent, qboolean silent) {
 		if (error == qtrue) {
 			// User shouldn't be anything but regular so make sure..
 			ent->client->sess.admin = USER_REGULAR;
-			CP("print \"Error has occured while trying to log you in^1!\n\"");
+			CP("print \"^1Error: ^7Error has occured while trying to log you in!\n\"");
 			return;
 		}
 
 		// We came so far so go with it..
 		if (silent) {
-			CP("print \"Silent Login successful^2!\n\"");
+			CP("print \"^3Info: ^7Silent Login successful!\n\"");
 			ent->client->sess.incognito = 1; // Hide them
 
 			// Log it
@@ -93,7 +93,7 @@ void cmd_doLogin(gentity_t *ent, qboolean silent) {
 				logEntry(ADMLOG, log);
 		}
 		else {
-			AP(va("chat \"^7console: %s ^7has logged in as %s^7!\n\"", ent->client->pers.netname, sortTag(ent)));
+			AP(va("chat \"^7console: %s ^7has ^3logged in^7 as %s^7.\n\"", ent->client->pers.netname, sortTag(ent)));
 
 			// Log it
 			log = va("Time: %s\nPlayer %s (IP: %s) has logged in as %s.%s",
@@ -106,7 +106,7 @@ void cmd_doLogin(gentity_t *ent, qboolean silent) {
 	}
 	else
 	{
-		CP("print \"Incorrect password^1!\n\"");
+		CP("print \"^1Error: ^7Incorrect password!\n\"");
 
 		// Log it
 		log = va("Time: %s\nPlayer %s (IP: %s) has tried to login using password: %s%s",
@@ -134,9 +134,9 @@ void cmd_doLogout(gentity_t *ent) {
 	else {
 		// Admin is hidden so don't print 
 		if (ent->client->sess.incognito)
-			CP("print \"You have successfully logged out!\n\"");
+			CP("print \"^3Info: ^7You have successfully logged out!\n\"");
 		else
-			AP(va("chat \"console: %s ^7has logged out!\n\"", ent->client->pers.netname));
+			AP(va("chat \"console: %s ^7has ^3logged out^7.\n\"", ent->client->pers.netname));
 
 		// Log them out now
 		ent->client->sess.admin = USER_REGULAR;
