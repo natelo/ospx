@@ -1014,6 +1014,9 @@ typedef struct {
 	vec4_t xhairColor;
 	vec4_t xhairColorAlt;
 
+	// Reinforcements 
+	vec4_t reinforcementColor;
+
 	// Draw names on hud
 	qboolean	renderingFreeCam;
 	specName_t	specOnScreenNames[MAX_CLIENTS];
@@ -1838,6 +1841,7 @@ extern vmCvar_t cg_printObjectiveInfo;
 extern vmCvar_t cg_muzzleFlash;
 extern vmCvar_t cg_complaintPopUp;
 extern vmCvar_t cg_drawReinforcementTime;
+extern vmCvar_t cg_reinforcementTimeColor;
 extern vmCvar_t cg_noChat;
 extern vmCvar_t cg_noVoice;
 extern vmCvar_t cg_noAmmoAutoSwitch;
