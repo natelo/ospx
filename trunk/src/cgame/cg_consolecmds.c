@@ -734,4 +734,10 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand( "reset_match" );
 	trap_AddCommand( "swap_teams" );
 	// -NERVE - SMF
+
+	// OSPx 
+	trap_AddCommand("login");
+	trap_AddCommand("@login");
+	trap_AddCommand("logout");
+	// -OSPx
 }
