@@ -134,9 +134,9 @@ void cmd_doLogout(gentity_t *ent) {
 	else {
 		// Admin is hidden so don't print 
 		if (ent->client->sess.incognito)
-			CP("print \"You have successfully logged out^3!\n\"");
+			CP("print \"You have successfully logged out!\n\"");
 		else
-			AP(va("chat \"console: %s ^7has logged out^3!\n\"", ent->client->pers.netname));
+			AP(va("chat \"console: %s ^7has logged out!\n\"", ent->client->pers.netname));
 
 		// Log them out now
 		ent->client->sess.admin = USER_REGULAR;
@@ -161,7 +161,7 @@ void cmd_custom(gentity_t *ent) {
 	tag = sortTag(ent);
 
 	if (!strcmp(ent->client->pers.cmd2, "")) {
-		CP(va("print \"Command ^1%s ^7must have a value^1!\n\"", ent->client->pers.cmd1));
+		CP(va("print \"^Error^7: Command ^1%s ^7must have a value!\n\"", ent->client->pers.cmd1));
 		return;
 	}
 	else {
@@ -194,12 +194,12 @@ void cmd_incognito(gentity_t *ent, qboolean fParam) {
 
 	if (ent->client->sess.incognito == 0) {
 		ent->client->sess.incognito = 1;
-		CP("cp \"You are now incognito^3!\n\"2");
+		CP("cp \"You are now ^3incognito^7!\n\"2");
 		return;
 	}
 	else {
 		ent->client->sess.incognito = 0;
-		CP("cp \"Your status is now set to visible^3!\n\"2");
+		CP("cp \"Your status is now set to ^3visible^7!\n\"2");
 		return;
 	}
 }
@@ -220,11 +220,11 @@ void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore) {
 
 	count = ClientNumberFromNameMatch(ent->client->pers.cmd2, nums);
 	if (count == 0){
-		CP("print \"Client not on server^1!\n\"");
+		CP("print \"^Error^7: Client not on server!\n\"");
 		return;
 	}
 	else if (count > 1) {
-		CP(va("print \"Too many people with ^1%s ^7in their name^1!\n\"", ent->client->pers.cmd2));
+		CP(va("print \"^Error^7: Too many people with ^1%s ^7in their name!\n\"", ent->client->pers.cmd2));
 		return;
 	}
 
@@ -234,13 +234,13 @@ void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore) {
 			return;
 
 		if (g_entities[nums[i]].client->sess.ignored == dIgnore){
-			CP(va("print \"Player %s ^7is already %s^1!\n\"", g_entities[nums[i]].client->pers.netname, action));
+			CP(va("print \"^Error^7: Player %s ^7is already %s!\n\"", g_entities[nums[i]].client->pers.netname, action));
 			return;
 		}
 		else
 			g_entities[nums[i]].client->sess.ignored = dIgnore;
 
-		AP(va("chat \"console: %s has %s player %s^7!\n\"", tag, action, g_entities[nums[i]].client->pers.netname));
+		AP(va("chat \"console: %s has ^3%s ^7player %s^7!\n\"", tag, action, g_entities[nums[i]].client->pers.netname));
 
 		// Log it
 		log = va("Player %s (IP: %s) has %s user %s.",

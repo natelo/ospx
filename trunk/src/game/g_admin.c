@@ -285,7 +285,7 @@ qboolean cmds_admin(gentity_t *ent, qboolean dHelp) {
 		// Admin feature is not meant to work as rcon (full access) so if it's not
 		// in a5_cmds string and not in Admin structure, it's either a typo or not allowed. 
 		if (!userCommands(ent, cmd, dHelp))
-			CP(va("print \"Command ^1%s ^7is not allowed for your level^1!\n\"", cmd));
+			CP(va("print \"^1Error^7: Command ^1%s ^7is either not found or not allowed for your level!\n\"", cmd));
 
 		return qtrue;
 	}
@@ -304,7 +304,7 @@ qboolean cmds_admin(gentity_t *ent, qboolean dHelp) {
 	else
 	{
 		// Was not found due typo, insufficient level..whatever just bail out
-		CP(va("print \"Command ^1%s ^7is not allowed for your level^1!\n\"", cmd));
+		CP(va("print \"^1Error^7: Command ^1%s ^7is either not found or not allowed for your level!\n\"", cmd));
 	}
 	return qfalse;
 }
