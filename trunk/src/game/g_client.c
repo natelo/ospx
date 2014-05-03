@@ -1165,12 +1165,6 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 				break;
 			}
 
-			// don't allow black in a name, period
-			if ( ColorIndex( *in ) == 0 ) {
-				in++;
-				continue;
-			}
-
 			// make sure room in dest for both chars
 			if ( len > outSize - 2 ) {
 				break;
