@@ -1562,7 +1562,10 @@ typedef enum
 	shard_rubble
 } shards_t;
 
+//
 // g_antilag.c
+//
+// OSPx - Modified
 void G_ResetTrail(gentity_t *ent);
 void G_StoreTrail(gentity_t *ent);
 void G_TimeShiftClient(gentity_t *ent, int time);
@@ -1644,6 +1647,11 @@ void G_deleteStats(int nClient);
 void G_parseStats(char *pszStatsInfo);
 void G_addStats(gentity_t *targ, gentity_t *attacker, int dmg_ref, int mod);
 void G_addStatsHeadShot(gentity_t *attacker, int mod);
+void G_statsPrint(gentity_t *ent, int nType);
+void G_clientStatsPrint(gentity_t *ent, int nType, qboolean toWindow);
+void G_weaponStatsLeaders_cmd(gentity_t* ent, qboolean doTop, qboolean doWindow);
+void G_weaponRankings_cmd(gentity_t *ent, unsigned int dwCommand, qboolean state);
+void G_statsall_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 
 //
 // Macros

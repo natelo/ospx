@@ -2479,6 +2479,27 @@ void Cmd_SetSpawnPoint_f( gentity_t *clent ) {
 }
 // -NERVE - SMF
 
+//
+// OSPx - New client commands
+//
+
+/*
+===================
+Stats
+===================
+*/
+void G_scores_cmd(gentity_t *ent) {
+	//G_printMatchInfo(ent); OSPx - FIXME
+}
+// Shows a player's stats to the requesting client.
+void G_weaponStats_cmd(gentity_t *ent) {
+	G_statsPrint(ent, 0);
+}
+
+//
+// -OSPx
+//
+
 /*
 =================
 ClientCommand
@@ -2576,6 +2597,7 @@ void ClientCommand( int clientNum ) {
 	}
 
 // OSPx
+	// Admins
 	if (Q_stricmp(cmd, "login") == 0) {
 		cmd_doLogin(ent, qfalse);
 		return;
@@ -2587,6 +2609,48 @@ void ClientCommand( int clientNum ) {
 	if (Q_stricmp(cmd, "logout") == 0) {
 		cmd_doLogout(ent);
 		return;
+	}
+
+	// Stats
+	else if (!Q_stricmp(cmd, "wstats"))	{ 
+		G_statsPrint(ent, 1);
+		return; 
+	}
+	else if (!Q_stricmp(cmd, "cstats")) { 
+		G_clientStatsPrint(ent, 1, qtrue);	
+		return; 
+	}
+	else if (!Q_stricmp(cmd, "stats")) { 
+		G_clientStatsPrint(ent, 1, qfalse);	
+		return; 
+	}
+	else if (!Q_stricmp(cmd, "sgstats")) { 
+		G_statsPrint(ent, 2);
+		return; 
+	}
+	else if (!Q_stricmp(cmd, "stshots")) { 
+		G_weaponStatsLeaders_cmd(ent, qtrue, qtrue);
+		return;
+	}
+	else if (!Q_stricmp(cmd, "scores"))	{ 
+		G_scores_cmd(ent);	
+		return; 
+	}
+	else if (!Q_stricmp(cmd, "statsall")) { 
+		G_statsall_cmd(ent, 0, qfalse);	
+		return; 
+	}
+	else if (!Q_stricmp(cmd, "bottomshots")) { 
+		G_weaponRankings_cmd(ent, qtrue, qfalse);
+		return;
+	}
+	else if (!Q_stricmp(cmd, "topshots")) { 
+		G_weaponRankings_cmd(ent, qtrue, qtrue);
+		return; 
+	}
+	else if (!Q_stricmp(cmd, "weaponstats")) { 
+		G_weaponStats_cmd(ent);	
+		return; 
 	}
 // -OSPx
 
