@@ -568,6 +568,140 @@ void CG_vstrUp_f(void) {
 	else { CG_Printf("[cgnotify]^3Usage: ^7+vstr [down_vstr] [up_vstr]\n"); }
 }
 
+// +wstats
+void CG_wStatsDown_f(void) {
+	if (!cg.demoPlayback) {
+		int i = cg.snap->ps.clientNum;
+
+		if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR) {
+			CPri("You must be a player or following a player to use +wstats\n");
+			return;
+		}
+
+		// wstats overlap so close them first if they're open
+		if (cgs.clientGameStats.show == SHOW_ON) {
+			CG_StatsUp_f();
+		}
+
+		if (cgs.gamestats.show == SHOW_SHUTDOWN && cg.time < cgs.gamestats.fadeTime) {
+			cgs.gamestats.fadeTime = 2 * cg.time + STATS_FADE_TIME - cgs.gamestats.fadeTime;
+		}
+		else if (cgs.gamestats.show != SHOW_ON) {
+			cgs.gamestats.fadeTime = cg.time + STATS_FADE_TIME;
+		}
+
+		cgs.gamestats.show = SHOW_ON;
+
+		if (cgs.gamestats.requestTime < cg.time) {
+			cgs.gamestats.requestTime = cg.time + 2000;			
+			trap_SendClientCommand(va("wstats %d", i)); // OSPx - Decide which window will this draw..
+		}
+	}
+}
+
+// -wstats
+void CG_wStatsUp_f(void) {
+	if (cgs.gamestats.show == SHOW_ON) {
+		cgs.gamestats.show = SHOW_SHUTDOWN;
+		if (cg.time < cgs.gamestats.fadeTime) {
+			cgs.gamestats.fadeTime = 2 * cg.time + STATS_FADE_TIME - cgs.gamestats.fadeTime;
+		}
+		else {
+			cgs.gamestats.fadeTime = cg.time + STATS_FADE_TIME;
+		}
+		CG_windowFree(cg.statsWindow);
+		cg.statsWindow = NULL;
+	}
+}
+
+// +stats
+void CG_StatsDown_f(void) {
+	if (!cg.demoPlayback) {
+		int i = cg.snap->ps.clientNum;
+
+		if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR) {
+			CPri("You must be a player or following a player to use +stats\n");
+			return;
+		}
+
+		// wstats overlap so close them first if they're open
+		if (cgs.gamestats.show == SHOW_ON) {
+			CG_wStatsUp_f();
+		}
+
+		if (cgs.clientGameStats.show == SHOW_SHUTDOWN && cg.time < cgs.clientGameStats.fadeTime) {
+			cgs.clientGameStats.fadeTime = 2 * cg.time + STATS_FADE_TIME - cgs.clientGameStats.fadeTime;
+		}
+		else if (cgs.clientGameStats.show != SHOW_ON) {
+			cgs.clientGameStats.fadeTime = cg.time + STATS_FADE_TIME;
+		}
+
+		cgs.clientGameStats.show = SHOW_ON;
+
+		if (cgs.clientGameStats.requestTime < cg.time) {
+			cgs.clientGameStats.requestTime = cg.time + 2000;
+			trap_SendClientCommand(va("cstats %d", i));
+		}
+	}
+}
+
+// -stats
+void CG_StatsUp_f(void) {
+	if (cgs.clientGameStats.show == SHOW_ON) {
+		cgs.clientGameStats.show = SHOW_SHUTDOWN;
+		if (cg.time < cgs.clientGameStats.fadeTime) {
+			cgs.clientGameStats.fadeTime = 2 * cg.time + STATS_FADE_TIME - cgs.clientGameStats.fadeTime;
+		}
+		else {
+			cgs.clientGameStats.fadeTime = cg.time + STATS_FADE_TIME;
+		}
+		CG_windowFree(cg.clientStatsWindow);
+		cg.clientStatsWindow = NULL;
+	}
+}
+
+// +topshots
+void CG_topshotsDown_f(void) {
+	if (!cg.demoPlayback) {
+		if (cgs.topshots.show == SHOW_SHUTDOWN && cg.time < cgs.topshots.fadeTime) {
+			cgs.topshots.fadeTime = 2 * cg.time + STATS_FADE_TIME - cgs.topshots.fadeTime;
+		}
+		else if (cgs.topshots.show != SHOW_ON) {
+			cgs.topshots.fadeTime = cg.time + STATS_FADE_TIME;
+		}
+
+		cgs.topshots.show = SHOW_ON;
+
+		if (cgs.topshots.requestTime < cg.time) {
+			cgs.topshots.requestTime = cg.time + 2000;
+			trap_SendClientCommand("stshots");
+		}
+	}
+}
+
+// -topshots
+void CG_topshotsUp_f(void) {
+	if (cgs.topshots.show == SHOW_ON) {
+		cgs.topshots.show = SHOW_SHUTDOWN;
+		if (cg.time < cgs.topshots.fadeTime) {
+			cgs.topshots.fadeTime = 2 * cg.time + STATS_FADE_TIME - cgs.topshots.fadeTime;
+		}
+		else {
+			cgs.topshots.fadeTime = cg.time + STATS_FADE_TIME;
+		}
+		CG_windowFree(cg.topshotsWindow);
+		cg.topshotsWindow = NULL;
+	}
+}
+
+// Dumps stats in file
+void CG_dumpStats_f(void) {
+	if (cgs.dumpStatsTime < cg.time) {
+		cgs.dumpStatsTime = cg.time + 2000;
+		trap_SendClientCommand(((cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR)) ? "statsall" : "weaponstats");
+	}
+}
+
 /*	OSPx - New stuff ends here	*/
 
 typedef struct {
@@ -630,9 +764,15 @@ static consoleCommand_t commands[] = {
 	{ "-zoomView", CG_zoomViewRevert_f },
 	{ "autoRecord", CG_autoRecord_f },
 	{ "autoScreenshot", CG_autoScreenShot_f },
+	{ "statsdump", CG_dumpStats_f },
 	{ "currentTime", CG_currentTime_f },
 	{ "time", CG_currentTime_f },
-	//{ "statsdump", CG_dumpStats_f },
+	{ "+wstats", CG_wStatsDown_f },
+	{ "-wstats", CG_wStatsUp_f },
+	{ "+stats", CG_StatsDown_f },
+	{ "-stats", CG_StatsUp_f },
+	{ "+wtopshots", CG_topshotsDown_f },
+	{ "-wtopshots", CG_topshotsUp_f },
 	// -OSPx
 
 	// Arnout

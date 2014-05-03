@@ -315,6 +315,10 @@ vmCvar_t cg_autoAction;
 vmCvar_t cg_useScreenshotJPEG;
 vmCvar_t cg_uinfo;
 
+// Stats - Font scale
+vmCvar_t cf_wstats; 
+vmCvar_t cf_wtopshots;
+
 // - Mappings
 vmCvar_t int_cl_maxpackets;
 vmCvar_t int_cl_timenudge;
@@ -550,6 +554,9 @@ cvarTable_t cvarTable[] = {
 	{ &cg_autoAction, "cg_autoAction", "0", CVAR_ARCHIVE },
 	{ &cg_useScreenshotJPEG, "cg_useScreenshotJPEG", "1", CVAR_ARCHIVE },
 	{ &cg_uinfo, "cg_uinfo", "0", CVAR_ROM | CVAR_USERINFO },
+
+	{ &cf_wstats, "cf_wstats", "1.2", CVAR_ARCHIVE },
+	{ &cf_wtopshots, "cf_wtopshots", "1.0", CVAR_ARCHIVE },
 
 	{ &int_cl_maxpackets, "cl_maxpackets", "30", CVAR_ARCHIVE },
 	{ &int_cl_timenudge, "cl_timenudge", "0", CVAR_ARCHIVE },
@@ -802,6 +809,14 @@ char *CG_generateFilename(void) {
 		Info_ValueForKey(pszServerInfo, "mapname")));
 }
 
+/*
+================
+OSPx - Console prints for stats
+================
+*/
+void CG_printConsoleString(char *str) {
+	CG_Printf("[skipnotify]%s", str);
+}
 
 //========================================================================
 void CG_SetupDlightstyles( void ) {
@@ -2556,6 +2571,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	}
 	// jpw
 	// -NERVE - SMF
+
+	// OSPx - Stats
+	cgs.dumpStatsFile = 0;
+	cgs.dumpStatsTime = 0;
 }
 
 /*

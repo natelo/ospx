@@ -1783,4 +1783,7 @@ typedef struct weap_ws_convert_s {
 
 extWeaponStats_t BG_WeapStatForWeapon(weapon_t iWeaponID);
 
+// ET Port
+int BG_cleanName(const char *pszIn, char *pszOut, unsigned int dwMaxLength, qboolean fCRLF);
+
 // -OSPx
