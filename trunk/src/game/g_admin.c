@@ -187,6 +187,20 @@ qboolean canUse(gentity_t *ent, qboolean dHelp) {
 
 /*
 ===========
+A simple Flat level check..
+===========
+*/
+qboolean isHigher(gentity_t *ent, gentity_t *target)
+{
+	if (ent->client->sess.admin <= target->client->sess.admin) {
+		CP(va("print \"^3Denied^7: %s ^7has the same or higher level than you!\n^3Reason^7: You can only Administrate users with lower level than yours.\n\"", target->client->pers.netname));
+		return qtrue;
+	}
+	return qfalse;
+}
+
+/*
+===========
 Admin structure
 ===========
 */
@@ -199,8 +213,11 @@ typedef struct {
 } cmd_reference_t;
 
 static const cmd_reference_t userCmd[] = {
-	{ "help",		NULL,			qfalse, "?command", "Shows property and usage info of specified command." },	
-	{ 0,			NULL,			qfalse,	0,			0 }
+	{ "help",		NULL,				qfalse, "?command",							"Shows property and usage info of specified command." },	
+	{ "incognito",	cmd_incognito,		qfalse,	"!incognito",						"Toggles your Admin status from visible to hidden."  },
+	{ "ignore",		cmd_ignoreHandle,	qtrue,	"!ignore <unique part of name>",	"Takes ability to (v)chat or call votes from a targeted player." },
+	{ "unignore",	cmd_ignoreHandle,	qfalse,	"!unignore <unique part of name>",	"Restores ability to (v)chat or call votes to a targeted player." },
+	{ 0,			NULL,				qfalse,	0,									0 }
 };
 
 /*
@@ -259,6 +276,18 @@ qboolean cmds_admin(gentity_t *ent, qboolean dHelp) {
 	// Allow ?help at any time..
 	if (Q_stricmp(cmd, "help") == 0) {
 		return userCommands(ent, cmd, qtrue);
+	}	
+	// a5_allowAll enabled allows for client to execute 
+	// any existing command while a5_cmds can then be used
+	// for any server related commands (e.g. g_allowvote..)
+	else if (ent->client->sess.admin == ADMIN_5	&& a5_allowAll.integer)
+	{		
+		// Admin feature is not meant to work as rcon (full access) so if it's not
+		// in a5_cmds string and not in Admin structure, it's either a typo or not allowed. 
+		if (!userCommands(ent, cmd, dHelp))
+			CP(va("print \"Command ^1%s ^7is not allowed for your level^1!\n\"", cmd));
+
+		return qtrue;
 	}
 	// Command is allowed (found in a*_cmds string..)
 	else if (canUse(ent, dHelp))
@@ -269,18 +298,6 @@ qboolean cmds_admin(gentity_t *ent, qboolean dHelp) {
 			// server command as those can be set as well..
 			// NOTE: simpleton function really..
 			cmd_custom(ent);
-		
-		return qtrue;
-	}
-	// a5_allowAll enabled allows for client to execute 
-	// any existing command while a5_cmds can then be used
-	// for any server related commands (e.g. g_allowvote..)
-	else if (ent->client->sess.admin == ADMIN_5	&& a5_allowAll.integer)
-	{		
-		// Admin feature is not meant to work as rcon (full access) so if it's not
-		// in a5_cmds string and not in Admin structure, it's either a typo or not allowed. 
-		if (userCommands(ent, cmd, dHelp))
-			CP(va("print \"Command ^1%s ^7is not allowed for your level^1!\n\"", cmd));
 
 		return qtrue;
 	}
@@ -289,5 +306,5 @@ qboolean cmds_admin(gentity_t *ent, qboolean dHelp) {
 		// Was not found due typo, insufficient level..whatever just bail out
 		CP(va("print \"Command ^1%s ^7is not allowed for your level^1!\n\"", cmd));
 	}
-	return qfalse;;
+	return qfalse;
 }
