@@ -187,6 +187,7 @@ vmCvar_t g_extendedLog;
 // - General
 vmCvar_t g_spectatorInactivity;
 vmCvar_t g_showFlags;
+vmCvar_t g_allowSoftKill;
 vmCvar_t server_autoconfig;
 
 // - System
@@ -350,6 +351,7 @@ cvarTable_t gameCvarTable[] = {
 
 	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },
 	{ &g_showFlags, "g_showFlags", "1", 0 },
+	{ &g_allowSoftKill, "g_allowSoftKill", "0", CVAR_ARCHIVE, 0, qfalse, qfalse },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
@@ -2666,7 +2668,7 @@ void G_RunFrame( int levelTime ) {
 		return;
 	}
 
-	// OSPx -FIXME (pause)
+	// OSPx - FIXME (pause)
 	level.timeCurrent = levelTime /*- level.timeDelta*/;
 
 	level.frameStartTime = trap_Milliseconds();
