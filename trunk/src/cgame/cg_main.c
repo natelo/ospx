@@ -685,7 +685,7 @@ void CG_UpdateCvars( void ) {
 OSPx - Gender
 =================
 */
-int convertGender( void ) {
+int setGender( void ) {
 	if (!Q_stricmp(gender.string, "male") || 
 		!Q_stricmp(gender.string, "m") || 
 		!Q_stricmp(gender.string, "0"))
@@ -697,7 +697,6 @@ int convertGender( void ) {
 	else
 		return 0;
 }
-
 
 /*
 =================
@@ -726,7 +725,7 @@ void CG_setClientFlags(void) {
 		// MaxPackets
 		int_cl_maxpackets.integer,
 		// Gender 
-		convertGender()
+		setGender()
 		));
 }
 

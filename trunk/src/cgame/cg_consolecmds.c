@@ -888,12 +888,12 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand("sui");			// Suicide (soft kill)
 
 	// Stats
-	trap_AddCommand("scores");		// Prints score table
-	trap_AddCommand("weaponstats");	// +wstats equivalent for console
-	trap_AddCommand("topshots");		// +topshots equivalent for console
-	trap_AddCommand("bottomshots");	// Dumps to console
-	trap_AddCommand("stats");			// Dumps to console (same as +stats just no fancy window)
-	trap_AddCommand("statsall");		// Dumps stats of all players
-	trap_AddCommand("statsdump");		// Dumps current stats
+	trap_AddCommand("scores");
+	trap_AddCommand("weaponstats");
+	trap_AddCommand("topshots");
+	trap_AddCommand("bottomshots");
+	trap_AddCommand("stats");
+	trap_AddCommand("statsall");
+	trap_AddCommand("statsdump");
 // -OSPx
 }

@@ -46,7 +46,6 @@ qboolean cf_draw(float x, float y, float fade, int clientNum) {
 	unsigned int flag_sd = 512;
 	unsigned int client_flag = atoi(Info_ValueForKey(CG_ConfigString(clientNum + CS_PLAYERS), "country"));
 
-
 	if (client_flag < 255) {
 		float x1 = (float)((client_flag * (unsigned int)flag_step) % flag_sd);
 		float y1 = (float)(floor((client_flag * flag_step) / flag_sd) * flag_step);
