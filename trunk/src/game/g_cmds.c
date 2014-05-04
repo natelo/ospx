@@ -568,20 +568,20 @@ Cmd_Kill_f
 =================
 */
 void Cmd_Kill_f( gentity_t *ent ) {
+	int dmg = 0; // OSPx - Needed for Team Damage stats..
+
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		return;
-	}
-	if ( g_gamestate.integer != GS_PLAYING ) {
 		return;
 	}
 	if ( g_gametype.integer >= GT_WOLF && ent->client->ps.pm_flags & PMF_LIMBO ) {
 		return;
 	}
 
+	dmg = ent->health;
 	ent->flags &= ~FL_GODMODE;
 	ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
 	ent->client->ps.persistant[PERS_HWEAPON_USE] = 0; // TTimo - if using /kill while at MG42
-	player_die( ent, ent, ent, 100000, MOD_SUICIDE );
+	player_die( ent, ent, ent, dmg, MOD_SUICIDE );
 }
 
 
@@ -715,7 +715,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 			// Kill him (makes sure he loses flags, etc)
 			ent->flags &= ~FL_GODMODE;
 			ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
-			player_die( ent, ent, ent, 100000, MOD_SUICIDE );
+			player_die( ent, ent, ent, 100000, MOD_SWITCHTEAM ); // OSPx - Fix this for stats..
 		}
 	}
 	// they go to the end of the line for tournements

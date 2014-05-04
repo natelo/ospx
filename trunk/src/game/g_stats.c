@@ -216,9 +216,9 @@ void G_addStats( gentity_t *targ, gentity_t *attacker, int dmg_ref, int mod ) {
 	// Keep track of only active player-to-player interactions in a real game
 	if ( !targ || !targ->client ||
 		 g_gamestate.integer != GS_PLAYING ||
-	/*	 mod == MOD_ADMKILL ||
+		 mod == MOD_ADMKILL ||
 		 mod == MOD_SWITCHTEAM ||
-	*/	 ( g_gametype.integer >= GT_WOLF && ( targ->client->ps.pm_flags & PMF_LIMBO ) ) ||
+		 ( g_gametype.integer >= GT_WOLF && ( targ->client->ps.pm_flags & PMF_LIMBO ) ) ||
 		 ( g_gametype.integer < GT_WOLF && ( targ->s.eFlags == EF_DEAD || targ->client->ps.pm_type == PM_DEAD ) ) ) {
 		return;
 	}
@@ -235,7 +235,7 @@ void G_addStats( gentity_t *targ, gentity_t *attacker, int dmg_ref, int mod ) {
 	}
 
 	// Suicides only affect the player specifically
-	if ( targ == attacker || !attacker || !attacker->client || mod == MOD_SUICIDE /*|| mod == MOD_SELFKILL */) {	
+	if ( targ == attacker || !attacker || !attacker->client || mod == MOD_SUICIDE || mod == MOD_SELFKILL ) {	
 		if ( !attacker || !attacker->client )
 		return;
 	}
@@ -250,7 +250,7 @@ void G_addStats( gentity_t *targ, gentity_t *attacker, int dmg_ref, int mod ) {
 		 targ->client->sess.sessionTeam == attacker->client->sess.sessionTeam ) {
 		attacker->client->sess.team_damage += dmg;
 		// Don't count self kill as team kill..because it ain't!
-		if ( targ->health <= 0 && !(mod == MOD_SUICIDE /*|| mod == MOD_SELFKILL*/)) {
+		if ( targ->health <= 0 && !(mod == MOD_SUICIDE || mod == MOD_SELFKILL)) {
 			attacker->client->sess.team_kills++;
 			targ->client->sess.deaths++;	// Record death when TK occurs
 		}
@@ -308,7 +308,6 @@ void G_deleteStats( int nClient ) {
 	cl->sess.suicides = 0;
 	cl->sess.team_damage = 0;
 	cl->sess.team_kills = 0;
-	// Reset new ones as well
 	cl->sess.headshots = 0;
 	cl->sess.med_given = 0;
 	cl->sess.ammo_given = 0;
