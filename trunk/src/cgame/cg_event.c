@@ -166,6 +166,11 @@ static void CG_Obituary( entityState_t *ent ) {
 	case MOD_TRIGGER_HURT:
 		message = "was killed";
 		break;
+// OSPx
+	case MOD_ADMKILL:
+		message = "was killed";
+		break;
+// -OSPx
 	default:
 		message = NULL;
 		break;
@@ -194,6 +199,16 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_EXPLOSIVE:
 			message = "died in his own explosion";
 			break;
+// OSPx - MODs
+		case MOD_SWITCHTEAM:
+			return;
+		case MOD_SUICIDE:
+			message = "committed suicide";
+			break;
+		case MOD_SELFKILL:
+			message = "slit his own throat";
+			break;			
+// -OSPx
 		default:
 			message = "killed himself";
 			break;

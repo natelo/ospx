@@ -268,7 +268,12 @@ char    *modNames[] = {
 	"MOD_BAT",
 	
 // jpw
-	"MOD_NUM_MODS"	// OSPx
+// OSPx
+	"MOD_ADMKILL",
+	"MOD_SELFKILL",
+	"MOD_SWITCHTEAM",
+	"MOD_NUM_MODS"
+// -OSPx
 };
 
 /*

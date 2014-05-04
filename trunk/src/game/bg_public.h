@@ -1203,7 +1203,12 @@ typedef enum {
 //
 	MOD_BAT,
 
-	MOD_NUM_MODS	// OSPx
+// OSPx
+	MOD_ADMKILL,
+	MOD_SELFKILL,
+	MOD_SWITCHTEAM,
+	MOD_NUM_MODS
+// -OSPx
 
 } meansOfDeath_t;
 
