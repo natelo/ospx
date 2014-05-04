@@ -568,7 +568,7 @@ void G_weaponRankings_cmd( gentity_t *ent, unsigned int dwCommand, qboolean stat
 }
 
 // Prints current player match info.
-void G_printMatchInfo(gentity_t *ent) {
+void G_printMatchInfo(gentity_t *ent, qboolean time) {
 	int i, j, cnt, eff;
 	float tot_acc = 0.00f;
 	int tot_kills, tot_deaths, tot_gp, tot_hs, tot_sui, tot_tk, tot_dg, tot_dr, tot_td, tot_hits, tot_shots;
@@ -576,8 +576,8 @@ void G_printMatchInfo(gentity_t *ent) {
 	char *ref;
 	char n1[MAX_NETNAME];
 	
-	CP(va("sc \"\nMod: %s \n^7Server: %s  \n^7Time: ^3%s\n\n\"",
-		GAMEVERSION, sv_hostname.string, getTime()));
+	CP(va("sc \"\nMod: %s \n^7Server: %s %s\n\n\"",
+		GAMEVERSION, sv_hostname.string, ( time ? va("\n^7Time: ^3%s", getTime()) : "" ) ));
 
 	cnt = 0;
 	for (i = TEAM_RED; i <= TEAM_BLUE; i++) {
@@ -663,8 +663,8 @@ void G_printMatchInfo(gentity_t *ent) {
 		tot_acc = ((tot_shots == 0) ? 0.00 : ((float)tot_hits / (float)tot_shots) * 100.00f);
 
 		CP(va("sc \"^7----------------------------------------------------------------------\n"
-			"%-19s%4d%4d%4d%3d^2%4d %6.2f%5d^5%6d%6d%5d^3%7d\n\n\n\"",
-			"^1Totals^7",
+			"%-19s%4d%4d%4d%3d^2%4d %6.2f%5d^5%6d%6d%5d^3%7d\n\n\"",
+			"^3Totals^7",
 			tot_kills,
 			tot_deaths,
 			tot_sui,

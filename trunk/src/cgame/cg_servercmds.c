@@ -1802,7 +1802,7 @@ void CG_TopShotsParse_cmd( void ) {
 void CG_scores_cmd( void ) {
 	const char *str = CG_Argv( 1 );	
 
-	CG_Printf( "[skipnotify]%s", str );	// L0 - FIXME - this causes double prints..
+	CG_Printf( "[skipnotify]%s", str );
 	if ( cgs.dumpStatsFile > 0 ) {
 		char s[MAX_STRING_CHARS];
 
@@ -1815,13 +1815,13 @@ void CG_scores_cmd( void ) {
 			qtime_t ct;
 
 			trap_RealTime( &ct );
-			str = va( "\nStats recorded: %02d:%02d:%02d (%02d %s %d)\n",
+			str = va( "Stats recorded: %02d:%02d:%02d (%02d %s %d)\n",
 					  ct.tm_hour, ct.tm_min, ct.tm_sec,
 					  ct.tm_mday, aMonths[ct.tm_mon], 1900 + ct.tm_year );
 
 			trap_FS_Write( str, strlen( str ), cgs.dumpStatsFile );
 
-			CG_Printf( "[cgnotify]\n^z>>> Stats recorded to: ^7%s\n", cgs.dumpStatsFileName );
+			CG_Printf( "[cgnotify]>>> ^3Stats recorded to: ^7%s\n", cgs.dumpStatsFileName );
 			trap_FS_FCloseFile( cgs.dumpStatsFile );
 			cgs.dumpStatsFile = 0;
 		}
@@ -1843,13 +1843,13 @@ void CG_dumpStats( void ) {
 	qtime_t ct;
 	qboolean fDoScores = qfalse;
 	const char *info = CG_ConfigString( CS_SERVERINFO );
-	char *s = va( "\n^z>>> %s: ^z%s\n\n", CG_TranslateString( "Map" ), Info_ValueForKey( info, "mapname" ) );
+	char *s = va( ">>> ^3%s: ^7%s\n", CG_TranslateString( "Map" ), Info_ValueForKey( info, "mapname" ) );
 
 	trap_RealTime( &ct );
 	// /me holds breath (using circular va() buffer)
 	if ( cgs.dumpStatsFile == 0 ) {
 		fDoScores = qtrue;
-		cgs.dumpStatsFileName = va( "stats/%s.%02d.%d/%02d%02d%02d.%s.txt",
+		cgs.dumpStatsFileName = va( "stats/%s.%02d.%d/%02d.%02d.%02d-%s.txt",
 									aMonths[ct.tm_mon],ct.tm_mday, 1900 + ct.tm_year,
 									ct.tm_hour, ct.tm_min, ct.tm_sec, Info_ValueForKey( info, "mapname" ) ); // Map has to be last so they sort right..
 	}
@@ -1862,7 +1862,7 @@ void CG_dumpStats( void ) {
 	CG_printFile( s );
 	CG_parseWeaponStats_cmd( CG_printFile );
 	if ( cgs.dumpStatsFile == 0 ) {
-		CG_Printf( "[cgnotify]\n^z>>> %s: %s\n", CG_TranslateString( "Could not create logfile" ), cgs.dumpStatsFileName );
+		CG_Printf( "[cgnotify]\n>>> ^3%s: %s\n", CG_TranslateString( "Could not create logfile" ), cgs.dumpStatsFileName );
 	}
 
 	// Daisy-chain to scores info

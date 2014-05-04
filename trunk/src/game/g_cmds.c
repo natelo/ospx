@@ -2518,7 +2518,7 @@ Stats
 ===================
 */
 void G_scores_cmd(gentity_t *ent) {
-	G_printMatchInfo(ent);
+	G_printMatchInfo(ent, qfalse);
 }
 // Shows a player's stats to the requesting client.
 void G_weaponStats_cmd(gentity_t *ent) {
