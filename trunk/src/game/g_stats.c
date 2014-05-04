@@ -26,7 +26,7 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 OSPx - g_stats.c
 
-Mostly a ET code bump with few modifications..
+Mostly a ET code dump with few modifications..
 
 Created: 3 May / 2014
 ===========================================================================
@@ -265,8 +265,8 @@ void G_addStats( gentity_t *targ, gentity_t *attacker, int dmg_ref, int mod ) {
 			attacker->client->sess.kills++;
 			targ->client->sess.deaths++;
 
-			// L0 - Life(s) Kill peak
-			if (attacker->client->pers.life_kills >= attacker->client->sess.killPeak)
+			// OSPx - Life(s) Kill peak
+			if (attacker->client->pers.life_kills > attacker->client->sess.killPeak)
 				attacker->client->sess.killPeak++;
 		}
 	}
@@ -352,8 +352,6 @@ void G_parseStats( char *pszStatsInfo ) {
 	GETVAL( cl->sess.damage_given );
 	GETVAL( cl->sess.damage_received );
 	GETVAL( cl->sess.team_damage );
-	// L0 - New ones
-	// We store this so players can check it up in warmup (TODO)..
 	GETVAL( cl->sess.deaths );
 	GETVAL( cl->sess.kills );
 	GETVAL( cl->sess.suicides );
@@ -369,7 +367,7 @@ void G_parseStats( char *pszStatsInfo ) {
 }
 
 // These map to WS_* weapon indexes
-// L0: In other words...min shots before it qualifies for top-bottom check..
+// OSPx: In other words...min shots before it qualifies for top-bottom check..
 const int cQualifyingShots[WS_MAX] = {
 	20,     // Knife
 	14,     // Luger
@@ -529,13 +527,13 @@ void G_weaponRankings_cmd( gentity_t *ent, unsigned int dwCommand, qboolean stat
 	}
 
 	if ( iWeap < WS_KNIFE ) {		
-		CP( va( "print \"\n^zInfo: %s\n\n\"",   
+		CP( va( "print \"\n^dInfo: %s\n\n\"",   
 			(state ? 
 				"^7 Shows BEST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon " : 
 				"^7 Shows WORST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon" ) 
 		));
 
-		Q_strncpyz( z, "^zAvailable weapon codes:^7\n", sizeof( z ) );
+		Q_strncpyz( z, "^3Available weapon codes:^7\n", sizeof( z ) );
 		for ( i = WS_KNIFE; i < WS_MAX; i++ ) {
 			Q_strcat( z, sizeof( z ), va( "  %s - %s\n", aWeaponInfo[i].pszCode, aWeaponInfo[i].pszName ) );
 		}
@@ -568,4 +566,197 @@ void G_weaponRankings_cmd( gentity_t *ent, unsigned int dwCommand, qboolean stat
 		}
 	}
 	CP( va( "astats%s %d %d %d%s", ( ( state ) ? "" : "b" ), c, iWeap, wBestAcc, z ) );
+}
+
+// Prints current player match info.
+void G_printMatchInfo(gentity_t *ent) {
+	int i, j, cnt, eff;
+	float tot_acc = 0.00f;
+	int tot_kills, tot_deaths, tot_gp, tot_hs, tot_sui, tot_tk, tot_dg, tot_dr, tot_td, tot_hits, tot_shots;
+	gclient_t *cl;
+	char *ref;
+	char n1[MAX_NETNAME];
+	
+	CP(va("sc \"\nMod: %s \n^7Server: %s  \n^7Time: ^3%s\n\n\"",
+		GAMEVERSION, sv_hostname.string, getTime()));
+
+	cnt = 0;
+	for (i = TEAM_RED; i <= TEAM_BLUE; i++) {
+		if (!TeamCount(-1, i)) {
+			continue;
+		}
+
+		tot_kills = 0;
+		tot_deaths = 0;
+		tot_hs = 0;
+		tot_sui = 0;
+		tot_tk = 0;
+		tot_dg = 0;
+		tot_dr = 0;
+		tot_td = 0;
+		tot_gp = 0;
+		tot_hits = 0;
+		tot_shots = 0;
+		tot_acc = 0;
+
+		CP(va("sc \"%s ^7Team\n"
+			"^7----------------------------------------------------------------------"
+			"\nPlayer          Kll Dth Sui TK ^2Eff Accrcy   HS    ^5DG    DR   TD  ^3Score\n"
+			"^7----------------------------------------------------------------------\n\"", (i == TEAM_RED) ? "^1Axis" : "^4Allied"));
+
+		for (j = 0; j < level.numPlayingClients; j++) {
+			cl = level.clients + level.sortedClients[j];
+
+			if (cl->pers.connected != CON_CONNECTED || cl->sess.sessionTeam != i) {
+				continue;
+			}
+									
+			SanitizeString(cl->pers.netname, n1, qtrue);
+			Q_CleanStr(n1);						
+
+			ref = "^7";
+			tot_kills += cl->sess.kills;
+			tot_deaths += cl->sess.deaths;
+			tot_sui += cl->sess.suicides;
+			tot_tk += cl->sess.team_kills;
+			tot_hs += cl->sess.headshots;
+			tot_dg += cl->sess.damage_given;
+			tot_dr += cl->sess.damage_received;
+			tot_td += cl->sess.team_damage;
+			tot_gp += cl->ps.persistant[PERS_SCORE];
+			tot_hits += cl->sess.acc_hits;
+			tot_shots += cl->sess.acc_shots;
+
+			eff = (cl->sess.deaths + cl->sess.kills == 0) ? 0 : 100 * cl->sess.kills / (cl->sess.deaths + cl->sess.kills);
+			if (eff < 0) {
+				eff = 0;
+			}
+
+			if (ent->client == cl ||
+				(ent->client->sess.sessionTeam == TEAM_SPECTATOR &&
+				ent->client->sess.spectatorState == SPECTATOR_FOLLOW &&
+				ent->client->sess.spectatorClient == level.sortedClients[j])) {
+				ref = "^7";
+			}
+
+			cnt++;
+			CP(va("sc \"%s%-15s%4d%4d%4d%3d%s^2%4d %6.2f%5d^5%6d%6d%5d^3%7d\n\"",
+				ref,
+				n1,
+				cl->sess.kills,
+				cl->sess.deaths,
+				cl->sess.suicides,
+				cl->sess.team_kills,
+				ref,
+				eff,
+				((cl->sess.acc_shots == 0) ? 0.00 : ((float)cl->sess.acc_hits / (float)cl->sess.acc_shots) * 100.00f),
+				cl->sess.headshots,
+				cl->sess.damage_given,
+				cl->sess.damage_received,
+				cl->sess.team_damage,
+				cl->ps.persistant[PERS_SCORE]));
+		}
+
+		eff = (tot_kills + tot_deaths == 0) ? 0 : 100 * tot_kills / (tot_kills + tot_deaths);
+		if (eff < 0) {
+			eff = 0;
+		}
+		tot_acc = ((tot_shots == 0) ? 0.00 : ((float)tot_hits / (float)tot_shots) * 100.00f);
+
+		CP(va("sc \"^7----------------------------------------------------------------------\n"
+			"%-19s%4d%4d%4d%3d^2%4d %6.2f%5d^5%6d%6d%5d^3%7d\n\n\n\"",
+			"^1Totals^7",
+			tot_kills,
+			tot_deaths,
+			tot_sui,
+			tot_tk,
+			eff,
+			tot_acc,
+			tot_hs,
+			tot_dg,
+			tot_dr,
+			tot_td,
+			tot_gp));
+	}
+	CP(va("sc \"%s\n\" 0", ((!cnt) ? "^3\nNo scores to report." : "")));
+}
+
+// Dumps end-of-match info
+void G_matchInfoDump(unsigned int dwDumpType) {
+	int i, ref;
+	gentity_t *ent;
+	gclient_t *cl;
+
+	for (i = 0; i < level.numConnectedClients; i++) {
+		ref = level.sortedClients[i];
+		ent = &g_entities[ref];
+		cl = ent->client;
+
+		if (cl->pers.connected != CON_CONNECTED) {
+			continue;
+		}
+
+		if (dwDumpType == EOM_WEAPONSTATS) {
+			// L0 - THIS NEEDS FINE TUNNING - TODO!
+			// If client wants to write stats to a file, don't auto send this stuff
+			if (!(cl->pers.clientFlags & CGF_STATSDUMP)) {
+				/*
+				if ( ( !cl->pers.int_statsType )) {
+				G_statsall_cmd( ent, 0, qfalse );
+				} else if ( cl->sess.sessionTeam != TEAM_SPECTATOR ) {
+
+				if ( cl->pers.int_statsType == 1 ) {
+				G_statsall_cmd( ent, cl->sess.sessionTeam, qfalse );
+				} else {
+				CP( va( "ws %s\n", G_createStats( ent ) ) );
+				}
+
+				} else if ( cl->sess.spectatorState != SPECTATOR_FREE ) {
+				int pid = cl->sess.spectatorClient;
+
+				if ( ( cl->pers.int_statsType == 2 ) ) {
+				G_statsall_cmd( ent, level.clients[pid].sess.sessionTeam, qfalse );
+				} else {
+				CP( va( "ws %s\n", G_createStats( g_entities + pid ) ) );
+				}
+				}
+				*/
+			}
+
+			// Log it
+			if (cl->sess.sessionTeam != TEAM_SPECTATOR) {
+				G_LogPrintf("WeaponStats: %s\n", G_createStats(ent));
+			}
+
+		}
+		else if (dwDumpType == EOM_MATCHINFO) {
+			// Don't dump score table for users with stats dump enabled
+			if (!(cl->pers.clientFlags & CGF_STATSDUMP)) {
+				G_printMatchInfo(ent);
+			}
+
+			if (g_gametype.integer == GT_WOLF_STOPWATCH) {
+				if (g_currentRound.integer == 1) {   // We've already missed the switch
+					CP(va("print \">>> ^3Clock set to: %d:%02d\n\"",
+						g_nextTimeLimit.integer,
+						(int)(60.0 * (float)(g_nextTimeLimit.value - g_nextTimeLimit.integer))));
+				}
+				else {
+					float val = (float)((level.timeCurrent - (level.startTime + level.time - level.intermissiontime)) / 60000.0);
+					if (val < g_timelimit.value) {
+						CP(va("print \">>> ^3Objective reached at %d:%02d (original: %d:%02d)\n\"",
+							(int)val,
+							(int)(60.0 * (val - (int)val)),
+							g_timelimit.integer,
+							(int)(60.0 * (float)(g_timelimit.value - g_timelimit.integer))));
+					}
+					else {
+						CP(va("print \">>> ^3Objective NOT reached in time (%d:%02d)\n\"",
+							g_timelimit.integer,
+							(int)(60.0 * (float)(g_timelimit.value - g_timelimit.integer))));
+					}
+				}
+			}
+		}
+	}
 }

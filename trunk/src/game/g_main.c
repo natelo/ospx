@@ -191,6 +191,7 @@ vmCvar_t server_autoconfig;
 
 // - System
 vmCvar_t z_serverflags;
+vmCvar_t sv_hostname;
 // -OSPx
 
 cvarTable_t gameCvarTable[] = {
@@ -351,7 +352,8 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_showFlags, "g_showFlags", "1", 0 },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
 
-	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse }
+	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
+	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse }
 // -OSPx
 };
 
@@ -1877,6 +1879,10 @@ void BeginIntermission( void ) {
 	// send the current scoring to all clients
 	SendScoreboardMessageToAllClients();
 
+	// OSPx - End stats (FIXME!)
+	//if (level.time - level.intermissiontime > 800)
+	G_matchInfoDump(EOM_MATCHINFO);
+
 }
 
 
@@ -2047,7 +2053,7 @@ void LogExit( const char *string ) {
 				trap_Cvar_Set( "g_nextTimeLimit", va( "%f", g_timelimit.value ) );
 			} else {
 				// use remaining time as next timer
-				trap_Cvar_Set( "g_nextTimeLimit", va( "%f", ( level.time - level.startTime ) / 60000.f ) );
+				trap_Cvar_Set("g_nextTimeLimit", va( "%f", (level.timeCurrent - level.startTime ) / 60000.f));
 			}
 		} else {
 			// reset timer
@@ -2225,7 +2231,7 @@ void CheckExitRules( void ) {
 	}
 
 	if ( g_timelimit.value && !level.warmupTime ) {
-		if ( level.time - level.startTime >= g_timelimit.value * 60000 ) {
+		if ( level.timeCurrent - level.startTime >= g_timelimit.value * 60000 ) {
 
 			// check for sudden death
 			if ( g_gametype.integer != GT_CTF && ScoreIsTied() ) {
@@ -2659,6 +2665,9 @@ void G_RunFrame( int levelTime ) {
 	if ( level.restarted ) {
 		return;
 	}
+
+	// OSPx -FIXME (pause)
+	level.timeCurrent = levelTime /*- level.timeDelta*/;
 
 	level.frameStartTime = trap_Milliseconds();
 

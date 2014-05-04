@@ -1591,7 +1591,7 @@ void CG_parseClientStats_cmd (void( txt_dump ) ( char * ) ) {
 	if (ammo_giv > 0 || med_giv > 0)
 		txt_dump( va("^zAmmopacks: ^7%-3d    ^zHealthpacks: ^7%d\n", ammo_giv, med_giv ));	
 	if (revived > 0 )
-		txt_dump( va("^zRevives  : ^7%-3d    \n", revived, ));	
+		txt_dump( va("^zRevives  : ^7%-3d    \n", revived ));	
 	if (kill_peak > 0 || gibs > 0) 
 		txt_dump( va("^zKill Peak: ^7%-3d    ^zGibbed     : ^7%d\n", kill_peak, gibs ));	
 	if (acc_shots > 0 || acc_hits > 0)

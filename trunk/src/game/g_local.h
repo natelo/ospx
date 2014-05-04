@@ -834,6 +834,9 @@ typedef struct {
 	// Stats
 	qboolean fResetStats;	
 	int sortedStats[MAX_CLIENTS];
+
+	// Real game clock
+	int timeCurrent;	
 // -OSPx
 
 } level_locals_t;
@@ -1338,6 +1341,7 @@ extern vmCvar_t g_showFlags;
 extern vmCvar_t server_autoconfig;
 
 extern vmCvar_t z_serverflags;
+extern vmCvar_t sv_hostname;
 // -OSPx
 
 void    trap_Printf( const char *fmt );
@@ -1652,6 +1656,8 @@ void G_clientStatsPrint(gentity_t *ent, int nType, qboolean toWindow);
 void G_weaponStatsLeaders_cmd(gentity_t* ent, qboolean doTop, qboolean doWindow);
 void G_weaponRankings_cmd(gentity_t *ent, unsigned int dwCommand, qboolean state);
 void G_statsall_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
+void G_printMatchInfo(gentity_t *ent);
+void G_matchInfoDump(unsigned int dwDumpType);
 
 //
 // Macros
@@ -1664,4 +1670,9 @@ void G_statsall_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 //
 // Bit Flags
 //
+// - Config
 #define ZSF_COMP        0x01    // Have comp settings loaded for current gametype?
+
+// - Stats
+#define EOM_WEAPONSTATS 0x01    // Dump of player weapon stats at end of match.
+#define EOM_MATCHINFO   0x02    // Dump of match stats at end of match.

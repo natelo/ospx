@@ -2489,7 +2489,7 @@ Stats
 ===================
 */
 void G_scores_cmd(gentity_t *ent) {
-	//G_printMatchInfo(ent); OSPx - FIXME
+	G_printMatchInfo(ent);
 }
 // Shows a player's stats to the requesting client.
 void G_weaponStats_cmd(gentity_t *ent) {
