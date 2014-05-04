@@ -1383,6 +1383,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	gentity_t *ent;
 	char    *s;
 	char model[MAX_QPATH], modelname[MAX_QPATH];
+	char *gender="m";	// OSPx 
 
 //----(SA) added this for head separation
 	char head[MAX_QPATH];
@@ -1434,14 +1435,19 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->pers.predictItemPickup = qfalse;
 	}
 	else {
+		int cGender = 0;
+
 		s = Info_ValueForKey(userinfo, "cg_uinfo");
-		sscanf(s, "%i %i %i",
+		sscanf(s, "%i %i %i %i",
 			&client->pers.clientFlags,
 			&client->pers.clientTimeNudge,
-			&client->pers.clientMaxPackets);
+			&client->pers.clientMaxPackets,
+			&cGender);
 
 		client->pers.autoActivate = (client->pers.clientFlags & CGF_AUTOACTIVATE) ? PICKUP_TOUCH : PICKUP_ACTIVATE;
 		client->pers.predictItemPickup = ((client->pers.clientFlags & CGF_PREDICTITEMS) != 0);
+
+		gender = (cGender ? "f" : "m");
 
 		if (client->pers.clientFlags & CGF_AUTORELOAD) {
 			client->pers.bAutoReloadAux = qtrue;
@@ -1556,7 +1562,6 @@ void ClientUserinfoChanged( int clientNum ) {
 	}
 	//dhm - end
 
-
 	// colors
 	c1 = Info_ValueForKey( userinfo, "color" );
 
@@ -1567,16 +1572,16 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	if (ent->r.svFlags & SVF_BOT) {
 
-		s = va("n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\country\\255\\mu\\0",
+		s = va("n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\country\\255\\mu\\0\\ug\\%s",
 			client->pers.netname, client->sess.sessionTeam, model, head, c1,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
-			Info_ValueForKey(userinfo, "skill"));
+			Info_ValueForKey(userinfo, "skill"), gender);
 	}
 	else {
-		s = va("n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i\\mu\\%i\\",
+		s = va("n\\%s\\t\\%i\\model\\%s\\head\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\country\\%i\\mu\\%i\\ug\\%s",
 			client->pers.netname, client->sess.sessionTeam, model, head, c1,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
-			client->sess.uci, (client->sess.ignored ? 1 : 0));
+			client->sess.uci, (client->sess.ignored ? 1 : 0), gender);
 	}
 
 	//----(SA) end	
@@ -1591,10 +1596,10 @@ void ClientUserinfoChanged( int clientNum ) {
 			((client->sess.sessionTeam == TEAM_BLUE) ? "Allied" : "Spectator");
 
 		// Print essentials and skip the garbage		
-		s = va("name\\%s\\team\\%s\\IP\\%d.%d.%d.%d\\country\\%i\\ignored\\%s\\status\\%i\\timenudge\\%i\\maxpackets\\%i",
+		s = va("name\\%s\\team\\%s\\IP\\%d.%d.%d.%d\\country\\%i\\ignored\\%s\\status\\%i\\timenudge\\%i\\maxpackets\\%i\\gender\\%s",
 			client->pers.netname, team, client->sess.ip[0], client->sess.ip[1], client->sess.ip[2], 
 			client->sess.ip[3], client->sess.uci, (client->sess.ignored ? "yes" : "no"), client->sess.admin,
-			client->pers.clientTimeNudge, client->pers.clientMaxPackets);
+			client->pers.clientTimeNudge, client->pers.clientMaxPackets, gender);
 	}
 	// Account for bots..
 	else {

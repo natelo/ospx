@@ -83,6 +83,23 @@ const char  *CG_PlaceString( int rank ) {
 }
 
 /*
+===============
+OSPx - getGender
+
+Returns player gender
+===============
+*/
+char *getGender(char *gender, qboolean pNoun) {	
+
+	if (!Q_stricmp(gender, "f") || !Q_stricmp(gender, "female"))
+		return "her";
+	else if (!Q_stricmp(gender, "m") || !Q_stricmp(gender, "male"))
+		return (pNoun ? "him" : "his");
+	else
+		return (pNoun ? "him" : "his");
+}
+
+/*
 =============
 CG_Obituary
 =============
@@ -98,6 +115,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	char targetName[32];
 	char attackerName[32];
 	clientInfo_t    *ci, *ca; // JPW NERVE ca = attacker
+	char *gender;	// OSPx
 
 	// Ridah, no obituaries in single player
 	if ( cgs.gametype == GT_SINGLE_PLAYER ) {
@@ -127,7 +145,9 @@ static void CG_Obituary( entityState_t *ent ) {
 	}
 	Q_strncpyz( targetName, Info_ValueForKey( targetInfo, "n" ), sizeof( targetName ) - 2 );
 	strcat( targetName, S_COLOR_WHITE );
-
+	
+	gender = Info_ValueForKey(targetInfo, "ug");	// OSPx - Gender
+	
 	message2 = "";
 
 	// DHM - Nerve :: Set killtype
@@ -146,7 +166,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		message = "committed suicide";
 		break;
 	case MOD_FALLING:
-		message = "fell to his death";
+		message = va("fell to %s death", getGender(gender, qfalse));
 		break;
 	case MOD_CRUSH:
 		message = "was crushed";
@@ -180,28 +200,29 @@ static void CG_Obituary( entityState_t *ent ) {
 		switch ( mod ) {
 // JPW NERVE per atvi req
 		case MOD_DYNAMITE:
-		case MOD_DYNAMITE_SPLASH:
-			message = "dynamited himself to pieces";
+		case MOD_DYNAMITE_SPLASH:			
+			message = va("dynamited %sself to pieces", getGender(gender, qtrue));
 			break;
 // jpw
-		case MOD_GRENADE_SPLASH:
-			message = "dove on his own grenade";
+		case MOD_GRENADE_SPLASH:			
+			message = va("dove on %s own grenade", getGender(gender, qfalse));
 			break;
-		case MOD_ROCKET_SPLASH:
-			message = "vaporized himself";
+		case MOD_ROCKET_SPLASH:			
+			message = va("vaporized %sself", getGender(gender, qtrue));
 			break;
 		case MOD_AIRSTRIKE:
-			message = "obliterated himself";
+			message = "";
+			message = va("obliterated %sself", getGender(gender, qtrue));
 			break;
 			//case MOD_BFG_SPLASH:
 			//message = "should have used a smaller gun";
 			//break;
-		case MOD_EXPLOSIVE:
-			message = "died in his own explosion";
+		case MOD_EXPLOSIVE:			
+			message = va("died in %s own explosion", getGender(gender, qfalse));
 			break;
 // OSPx - MODs
-		case MOD_ARTY:
-			message = "obliterated himself";
+		case MOD_ARTY:			
+			message = va("obliterated %sself", getGender(gender, qtrue));
 			break;
 		case MOD_SWITCHTEAM:
 			return;
@@ -209,11 +230,12 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "committed suicide";
 			break;
 		case MOD_SELFKILL:
-			message = "slit his own throat";
+			//message = "slit his own throat";
+			message = va("slit %s own throat", getGender(gender, qfalse));
 			break;			
 // -OSPx
-		default:
-			message = "killed himself";
+		default:			
+			message = va("killed %sself", getGender(gender, qtrue));
 			break;
 		}
 	}

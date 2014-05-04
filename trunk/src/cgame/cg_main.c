@@ -322,6 +322,7 @@ vmCvar_t cf_wtopshots;
 // - Mappings
 vmCvar_t int_cl_maxpackets;
 vmCvar_t int_cl_timenudge;
+vmCvar_t gender;
 // -OSPx
 
 typedef struct {
@@ -559,7 +560,8 @@ cvarTable_t cvarTable[] = {
 	{ &cf_wtopshots, "cf_wtopshots", "1.0", CVAR_ARCHIVE },
 
 	{ &int_cl_maxpackets, "cl_maxpackets", "30", CVAR_ARCHIVE },
-	{ &int_cl_timenudge, "cl_timenudge", "0", CVAR_ARCHIVE },
+	{ &int_cl_timenudge, "cl_timenudge", "0", CVAR_ARCHIVE|CVAR_LATCH },
+	{ &gender, "gender", "male", CVAR_ARCHIVE }
 	// -OSPx
 };
 int cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
@@ -637,8 +639,14 @@ void CG_UpdateCvars( void ) {
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Update( cv->vmCvar );
 // OSPx
+		// Check if we need to update any client flags to be sent to the server
+		if (cv->vmCvar == &cg_autoAction || cv->vmCvar == &cg_autoReload ||
+			cv->vmCvar == &int_cl_timenudge || cv->vmCvar == &int_cl_maxpackets ||
+			cv->vmCvar == &cg_autoactivate || cv->vmCvar == &cg_predictItems ||
+			cv->vmCvar == &gender) {
+			fSetFlags = qtrue;
 		// Crosshairs
-		if (cv->vmCvar == &cg_crosshairColor || cv->vmCvar == &cg_crosshairAlpha) {
+		} else if (cv->vmCvar == &cg_crosshairColor || cv->vmCvar == &cg_crosshairAlpha) {
 			BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
 		}
 		else if (cv->vmCvar == &cg_crosshairColorAlt || cv->vmCvar == &cg_crosshairAlphaAlt)     {
@@ -674,6 +682,25 @@ void CG_UpdateCvars( void ) {
 
 /*
 =================
+OSPx - Gender
+=================
+*/
+int convertGender( void ) {
+	if (!Q_stricmp(gender.string, "male") || 
+		!Q_stricmp(gender.string, "m") || 
+		!Q_stricmp(gender.string, "0"))
+		return 0;
+	else if (!Q_stricmp(gender.string, "female") || 
+		!Q_stricmp(gender.string, "f") || 
+		!Q_stricmp(gender.string, "1"))
+		return 1;
+	else
+		return 0;
+}
+
+
+/*
+=================
 OSPx - Client Flags
 =================
 */
@@ -684,7 +711,7 @@ void CG_setClientFlags(void) {
 	}
 
 	cg.pmext.bAutoReload = (cg_autoReload.integer > 0);
-	trap_Cvar_Set("cg_uinfo", va("%d %d %d",
+	trap_Cvar_Set("cg_uinfo", va("%d %d %d %d",
 		// Client Flags
 		(
 			((cg_autoReload.integer > 0) ? CGF_AUTORELOAD : 0) |
@@ -697,8 +724,9 @@ void CG_setClientFlags(void) {
 		// Timenudge
 		int_cl_timenudge.integer,
 		// MaxPackets
-		int_cl_maxpackets.integer
-
+		int_cl_maxpackets.integer,
+		// Gender 
+		convertGender()
 		));
 }
 
