@@ -1178,6 +1178,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 // JPW NERVE -- repeated shooting sends to limbo
 				if ( g_gametype.integer >= GT_WOLF ) {
 					if ( ( targ->health < FORCE_LIMBO_HEALTH ) && ( targ->health > GIB_HEALTH ) && ( !( targ->client->ps.pm_flags & PMF_LIMBO ) ) ) {
+						// OSPx - Stats
+						if (!OnSameTeam(attacker, targ) && attacker->client)
+							attacker->client->sess.gibs++;
+						// -OSPx
 						limbo( targ, qtrue );
 					}
 				}

@@ -526,7 +526,7 @@ void G_weaponRankings_cmd( gentity_t *ent, unsigned int dwCommand, qboolean stat
 	}
 
 	if ( iWeap < WS_KNIFE ) {		
-		CP( va( "print \"\n^dInfo: %s\n\n\"",   
+		CP( va( "print \"\n^3Info: %s\n\n\"",   
 			(state ? 
 				"^7 Shows BEST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon " : 
 				"^7 Shows WORST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon" ) 

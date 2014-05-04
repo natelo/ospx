@@ -1474,7 +1474,7 @@ void CG_parseWeaponStats_cmd( void( txt_dump ) ( char * ) ) {
 	ci = &cgs.clientinfo[nClient];
 
 	Q_strncpyz( strName, ci->name, sizeof( strName ) );
-	txt_dump( va( "^7Overall stats for: ^z%s ^7(^2%d^7 Round%s)\n\n", strName, nRounds, ( ( nRounds != 1 ) ? "s" : "" ) ) );
+	txt_dump( va( "^2Overall stats for: ^7%s ^7(^2%d^7 Round%s)\n\n", strName, nRounds, ( ( nRounds != 1 ) ? "s" : "" ) ) );
 
 	if ( fFull ) {
 		txt_dump(     "Weapon     Acrcy Hits/Atts Kills Deaths Headshots\n" );
@@ -1485,7 +1485,10 @@ void CG_parseWeaponStats_cmd( void( txt_dump ) ( char * ) ) {
 	}
 
 	if ( !dwWeaponMask ) {
-		txt_dump( "^zNo weapon info available.\n" );
+		if (fFull)
+			txt_dump( "^3No weapon info available.\n" );
+		else
+			txt_dump("^zNo weapon info available.\n");
 	} else {		
 		for ( i = WS_KNIFE; i < WS_MAX; i++ ) {
 			if ( dwWeaponMask & ( 1 << i ) ) {
@@ -1495,7 +1498,11 @@ void CG_parseWeaponStats_cmd( void( txt_dump ) ( char * ) ) {
 				deaths = atoi( CG_Argv( iArg++ ) );
 				headshots = atoi( CG_Argv( iArg++ ) );
 
-				Q_strncpyz( strName, va( "^z%-9s: ", aWeaponInfo[i].pszName ), sizeof( strName ) );
+				if (fFull)
+					Q_strncpyz(strName, va("^3%-9s: ", aWeaponInfo[i].pszName), sizeof(strName));
+				else
+					Q_strncpyz( strName, va( "^z%-9s: ", aWeaponInfo[i].pszName ), sizeof( strName ) );
+
 				if ( atts > 0 || hits > 0 ) {
 					fHasStats = qtrue;
 					Q_strcat( strName, sizeof( strName ), va( "^7%5.1f ^5%4d/%-4d ",
@@ -1526,13 +1533,20 @@ void CG_parseWeaponStats_cmd( void( txt_dump ) ( char * ) ) {
 				txt_dump( "\n" );
 			}
 
-			txt_dump( va( "\n^zDamage Given: ^7%-6d  ^zTeam Damage : ^7%d\n", dmg_given, team_dmg ) );
-			txt_dump( va(  "^zDamage Recvd: ^7%-6d  ^zBodies Gibed: ^7%d \n", dmg_rcvd, gibs ) );
+			if (fFull) {
+				txt_dump(va("\n^3Damage Given: ^7%-6d  ^3Team Damage : ^7%d\n", dmg_given, team_dmg));
+				txt_dump(va("^3Damage Recvd: ^7%-6d  ^3Bodies Gibed: ^7%d \n", dmg_rcvd, gibs));
+			}
+			else {
+				txt_dump(va("\n^zDamage Given: ^7%-6d  ^zTeam Damage : ^7%d\n", dmg_given, team_dmg));
+				txt_dump(va("^zDamage Recvd: ^7%-6d  ^zBodies Gibed: ^7%d \n", dmg_rcvd, gibs));
+			}
 		}	
 	}
 	txt_dump( "\n" );
 }
-// 1.0 like stats (+stats)
+
+// 1.0/shrub like stats (+stats) but with Window overlay
 void CG_parseClientStats_cmd (void( txt_dump ) ( char * ) ) {
 	clientInfo_t *ci;
 	qboolean fFull = ( txt_dump != CG_printWindow );	
@@ -1546,17 +1560,16 @@ void CG_parseClientStats_cmd (void( txt_dump ) ( char * ) ) {
 	ci = &cgs.clientinfo[nClient];
 
 	Q_strncpyz( strName, ci->name, sizeof( strName ) );
-	txt_dump( va( "^7Current game stats for: ^z%s\n\n", strName ));
+	txt_dump( va( "^3Current game stats for: ^7%s\n\n", strName ));
 
 	if ( fFull ) {
-		txt_dump(     "^zKills ^7HS   Deaths TKs Suicides ^nDmgGiv DmgRcv TeamDmg\n" );
+		txt_dump(     "Kills HS   Deaths TKs Suicides ^3DmgGiv DmgRcv TeamDmg\n" );
 		txt_dump(     "----------------------------------------------------\n" );
 	} else {
 		txt_dump(     "^zKls  ^7HS  Dth TK Sui ^nDmGiv DmRcv TDmg\n" );
 		//txt_dump(     "-------------------------------------\n");
 		txt_dump(     "\n" );
 	}
-
 	
 	kills = atoi( CG_Argv( iArg++ ) );
 	headshots = atoi( CG_Argv( iArg++ ) );
@@ -1577,7 +1590,7 @@ void CG_parseClientStats_cmd (void( txt_dump ) ( char * ) ) {
 	acc = ( acc_shots > 0 ) ? (((float)acc_hits / (float)acc_shots ) * 100.00f) : 0.00;
 	
 	if ( fFull ) {
-		txt_dump( va( "^z%-4d  ^7%-3d  %-3d    %-2d  %-2d       ^n%-5d  %-5d  %-5d\n\n", 
+		txt_dump( va( "%-4d  %-3d  %-3d    %-2d  %-2d       ^3%-5d  %-5d  %-5d\n\n", 
 					kills, headshots, deaths, 
 					team_kills, suicides, damage_giv,	
 					damage_rec, bleed) );
@@ -1588,14 +1601,28 @@ void CG_parseClientStats_cmd (void( txt_dump ) ( char * ) ) {
 					damage_rec, bleed) );
 	}
 	
-	if (ammo_giv > 0 || med_giv > 0)
-		txt_dump( va("^zAmmopacks: ^7%-3d    ^zHealthpacks: ^7%d\n", ammo_giv, med_giv ));	
-	if (revived > 0 )
-		txt_dump( va("^zRevives  : ^7%-3d    \n", revived ));	
-	if (kill_peak > 0 || gibs > 0) 
-		txt_dump( va("^zKill Peak: ^7%-3d    ^zGibbed     : ^7%d\n", kill_peak, gibs ));	
-	if (acc_shots > 0 || acc_hits > 0)
-		txt_dump( va("^zAccouracy: ^7%-3.2f  ^zShots-Hits : ^7%d/^n%d\n", acc, acc_shots, acc_hits  ));
+	// OSPx - May look like an overkill but console can't parse 
+	// new colors and it ends up looking like rubish..
+	if (fFull) {
+		if (ammo_giv > 0 || med_giv > 0)
+			txt_dump(va("^3Ammopacks: ^7%-3d    ^3Healthpacks: ^7%d\n", ammo_giv, med_giv));
+		if (revived > 0)
+			txt_dump(va("^3Revives  : ^7%-3d    \n", revived));
+		if (kill_peak > 0 || gibs > 0)
+			txt_dump(va("^3Kill Peak: ^7%-3d    ^3Gibbed     : ^7%d\n", kill_peak, gibs));
+		if (acc_shots > 0 || acc_hits > 0)
+			txt_dump(va("^3Accouracy: ^7%-3.2f  ^3Shots-Hits : ^7%d/^n%d\n", acc, acc_shots, acc_hits));
+	}
+	else {
+		if (ammo_giv > 0 || med_giv > 0)
+			txt_dump(va("^zAmmopacks: ^7%-3d    ^zHealthpacks: ^7%d\n", ammo_giv, med_giv));
+		if (revived > 0)
+			txt_dump(va("^zRevives  : ^7%-3d    \n", revived));
+		if (kill_peak > 0 || gibs > 0)
+			txt_dump(va("^zKill Peak: ^7%-3d    ^zGibbed     : ^7%d\n", kill_peak, gibs));
+		if (acc_shots > 0 || acc_hits > 0)
+			txt_dump(va("^zAccouracy: ^7%-3.2f  ^zShots-Hits : ^7%d/^n%d\n", acc, acc_shots, acc_hits));
+	}	
 			
 	if ( !fFull ) {
 		txt_dump( "\n" );
@@ -1613,13 +1640,16 @@ void CG_parseBestShotsStats_cmd( qboolean doTop, void( txt_dump ) ( char * ) ) {
 
 	int iWeap = atoi( CG_Argv( iArg++ ) );
 	if ( !iWeap ) {
-		txt_dump( va( "^zNo qualifying %sshot info available.      \n\n", ( ( doTop ) ? "top" : "bottom" ) ) );
+		if (fFull)
+			txt_dump(va("^3No qualifying %sshot info available.      \n\n", ((doTop) ? "top" : "bottom")));
+		else
+			txt_dump( va( "^zNo qualifying %sshot info available.      \n\n", ( ( doTop ) ? "top" : "bottom" ) ) );
 		return;
 	}
 	
 	if ( fFull ) {
-		txt_dump( va( "^2%s Match Accuracies:\n", ( doTop ) ? "BEST" : "WORST" ) );
-		txt_dump(  "\n^zWP   Acrcy Hits/Atts Kills Deaths\n" );
+		txt_dump( va( "^5%s Match Accuracies:\n", ( doTop ) ? "BEST" : "WORST" ) );
+		txt_dump(  "\n^3WP   Acrcy Hits/Atts Kills Deaths\n" );
 		txt_dump(    "-------------------------------------------------------------\n" );
 	} else {
 		// OSPx - Sucks I know...alternative is to patch cg_info.c 
@@ -1641,7 +1671,7 @@ void CG_parseBestShotsStats_cmd( qboolean doTop, void( txt_dump ) ( char * ) ) {
 
 		if ( fFull ) {
 			BG_cleanName( cgs.clientinfo[cnum].name, name, 30, qfalse );
-			txt_dump( va( "^z%s ^7%5.1f ^5%4d/%-4d ^2%5d ^1%6d ^7%s\n",
+			txt_dump( va( "^3%s ^7%5.1f ^5%4d/%-4d ^2%5d ^1%6d ^7%s\n",
 						  aWeaponInfo[iWeap - 1].pszCode, acc, hits, atts, kills, deaths, name ) );
 		} else {
 			BG_cleanName( cgs.clientinfo[cnum].name, name, 12, qfalse );
@@ -1661,14 +1691,23 @@ void CG_parseBestShotsStats_cmd( qboolean doTop, void( txt_dump ) ( char * ) ) {
 
 void CG_parseTopShotsStats_cmd( qboolean doTop, void( txt_dump ) ( char * ) ) {
 	int i, iArg = 1;
+	qboolean fFull = (txt_dump != CG_printWindow);
 	int cClients = atoi( CG_Argv( iArg++ ) );
 	int iWeap = atoi( CG_Argv( iArg++ ) );
 	int wBestAcc = atoi( CG_Argv( iArg++ ) );
 
-	txt_dump( va( "Weapon accuracies for: ^z%s\n",
-				  ( iWeap >= WS_KNIFE && iWeap < WS_MAX ) ? aWeaponInfo[iWeap].pszName : "UNKNOWN" ) );
+	if (fFull)
+		txt_dump(va("^3Weapon accuracies for: ^7%s\n",
+					  ( iWeap >= WS_KNIFE && iWeap < WS_MAX) ? aWeaponInfo[iWeap].pszName : "UNKNOWN") );
+	else
+		txt_dump( va( "Weapon accuracies for: ^z%s\n",
+					  ( iWeap >= WS_KNIFE && iWeap < WS_MAX ) ? aWeaponInfo[iWeap].pszName : "UNKNOWN" ) );
 
-	txt_dump( "\n^z  Acc Hits/Atts Kills Deaths\n" );
+	if (fFull)
+		txt_dump("\n^3  Acc Hits/Atts Kills Deaths\n");
+	else
+		txt_dump( "\n^z  Acc Hits/Atts Kills Deaths\n" );
+
 	txt_dump(    "----------------------------------------------------------\n" );
 
 	if ( !cClients ) {
