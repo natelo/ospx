@@ -2344,12 +2344,10 @@ static void CG_DrawIntermission( void ) {
 			// Some instantly open console to check the stats..
 			if (cg_autoAction.integer & AA_SCREENSHOT) {
 				doScreenshot = cg.time + 250;
-			}
-			/*
+			}			
 			if (cg_autoAction.integer & AA_STATSDUMP) {
 				CG_dumpStats_f();
-			}
-			*/
+			}			
 			if ((cg_autoAction.integer & AA_DEMORECORD) &&
 				((cgs.gametype == GT_WOLF_STOPWATCH && cgs.currentRound == 0) ||
 				cgs.gametype != GT_WOLF_STOPWATCH)) {

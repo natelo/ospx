@@ -1880,11 +1880,6 @@ void BeginIntermission( void ) {
 
 	// send the current scoring to all clients
 	SendScoreboardMessageToAllClients();
-
-	// OSPx - End stats (FIXME!)
-	//if (level.time - level.intermissiontime > 800)
-	G_matchInfoDump(EOM_MATCHINFO);
-
 }
 
 
@@ -2079,6 +2074,7 @@ wait 10 seconds before going on.
 =================
 */
 void CheckIntermissionExit( void ) {
+	static int fActions = 0;
 	int ready, notReady;
 	int i;
 	gclient_t   *cl;
@@ -2086,6 +2082,16 @@ void CheckIntermissionExit( void ) {
 
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
 		return;
+	}
+
+	// OSPx - end-of-level auto-actions
+	if (!(fActions & EOM_WEAPONSTATS) && (level.time - level.intermissiontime) > 300) {
+		G_matchInfoDump(EOM_WEAPONSTATS);
+		fActions |= EOM_WEAPONSTATS;
+	}
+	if (!(fActions & EOM_MATCHINFO) && (level.time - level.intermissiontime) > 2000) {
+		G_matchInfoDump(EOM_MATCHINFO);
+		fActions |= EOM_MATCHINFO;
 	}
 
 	// DHM - Nerve :: Flat 10 second timer until exit

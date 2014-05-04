@@ -563,8 +563,9 @@ typedef struct {
 
 	qboolean bAutoReloadAux;		// TTimo - auxiliary storage for pmoveExt_t::bAutoReload, to achieve persistance
 
-// OSPx	
+// OSPx		
 	unsigned int clientFlags;		// Client settings that need server involvement
+	unsigned int autoaction;		// End-of-match auto-requests
 	unsigned int clientMaxPackets;	// Client com_maxpacket settings
 	unsigned int clientTimeNudge;	// Client cl_timenudge settings
 
@@ -1589,6 +1590,7 @@ void G_HistoricalTrace(gentity_t* ent, trace_t *results, const vec3_t start, con
 // g_match.c
 //
 void G_loadMatchGame(void);
+void G_matchInfoDump(unsigned int dwDumpType);
 
 //
 // g_geoip.c
@@ -1648,6 +1650,7 @@ void logEntry(char *filename, char *info);
 //
 // g_stats.c
 //
+char *G_createStats(gentity_t *refEnt);
 void G_deleteStats(int nClient);
 void G_parseStats(char *pszStatsInfo);
 void G_addStats(gentity_t *targ, gentity_t *attacker, int dmg_ref, int mod);
@@ -1658,7 +1661,6 @@ void G_weaponStatsLeaders_cmd(gentity_t* ent, qboolean doTop, qboolean doWindow)
 void G_weaponRankings_cmd(gentity_t *ent, unsigned int dwCommand, qboolean state);
 void G_statsall_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 void G_printMatchInfo(gentity_t *ent);
-void G_matchInfoDump(unsigned int dwDumpType);
 
 //
 // Macros
@@ -1677,3 +1679,7 @@ void G_matchInfoDump(unsigned int dwDumpType);
 // - Stats
 #define EOM_WEAPONSTATS 0x01    // Dump of player weapon stats at end of match.
 #define EOM_MATCHINFO   0x02    // Dump of match stats at end of match.
+
+// - Auto Actions
+#define AA_STATSALL     0x01    // Client AutoAction: Dump ALL player stats
+#define AA_STATSTEAM    0x02    // Client AutoAction: Dump TEAM player stats
