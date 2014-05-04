@@ -799,6 +799,10 @@ void weapon_callAirStrike( gentity_t *ent ) {
 		// move pos for next bomb
 		VectorAdd( pos,bombaxis,pos );
 	}
+
+	// OSPx - Stats
+	if (g_gamestate.integer == GS_PLAYING)
+		ent->parent->client->sess.aWeaponStats[WS_AIRSTRIKE].atts++;
 }
 
 // JPW NERVE -- sound effect for spotter round, had to do this as half-second bomb warning
@@ -970,8 +974,8 @@ void Weapon_Artillery( gentity_t *ent ) {
 				bomb->splashDamage  = 400;
 				bomb->splashRadius  = 400;
 			}
-			bomb->methodOfDeath         = MOD_AIRSTRIKE;
-			bomb->splashMethodOfDeath   = MOD_AIRSTRIKE;
+			bomb->methodOfDeath         = MOD_ARTY;	// OSPx - Was MOD_AIRSTRIKE which mapped wrong in stats..
+			bomb->splashMethodOfDeath   = MOD_ARTY;
 			bomb->clipmask = MASK_MISSILESHOT;
 			bomb->s.pos.trType = TR_STATIONARY; // was TR_GRAVITY,  might wanna go back to this and drop from height
 			bomb->s.pos.trTime = level.time;        // move a bit on the very first frame
