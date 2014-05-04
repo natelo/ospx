@@ -875,9 +875,25 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand( "swap_teams" );
 	// -NERVE - SMF
 
-	// OSPx 
+// OSPx 
+	// Admins
 	trap_AddCommand("login");
 	trap_AddCommand("@login");
 	trap_AddCommand("logout");
-	// -OSPx
+	trap_AddCommand("getstatus");
+
+	// Misc
+	trap_AddCommand("time");
+	trap_AddCommand("currenttime");
+	trap_AddCommand("sui");			// Suicide (soft kill)
+
+	// Stats
+	trap_AddCommand("scores");		// Prints score table
+	trap_AddCommand("weaponstats");	// +wstats equivalent for console
+	trap_AddCommand("topshots");		// +topshots equivalent for console
+	trap_AddCommand("bottomshots");	// Dumps to console
+	trap_AddCommand("stats");			// Dumps to console (same as +stats just no fancy window)
+	trap_AddCommand("statsall");		// Dumps stats of all players
+	trap_AddCommand("statsdump");		// Dumps current stats
+// -OSPx
 }
