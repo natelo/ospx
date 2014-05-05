@@ -1425,16 +1425,24 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 		int clientNum;
 
 		if ( ent->client->sess.sessionTeam == TEAM_RED ) {
-			// OSPx - Reinforcements Offset (patched)
-			testtime = (level.dwRedReinfOffset + level.time - level.startTime) % g_redlimbotime.integer;
+			// OSPx - Warmup Damage
+			if (match_warmupDamage.integer && g_gamestate.integer != GS_PLAYING)
+				testtime = level.time % 3000;
+			else
+				// OSPx - Reinforcements Offset (patched)
+				testtime = (level.dwRedReinfOffset + level.time - level.startTime) % g_redlimbotime.integer;
 
 			if ( testtime < ent->client->pers.lastReinforceTime ) {
 				do_respawn = 1;
 			}
 			ent->client->pers.lastReinforceTime = testtime;
-		} else if ( ent->client->sess.sessionTeam == TEAM_BLUE )     {
-			// OSPx - Reinforcements Offset (patched)
-			testtime = (level.dwBlueReinfOffset + level.time - level.startTime) % g_bluelimbotime.integer;
+		} else if ( ent->client->sess.sessionTeam == TEAM_BLUE ) {
+			// OSPx - Warmup Damage
+			if (match_warmupDamage.integer && g_gamestate.integer != GS_PLAYING)
+				testtime = level.time % 3000;
+			else
+				// OSPx - Reinforcements Offset (patched)
+				testtime = (level.dwBlueReinfOffset + level.time - level.startTime) % g_bluelimbotime.integer;
 
 			if ( testtime < ent->client->pers.lastReinforceTime ) {
 				do_respawn = 1;

@@ -1357,6 +1357,8 @@ extern vmCvar_t g_fixedphysics;
 
 extern vmCvar_t team_maxplayers;
 
+extern vmCvar_t match_warmupDamage;
+
 extern vmCvar_t z_serverflags;
 extern vmCvar_t sv_hostname;
 // -OSPx
