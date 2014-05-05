@@ -195,6 +195,7 @@ vmCvar_t g_fixedphysics;
 vmCvar_t team_maxplayers;
 
 vmCvar_t match_warmupDamage;
+vmCvar_t match_mutespecs;
 
 // - System
 vmCvar_t z_serverflags;
@@ -364,6 +365,7 @@ cvarTable_t gameCvarTable[] = {
 	{ &team_maxplayers, "team_maxplayers", "0", 0, 0, qfalse, qfalse },
 
 	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
+	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
 	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse }
