@@ -686,7 +686,7 @@ void SetTeam(gentity_t *ent, char *s) {
 
 		// NERVE - SMF
 		if (g_noTeamSwitching.integer && team != ent->client->sess.sessionTeam && g_gamestate.integer == GS_PLAYING) {
-			trap_SendServerCommand(clientNum, "cp \"You cannot switch during a match, please wait until the round ends.\n\"");
+			CPx(clientNum, "cp \"You cannot switch during a match, please wait until the round ends.\n\"");
 			return; // ignore the request
 		}
 
@@ -699,13 +699,11 @@ void SetTeam(gentity_t *ent, char *s) {
 
 			// We allow a spread of one
 			if (team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] >= 1) {
-				trap_SendServerCommand(clientNum,
-					"cp \"The Axis has too many players.\n\"");
+				CPx(clientNum, "cp \"The ^1Axis ^7has too many players.\n\"");
 				return; // ignore the request
 			}
 			if (team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] >= 1) {
-				trap_SendServerCommand(clientNum,
-					"cp \"The Allies have too many players.\n\"");
+				CPx(clientNum, "cp \"The ^4Allies ^7have too many players.\n\"");
 				return; // ignore the request
 			}
 
@@ -728,19 +726,24 @@ void SetTeam(gentity_t *ent, char *s) {
 	// NERVE - SMF - prevent players from switching to regain deployments
 	if ( g_maxlives.integer > 0 && ent->client->ps.persistant[PERS_RESPAWNS_LEFT] == 0 &&
 		 oldTeam != TEAM_SPECTATOR ) {
-		trap_SendServerCommand( clientNum,
-								"cp \"You can't switch teams because you are out of lives.\n\" 3" );
+		CPx( clientNum, "cp \"You can't switch teams because you are out of lives.\n\" 3" );
 		return; // ignore the request
 	}
 
 	// DHM - Nerve :: Force players to wait 30 seconds before they can join a new team.
 	if ( g_gametype.integer >= GT_WOLF && team != oldTeam && level.warmupTime == 0 && !client->pers.initialSpawn
-		 && ( ( level.time - client->pers.connectTime ) > 10000 ) && ( ( level.time - client->pers.enterTime ) < 30000 ) ) {
-		trap_SendServerCommand( ent - g_entities,
-								va( "cp \"^3You must wait %i seconds before joining ^3a new team.\n\" 3", (int)( 30 - ( ( level.time - client->pers.enterTime ) / 1000 ) ) ) );
+		 && ( ( level.time - client->pers.connectTime ) > 5000 ) && ( ( level.time - client->pers.enterTime ) < 5000 ) ) {
+		CPx( ent - g_entities, va( "cp \"^3You must wait %i seconds before joining ^3a new team.\n\"3", (int)( 5 - ( ( level.time - client->pers.enterTime ) / 1000 ) ) ) );
 		return;
 	}
 	// dhm
+
+	// OSPx - Handle warmup team switch nuke
+	// - In warmup without a check, one can switch teams (scripted) which floods and eventually crashes the server..
+	if (team != oldTeam && level.warmupTime && ((level.time - client->pers.connectTime) > 5000) && ((level.time - client->pers.enterTime) < 2000)) {
+		CPx(ent - g_entities, va("cp \"^3You must wait %i seconds before joining ^3a new team.\n\"3", (int)(2 - ((level.time - client->pers.enterTime) / 1000))));
+		return;
+	}
 
 	//
 	// execute the team change
@@ -771,17 +774,13 @@ void SetTeam(gentity_t *ent, char *s) {
 	client->sess.spectatorClient = specClient;
 
 	if ( team == TEAM_RED ) {
-		trap_SendServerCommand( -1, va( "cp \"[lof]%s" S_COLOR_WHITE " [lon]joined the Axis team.\n\"",
-										client->pers.netname ) );
+		AP(va( "print \"[lof]%s" S_COLOR_WHITE " [lon]joined the ^1Axis ^7team.\n\"", client->pers.netname ) );
 	} else if ( team == TEAM_BLUE ) {
-		trap_SendServerCommand( -1, va( "cp \"[lof]%s" S_COLOR_WHITE " [lon]joined the Allied team.\n\"",
-										client->pers.netname ) );
+		AP(va( "print \"[lof]%s" S_COLOR_WHITE " [lon]joined the ^4Allied ^7team.\n\"",	client->pers.netname ) );
 	} else if ( team == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR ) {
-		trap_SendServerCommand( -1, va( "cp \"[lof]%s" S_COLOR_WHITE " [lon]joined the spectators.\n\"",
-										client->pers.netname ) );
+		AP(va( "print \"[lof]%s" S_COLOR_WHITE " [lon]joined the ^3spectators^7.\n\"", client->pers.netname ) );
 	} else if ( team == TEAM_FREE ) {
-		trap_SendServerCommand( -1, va( "cp \"[lof]%s" S_COLOR_WHITE " [lon]joined the battle.\n\"",
-										client->pers.netname ) );
+		AP(va( "print \"[lof]%s" S_COLOR_WHITE " [lon]joined the ^2battle^7.\n\"", client->pers.netname ) );
 	}
 
 	// get and distribute relevent paramters
