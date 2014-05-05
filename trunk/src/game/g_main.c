@@ -2512,12 +2512,10 @@ void CheckWolfMP() {
 		return;
 	}
 
-	// if the warmup time has counted down, restart
-	if ( level.time > level.warmupTime ) {
-		level.warmupTime += 10000;
-		trap_Cvar_Set( "g_restarted", "1" );
-		trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
-		level.restarted = qtrue;
+	// OSPx - Countdown
+	if (level.time > level.warmupTime - 7100 && !level.cnStarted) {
+		level.cnStarted = qtrue;
+		CountDown( qtrue );
 		return;
 	}
 }
@@ -2868,6 +2866,12 @@ void G_RunFrame( int levelTime ) {
 
 	// for tracking changes
 	CheckCvars();
+
+	// OSPx - Countdown for warmup/pause
+	if ((level.time > level.cnPush) &&
+		(g_gamestate.integer == GS_WARMUP_COUNTDOWN)) {
+		CountDown( qtrue );
+	}
 
 	if ( g_listEntity.integer ) {
 		for ( i = 0; i < MAX_GENTITIES; i++ ) {

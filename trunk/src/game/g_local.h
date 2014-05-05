@@ -838,6 +838,11 @@ typedef struct {
 
 	// Real game clock
 	int timeCurrent;	
+
+	// Countdown	
+	qboolean cnStarted;
+	int cnPush;
+	int cnNum;
 // -OSPx
 
 } level_locals_t;
@@ -1610,6 +1615,7 @@ void G_HistoricalTrace(gentity_t* ent, trace_t *results, const vec3_t start, con
 //
 void G_loadMatchGame(void);
 void G_matchInfoDump(unsigned int dwDumpType);
+void CountDown(qboolean restart);
 
 //
 // g_geoip.c
