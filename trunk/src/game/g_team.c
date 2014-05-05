@@ -1587,3 +1587,62 @@ void SP_team_WOLF_checkpoint( gentity_t *ent ) {
 
 	trap_LinkEntity( ent );
 }
+
+// OSPx
+char *aTeams[TEAM_NUM_TEAMS] = { "FFA", "^1Axis^7", "^4Allies^7", "Spectators" };
+team_info teamInfo[TEAM_NUM_TEAMS];
+
+/*
+===========
+OSPx - G_teamReset (et port)
+
+Resets a team's settings
+===========
+*/
+void G_teamReset(int team_num, qboolean fClearSpecLock) {
+	teamInfo[team_num].team_lock = /*(match_latejoin.integer == 0 && g_gamestate.integer == GS_PLAYING)*/ qfalse;
+	teamInfo[team_num].team_name[0] = 0;
+	teamInfo[team_num].team_score = 0;
+	teamInfo[team_num].timeouts = /*match_timeoutcount.integer*/ 0;
+
+	if (fClearSpecLock) {
+		teamInfo[team_num].spec_lock = qfalse;
+	}
+}
+
+/*
+===========
+OSPx - G_teamJoinCheck (et port)
+
+Checks to see if a specified team is allowing players to join.
+===========
+*/
+qboolean G_teamJoinCheck(int team_num, gentity_t *ent) {
+	int cnt = TeamCount(-1, team_num);
+
+	// Sanity check
+	if (cnt == 0) {
+		G_teamReset(team_num, qtrue);
+		teamInfo[team_num].team_lock = qfalse;
+	}
+
+	// Check for locked teams
+	if ((team_num == TEAM_RED || team_num == TEAM_BLUE)) {
+		if (ent->client->sess.sessionTeam == team_num) {
+			return(qtrue);
+		}
+		
+		// Check for full teams
+		if (team_maxplayers.integer > 0 && team_maxplayers.integer <= cnt) {			
+			CP(va("cp \"The %s team is full!\n\"2", aTeams[team_num]));
+			return(qfalse);
+
+			// Check for locked teams
+		}
+		else if (teamInfo[team_num].team_lock /*&& (!(ent->client->pers.invite & team_num))*/) {			
+			CP(va("cp \"The %s team is LOCKED!\n\"2", aTeams[team_num]));
+			return(qfalse);
+		}		
+	}
+	return(qtrue);
+}

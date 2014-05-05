@@ -842,6 +842,16 @@ typedef struct {
 
 } level_locals_t;
 
+// OSPx - Team extras
+typedef struct {
+	qboolean spec_lock;
+	qboolean team_lock;
+	char team_name[24];
+	int team_score;
+	int timeouts;
+} team_info;
+// -OSP
+
 extern qboolean reloading;                  // loading up a savegame
 // JPW NERVE
 extern char testid1[];
@@ -1126,7 +1136,9 @@ void G_RunClient( gentity_t *ent );
 // g_team.c
 //
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
-
+extern char *aTeams[TEAM_NUM_TEAMS];
+extern team_info teamInfo[TEAM_NUM_TEAMS];
+qboolean G_teamJoinCheck(int team_num, gentity_t *ent);
 
 //
 // g_mem.c
@@ -1342,6 +1354,8 @@ extern vmCvar_t g_showFlags;
 extern vmCvar_t g_allowSoftKill;
 extern vmCvar_t server_autoconfig;
 extern vmCvar_t g_fixedphysics;
+
+extern vmCvar_t team_maxplayers;
 
 extern vmCvar_t z_serverflags;
 extern vmCvar_t sv_hostname;

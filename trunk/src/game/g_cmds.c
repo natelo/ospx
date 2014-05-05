@@ -613,14 +613,52 @@ void Cmd_SoftKill_f(gentity_t *ent) {
 	player_die(ent, ent, ent, dmg, MOD_SELFKILL);
 }
 
+/*
+=================
+OSPx - ET Port
+=================
+*/
+void G_TeamDataForString(const char* teamstr, int clientNum, team_t* team, spectatorState_t* sState, int* specClient) {
+	*sState = SPECTATOR_NOT;
+	if (!Q_stricmp(teamstr, "follow1")) {
+		*team = TEAM_SPECTATOR;
+		*sState = SPECTATOR_FOLLOW;
+		if (specClient) {
+			*specClient = -1;
+		}
+	}
+	else if (!Q_stricmp(teamstr, "follow2")) {
+		*team = TEAM_SPECTATOR;
+		*sState = SPECTATOR_FOLLOW;
+		if (specClient) {
+			*specClient = -2;
+		}
+	}
+	else if (!Q_stricmp(teamstr, "spectator") || !Q_stricmp(teamstr, "s")) {
+		*team = TEAM_SPECTATOR;
+		*sState = SPECTATOR_FREE;
+	}
+	else if (!Q_stricmp(teamstr, "red") || !Q_stricmp(teamstr, "r") || !Q_stricmp(teamstr, "axis")) {
+		*team = TEAM_RED;
+	}
+	else if (!Q_stricmp(teamstr, "blue") || !Q_stricmp(teamstr, "b") || !Q_stricmp(teamstr, "allies")) {
+		*team = TEAM_BLUE;
+	}
+	else {
+		*team = PickTeam(clientNum);
+		if (!G_teamJoinCheck(*team, &g_entities[clientNum])) {
+			*team = ((TEAM_RED | TEAM_BLUE) & ~*team);
+		}
+	}
+}
 
 /*
 =================
 SetTeam
 =================
 */
-void SetTeam( gentity_t *ent, char *s ) {
-	int team, oldTeam;
+void SetTeam(gentity_t *ent, char *s) {
+	team_t team, oldTeam;
 	gclient_t           *client;
 	int clientNum;
 	spectatorState_t specState;
@@ -634,72 +672,48 @@ void SetTeam( gentity_t *ent, char *s ) {
 	clientNum = client - level.clients;
 	specClient = 0;
 
-	specState = SPECTATOR_NOT;
-	if ( !Q_stricmp( s, "scoreboard" ) || !Q_stricmp( s, "score" )  ) {
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_SCOREBOARD;
-	} else if ( !Q_stricmp( s, "follow1" ) ) {
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_FOLLOW;
-		specClient = -1;
-	} else if ( !Q_stricmp( s, "follow2" ) ) {
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_FOLLOW;
-		specClient = -2;
-	} else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) ) {
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_FREE;
-	} else if ( g_gametype.integer >= GT_TEAM ) {
-		// if running a team game, assign player to one of the teams
-		specState = SPECTATOR_NOT;
-		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) ) {
-			team = TEAM_RED;
-		} else if ( !Q_stricmp( s, "blue" ) || !Q_stricmp( s, "b" ) ) {
-			team = TEAM_BLUE;
-		} else {
-			// pick the team with the least number of players
-			team = PickTeam( clientNum );
+	// OSPx - New way of handling..
+	G_TeamDataForString(s, client - level.clients, &team, &specState, &specClient);
+
+	// OSPx - New way ..
+	if ( team != TEAM_SPECTATOR ) {
+
+		// OSPx - Ensure the player can join
+		if (!G_teamJoinCheck(team, ent)) {
+			// Leave them where they were before the command was issued
+			return;
 		}
 
 		// NERVE - SMF
-		if ( g_noTeamSwitching.integer && team != ent->client->sess.sessionTeam && g_gamestate.integer == GS_PLAYING ) {
-			trap_SendServerCommand( clientNum, "cp \"You cannot switch during a match, please wait until the round ends.\n\"" );
+		if (g_noTeamSwitching.integer && team != ent->client->sess.sessionTeam && g_gamestate.integer == GS_PLAYING) {
+			trap_SendServerCommand(clientNum, "cp \"You cannot switch during a match, please wait until the round ends.\n\"");
 			return; // ignore the request
 		}
 
 		// NERVE - SMF - merge from team arena
-		if ( g_teamForceBalance.integer  ) {
+		if (g_teamForceBalance.integer) {
 			int counts[TEAM_NUM_TEAMS];
 
-			counts[TEAM_BLUE] = TeamCount( ent - g_entities, TEAM_BLUE );
-			counts[TEAM_RED] = TeamCount( ent - g_entities, TEAM_RED );
+			counts[TEAM_BLUE] = TeamCount(ent - g_entities, TEAM_BLUE);
+			counts[TEAM_RED] = TeamCount(ent - g_entities, TEAM_RED);
 
 			// We allow a spread of one
-			if ( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] >= 1 ) {
-				trap_SendServerCommand( clientNum,
-										"cp \"The Axis has too many players.\n\"" );
+			if (team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] >= 1) {
+				trap_SendServerCommand(clientNum,
+					"cp \"The Axis has too many players.\n\"");
 				return; // ignore the request
 			}
-			if ( team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] >= 1 ) {
-				trap_SendServerCommand( clientNum,
-										"cp \"The Allies have too many players.\n\"" );
+			if (team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] >= 1) {
+				trap_SendServerCommand(clientNum,
+					"cp \"The Allies have too many players.\n\"");
 				return; // ignore the request
 			}
 
 			// It's ok, the team we are switching to has less or same number of players
 		}
-		// -NERVE - SMF
-	} else {
-		// force them to spectators if there aren't any spots free
-		team = TEAM_FREE;
 	}
-
-	// override decision if limiting the players
-	if ( g_gametype.integer == GT_TOURNAMENT
-		 && level.numNonSpectatorClients >= 2 ) {
-		team = TEAM_SPECTATOR;
-	} else if ( g_maxGameClients.integer > 0 &&
-				level.numNonSpectatorClients >= g_maxGameClients.integer ) {
+	
+	if (g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer) {
 		team = TEAM_SPECTATOR;
 	}
 
