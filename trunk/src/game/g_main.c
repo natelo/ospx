@@ -196,6 +196,7 @@ vmCvar_t team_maxplayers;
 
 vmCvar_t match_warmupDamage;
 vmCvar_t match_mutespecs;
+vmCvar_t match_latejoin;
 
 // - System
 vmCvar_t z_serverflags;
@@ -366,6 +367,7 @@ cvarTable_t gameCvarTable[] = {
 
 	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
 	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
+	{ &match_latejoin, "match_latejoin", "1", 0, 0, qfalse, qfalse },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
 	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse }
