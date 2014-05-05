@@ -24,7 +24,7 @@ In addition, the RTCW MP Source Code is also subject to certain additional terms
 If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 ===========================================================================
-OSPX - g_match.c
+OSPx - g_match.c
 
 Handle match related stuff, much like in et..
 

@@ -198,6 +198,9 @@
     <ClCompile Include="bg_stats.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="g_players.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.def">

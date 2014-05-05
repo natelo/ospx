@@ -1662,6 +1662,11 @@ void cmd_incognito(gentity_t *ent, qboolean fParam);
 void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore);
 
 //
+// g_players.c
+//
+void pCmd_Players(gentity_t *ent);
+
+//
 // g_files.c
 //
 void logEntry(char *filename, char *info);

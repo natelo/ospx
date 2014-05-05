@@ -880,12 +880,13 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand("login");
 	trap_AddCommand("@login");
 	trap_AddCommand("logout");
-	trap_AddCommand("getstatus");
+	trap_AddCommand("getstatus");	
 
 	// Misc
 	trap_AddCommand("time");
 	trap_AddCommand("currenttime");
 	trap_AddCommand("sui");			// Suicide (soft kill)
+	trap_AddCommand("players");
 
 	// Stats
 	trap_AddCommand("scores");

@@ -2647,6 +2647,12 @@ void ClientCommand( int clientNum ) {
 		return;
 	}
 
+	// Players
+	if (Q_stricmp(cmd, "players") == 0) {
+		pCmd_Players(ent);
+		return;
+	}
+
 	// Stats
 	else if (!Q_stricmp(cmd, "wstats"))	{ 
 		G_statsPrint(ent, 1);
