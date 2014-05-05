@@ -1640,6 +1640,9 @@ char *getTime(void);
 void Q_tokenize(char *str, char **splitstr, char *delim);
 qboolean Q_findToken(char *haystack, char *needle);
 char *Q_strReplace(char *haystack, char *needle, char *newp);
+void APSound(char *sound);
+void CPSound(gentity_t *ent, char *sound);
+void APRSound(gentity_t *ent, char *sound);
 
 //
 // g_admin.c
@@ -1692,6 +1695,10 @@ void G_printMatchInfo(gentity_t *ent, qboolean time);
 #define AP( x ) trap_SendServerCommand( -1, x )					// Print to all
 #define CP( x ) trap_SendServerCommand( ent - g_entities, x )	// Print to an ent
 #define CPx( x, y ) trap_SendServerCommand( x, y )				// Print to id = x
+#define TP( x, y ) G_TeamCommand( x, y)							// Sends team command
+#define APS(x)		APSound(x)									// Global sound 
+#define APRS(x, y)	APRSound(x, y)								// Global sound with limited (radius) range
+#define CPS(x, y)	CPSound(x, y)								// Client sound only
 #define ARRAY_LEN(x) (sizeof(x) / sizeof(*(x)))					// Saves some time..
 
 //
