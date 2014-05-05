@@ -189,6 +189,7 @@ vmCvar_t g_spectatorInactivity;
 vmCvar_t g_showFlags;
 vmCvar_t g_allowSoftKill;
 vmCvar_t server_autoconfig;
+vmCvar_t g_fixedphysics;
 
 // - System
 vmCvar_t z_serverflags;
@@ -353,6 +354,7 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_showFlags, "g_showFlags", "1", 0 },
 	{ &g_allowSoftKill, "g_allowSoftKill", "0", CVAR_ARCHIVE, 0, qfalse, qfalse },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
+	{ &g_fixedphysics, "g_fixedphysics", "1", CVAR_ARCHIVE | CVAR_SERVERINFO },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
 	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse }
