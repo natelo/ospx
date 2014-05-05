@@ -170,6 +170,22 @@ void APSound(char *sound) {
 
 /*
 ===========
+Global sound - Hooked under cg_announced .. 
+===========
+*/
+void AAPSound(char *sound) {
+	gentity_t *ent;
+	gentity_t *te;
+
+	ent = g_entities;
+
+	te = G_TempEntity(ent->s.pos.trBase, EV_ANNOUNCER_SOUND);
+	te->s.eventParm = G_SoundIndex(sound);
+	te->r.svFlags |= SVF_BROADCAST;
+}
+
+/*
+===========
 Client sound
 ===========
 */

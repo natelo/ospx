@@ -163,36 +163,26 @@ void CountDown( qboolean restart ) {
 		return;
 	}
 
-	if (level.cnNum == 0)
-	{
+	if (level.cnNum == 0) {
 		index = "prepare.wav";
-		if (!restart)
-			AP("cp \"Prepare to fight^2!\n\"2");
+		AP("cp \"Prepare to fight^2!\n\"2"); 
 	}
 	else if (level.cnNum < 6) {
-		index = va("cn_%d.wav", 6 - level.cnNum);
-		if (!restart)
-			AP(va("cp \"Match resumes in: ^3%d\n\"2", 6 - level.cnNum));
+		index = va("cn_%d.wav", (6 - level.cnNum) );
+		if (!restart) { AP(va("cp \"Match resuming in ^3%d seconds!\n\"2", (6 - level.cnNum) )); }
 	}
-	else if (level.cnNum == 6)
-	{
+	else if (level.cnNum == 6) {
 		index = "fight.wav"; 		
 	}
 
-	// Prepare to fight takes 2 seconds..
-	if (level.cnNum == 0){
+	if (level.cnNum == 0) {
 		level.cnPush = level.time + 2000;
-
-	} // Just enough to fix the bug and skip to action..
-	else if (level.cnNum == 6) {
+	} else if (level.cnNum == 6) {
 		level.cnPush = level.time + 200;
-		// Otherwise, 1 second.
-	}
-	else {
+	} else {
 		level.cnPush = level.time + 1000;
 	}
-
-	// We're done.. restart the game
+	
 	if (level.cnNum == 7) {
 		if (restart) {
 			level.warmupTime += 10000;
@@ -200,17 +190,16 @@ void CountDown( qboolean restart ) {
 			trap_SendConsoleCommand(EXEC_APPEND, "map_restart 0\n");
 			level.restarted = qtrue;
 		}
-		else {
-			// Resume the match..
+		else {			
 			//resetPause();
-			APS("sound/match/fight.wav");
+			AAPS("sound/match/fight.wav");
 			AP("print \"^1FIGHT\n\"");
 		}
 		return;
 	}
 
 	if (level.clients->pers.connected == CON_CONNECTED)
-		APS(va("sound/match/%s", index));
+		AAPS(va("sound/match/%s", index));
 
 	level.cnNum++;
 }

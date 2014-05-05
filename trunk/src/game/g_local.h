@@ -1647,6 +1647,7 @@ void Q_tokenize(char *str, char **splitstr, char *delim);
 qboolean Q_findToken(char *haystack, char *needle);
 char *Q_strReplace(char *haystack, char *needle, char *newp);
 void APSound(char *sound);
+void AAPSound(char *sound);
 void CPSound(gentity_t *ent, char *sound);
 void APRSound(gentity_t *ent, char *sound);
 
@@ -1703,6 +1704,7 @@ void G_printMatchInfo(gentity_t *ent, qboolean time);
 #define CPx( x, y ) trap_SendServerCommand( x, y )				// Print to id = x
 #define TP( x, y ) G_TeamCommand( x, y)							// Sends team command
 #define APS(x)		APSound(x)									// Global sound 
+#define AAPS(x)		AAPSound(x)									// Global sound but hooked under cg_announcer..
 #define APRS(x, y)	APRSound(x, y)								// Global sound with limited (radius) range
 #define CPS(x, y)	CPSound(x, y)								// Client sound only
 #define ARRAY_LEN(x) (sizeof(x) / sizeof(*(x)))					// Saves some time..
