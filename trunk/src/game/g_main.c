@@ -1231,7 +1231,14 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// NERVE - SMF - intialize gamestate
 	if ( g_gamestate.integer == GS_INITIALIZE ) {
 		if ( g_noTeamSwitching.integer ) {
-			trap_Cvar_Set( "gamestate", va( "%i", GS_WAITING_FOR_PLAYERS ) );
+			// OSPx - Rady
+			if (g_doWarmup.integer) {
+				trap_Cvar_Set("gamestate", va("%i", GS_WARMUP));
+				trap_SetConfigstring(CS_READY, va("%i", READY_PENDING));
+			}
+			else { 
+				trap_Cvar_Set("gamestate", va("%i", GS_WAITING_FOR_PLAYERS));
+			}
 		} else {
 			trap_Cvar_Set( "gamestate", va( "%i", GS_WARMUP ) );
 		}
@@ -2456,7 +2463,15 @@ void CheckGameState() {
 	if ( g_noTeamSwitching.integer && !trap_Cvar_VariableIntegerValue( "sv_serverRestarting" ) ) {
 		if ( current_gs != GS_WAITING_FOR_PLAYERS && level.numPlayingClients <= 1 && level.lastRestartTime + 1000 < level.time ) {
 			level.lastRestartTime = level.time;
-			trap_SendConsoleCommand( EXEC_APPEND, va( "map_restart 0 %i\n", GS_WAITING_FOR_PLAYERS ) );
+			
+			// OSPx - Ready
+			if (g_doWarmup.integer) {
+				trap_SetConfigstring(CS_READY, va("%i", READY_PENDING));
+				trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", GS_WARMUP));
+			}
+			else {
+				trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", GS_WAITING_FOR_PLAYERS));
+			}
 		}
 	}
 
@@ -2474,17 +2489,50 @@ void CheckGameState() {
 	}
 
 	// check warmup latch
-	if ( current_gs == GS_WARMUP ) {
-		int delay = g_warmup.integer + 1;
+	if (current_gs == GS_WARMUP) {
+// OSPx - Ready
+		if (g_doWarmup.integer) {
 
-		if ( delay < 6 ) {
-			trap_Cvar_Set( "g_warmup", "5" );
-			delay = 7;
+			if ((G_playersReady() == -2) || level.readyAll) {
+				level.warmupTime = level.time + 7000;
+				trap_SetConfigstring(CS_READY, va("%i", READY_NONE));
+				trap_SetConfigstring(CS_WARMUP, va("%i", level.warmupTime));
+				trap_Cvar_Set("gamestate", va("%i", GS_WARMUP_COUNTDOWN));
+				// Prevents joining once countdown starts..
+				if (g_doWarmup.integer == 2)
+					G_readyTeamLock();
+
+				if (!level.readyPrint) {
+					AP(va("cp \"%s\n\"2", (g_noTeamSwitching.integer ? "Ready threshold reached!" : "All players are now ^nready^7!")));
+					level.readyPrint = qtrue;
+				}
+			}
+			else {
+				trap_SetConfigstring(CS_READY, va("%i", (g_noTeamSwitching.integer ? READY_PENDING : READY_AWAITING)));
+			}
 		}
+		else { // Tourny is off..act casual
+			int delay = g_warmup.integer + 1;
+			trap_SetConfigstring(CS_READY, va("%i", READY_NONE));
 
-		level.warmupTime = level.time + ( delay * 1000 );
-		trap_SetConfigstring( CS_WARMUP, va( "%i", level.warmupTime ) );
-		trap_Cvar_Set( "gamestate", va( "%i", GS_WARMUP_COUNTDOWN ) );
+			if (delay < 6) {
+				trap_Cvar_Set("g_warmup", "5");
+				delay = 7;
+			}
+
+			level.warmupTime = level.time + (delay * 1000);
+			trap_SetConfigstring(CS_WARMUP, va("%i", level.warmupTime));
+			trap_Cvar_Set("gamestate", va("%i", GS_WARMUP_COUNTDOWN));
+		}
+// -OSPx
+	}
+
+	// OSPx - Reset countdown if ready goes off (eg. player enters, leaves..)
+	if (current_gs == GS_WARMUP_COUNTDOWN) {
+		if (g_doWarmup.integer) {
+			if ((G_playersReady() != -2) && !level.readyAll)
+				G_readyReset(qfalse);
+		}
 	}
 }
 

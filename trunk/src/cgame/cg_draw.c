@@ -2623,6 +2623,49 @@ static void CG_DrawWarmup( void ) {
 		return;     // (SA) don't bother with this stuff in sp
 	}
 
+	// OSPx - Ready
+	if (cgs.gamestate == GS_WARMUP && cgs.readyState != CREADY_NONE) {
+		cw = 10;
+
+		// Account for g_minGameClients if it's present
+		if (cgs.readyState == CREADY_PENDING) {
+
+			s = CG_TranslateString("^nGame Stopped ^7- Waiting for players to ready up");
+			w = CG_DrawStrlen(s);
+			CG_DrawStringExt(320 - w * 6, 120, s, colorWhite, qfalse, qtrue, 12, 18, 0);
+
+
+			s1 = va(CG_TranslateString("Waiting for at least ^n%i ^7%s to ready"), cgs.minclients, cgs.minclients == 1 ? "player" : "players");
+			s2 = CG_TranslateString("Type ^n\\ready ^7in the console to start");
+
+			w = CG_DrawStrlen(s1);
+			CG_DrawStringExt(320 - w * cw / 2, 160, s1, colorWhite,
+				qfalse, qtrue, cw, (int)(cw * 1.5), 0);
+
+			w = CG_DrawStrlen(s2);
+			CG_DrawStringExt(320 - w * cw / 2, 180, s2, colorWhite,
+				qfalse, qtrue, cw, (int)(cw * 1.5), 0);
+
+		}
+		else {
+
+			// No need to bother with count..scoreboard gives info..
+			s = CG_TranslateString("^nGame Stopped ^7- Waiting for players to ready up");
+			w = CG_DrawStrlen(s);
+			CG_DrawStringExt(320 - w * 6, 120, s, colorWhite, qfalse, qtrue, 12, 18, 0);
+
+			if (!cg.demoPlayback && cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR &&
+				(!(cg.snap->ps.pm_flags & PMF_FOLLOW) || (cg.snap->ps.pm_flags & PMF_LIMBO))) {
+				s1 = CG_TranslateString("Type ^n\\ready ^7in the console to start");
+				w = CG_DrawStrlen(s1);
+				CG_DrawStringExt(320 - w * cw / 2, 160, s1, colorWhite,
+					qfalse, qtrue, cw, (int)(cw * 1.5), 0);
+			}
+		}
+
+		return;
+	}
+
 	sec = cg.warmup;
 	if ( !sec ) {
 		if ( cgs.gamestate == GS_WAITING_FOR_PLAYERS ) {

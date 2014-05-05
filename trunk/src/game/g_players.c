@@ -99,18 +99,18 @@ void pCmd_Players(gentity_t *ent) {
 			if (cl->sess.sessionTeam == TEAM_SPECTATOR || cl->pers.connected == CON_CONNECTING) {
 				strcpy(ready, ((ent) ? "^5--------^1 :" : "-------- :"));
 			}
-			else if (/*cl->pers.ready ||*/ (g_entities[idnum].r.svFlags & SVF_BOT)) {
+			else if (cl->pers.ready || (g_entities[idnum].r.svFlags & SVF_BOT)) {
 				strcpy(ready, ((ent) ? "^3(READY)^1  :" : "(READY)  :"));
 			}
 			else {
 				strcpy(ready, ((ent) ? "NOTREADY^1 :" : "NOTREADY :"));
 			}
 		}
-		/*/
-		if (cl->sess.referee) {
+		
+		if (cl->sess.admin) {
 			strcpy(ref, "REF");
 		}
-
+		/*
 		if (cl->sess.coach_team) {
 			tteam = cl->sess.coach_team;
 			coach = (ent) ? "^3C" : "C";
@@ -152,6 +152,59 @@ void pCmd_Players(gentity_t *ent) {
 				}
 				else { G_Printf("** %s team is speclocked.\n", aTeams[i]); }
 			}
+		}
+	}
+}
+
+/*
+===================
+READY / NOTREADY
+
+Sets a player's "ready" status.
+
+Tardo - rewrote this because the parameter handling to the function is different in rtcw.
+===================
+*/
+void G_ready_cmd(gentity_t *ent, qboolean state) {
+	char *status[2] = { "NOT READY", "READY" };
+
+	if (!g_doWarmup.integer) {
+		return;
+	}
+
+	if (g_gamestate.integer == GS_PLAYING || g_gamestate.integer == GS_INTERMISSION) {
+		CP("@print \"Match is already in progress!\n\"");
+		return;
+	}
+
+	if (!state && g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
+		CP("print \"Countdown started..^3notready^7 ignored!\n\"");
+		return;
+	}
+
+	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
+		CP(va("print \"Specs cannot use ^3%s ^7command!\n\"", status[state]));
+		return;
+	}
+
+	// Move them to correct ready state
+	if (ent->client->pers.ready == state) {
+		CP(va("print \"You are already ^3%s^7!\n\"", status[state]));
+	}
+	else {
+		ent->client->pers.ready = state;
+		if (!level.intermissiontime) {
+			if (state) {
+				ent->client->pers.ready = qtrue;
+				ent->client->ps.powerups[PW_READY] = INT_MAX;
+			}
+			else {
+				ent->client->pers.ready = qfalse;
+				ent->client->ps.powerups[PW_READY] = 0;
+			}
+
+			// Doesn't rly matter..score tab will show slow ones..
+			AP(va("cp \"\n%s \n^7is ^3%s!\n\"", ent->client->pers.netname, status[state]));
 		}
 	}
 }

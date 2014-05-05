@@ -2717,6 +2717,11 @@ void ClientCommand( int clientNum ) {
 // OSPx
 	} else if (Q_stricmp(cmd, "sui") == 0)  {
 		Cmd_SoftKill_f(ent);
+	} else if (Q_stricmp(cmd, "ready") == 0)  {
+		G_ready_cmd(ent, qtrue);
+	}
+	else if (Q_stricmp(cmd, "notready") == 0)  {
+		G_ready_cmd(ent, qfalse);
 // -OSPx
 	} else if ( Q_stricmp( cmd, "levelshot" ) == 0 )  {
 		Cmd_LevelShot_f( ent );

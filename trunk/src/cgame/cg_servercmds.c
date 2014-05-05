@@ -308,6 +308,17 @@ void CG_ParseReinforcementTimes(const char *pszReinfSeedString) {
 
 /*
 ================
+OSPx - Ready
+
+Parse Ready state
+================
+*/
+void CG_ParseReady(const char *pState) {
+	cgs.readyState = atoi(pState);
+}
+
+/*
+================
 CG_SetConfigValues
 
 Called on load to set the initial values from configure strings
@@ -321,20 +332,14 @@ void CG_SetConfigValues( void ) {
 	cgs.scores1 = atoi( CG_ConfigString( CS_SCORES1 ) );
 	cgs.scores2 = atoi( CG_ConfigString( CS_SCORES2 ) );
 	cgs.levelStartTime = atoi( CG_ConfigString( CS_LEVEL_START_TIME ) );
-#ifdef MISSIONPACK
-	if ( cgs.gametype == GT_CTF ) {
-		s = CG_ConfigString( CS_FLAGSTATUS );
-		cgs.redflag = s[0] - '0';
-		cgs.blueflag = s[1] - '0';
-	} else if ( cgs.gametype == GT_1FCTF )    {
-		s = CG_ConfigString( CS_FLAGSTATUS );
-		cgs.flagStatus = s[0] - '0';
-	}
-#endif
 	cg.warmup = atoi( CG_ConfigString( CS_WARMUP ) );
 
-	// OSPx
+// OSPx
+	// Reinforcements
 	CG_ParseReinforcementTimes(CG_ConfigString(CS_REINFSEEDS));
+	// Ready	
+	CG_ParseReady(CG_ConfigString(CS_READY));
+// -OSPx
 }
 
 /*
@@ -409,9 +414,13 @@ static void CG_ConfigStringModified( void ) {
 		cgs.scores1 = atoi( str );
 	} else if ( num == CS_SCORES2 ) {
 		cgs.scores2 = atoi( str );
-// OSPx - Set reinforcement times for each team
+// OSPx 
+	// Set reinforcement times for each team
 	} else if (num == CS_REINFSEEDS) {
 		CG_ParseReinforcementTimes(str);
+		// Ready
+	} else if (num == CS_READY) {
+		CG_ParseReady(str);
 // OSPx
 	} else if ( num == CS_LEVEL_START_TIME ) {
 		cgs.levelStartTime = atoi( str );
@@ -800,7 +809,7 @@ static void CG_MapRestart( void ) {
 #endif
 
 	// OSPx - Fight Announcement 
-	if (cg.warmup == 0 && cg_announcer.integer)
+	if (cg.warmup == 0 && cg_announcer.integer && !cgs.readyState)
 		// Poor man's solution...replace font one of this days as this is ridicoulus.	:C		
 		CG_AddAnnouncer("F IGH T !", cgs.media.countFightSound, 1.6f, 1200, 1.0f, 0.0f, 0.0f, ANNOUNCER_NORMAL);
 
@@ -1919,7 +1928,7 @@ static void CG_ServerCommand( void ) {
 			}
 
 			// OSPx - Client logging
-			if (cg_printObjectiveInfo.integer > 0 && (args == 4 || atoi(CG_Argv(2)) > 1)) {
+			if (cg_printObjectiveInfo.integer > 0 && (args == 4 || atoi(CG_Argv(2)) > 1) && !cg.warmup) {
 				CG_Printf("[cgnotify]*** INFO: ^3%s\n", Q_CleanStr((char *)CG_LocalizeServerCommand(CG_Argv(1))));
 			}
 
@@ -1927,6 +1936,12 @@ static void CG_ServerCommand( void ) {
 		} else {
 			CG_CenterPrint( CG_LocalizeServerCommand( CG_Argv( 1 ) ), SCREEN_HEIGHT - ( SCREEN_HEIGHT * 0.25 ), SMALLCHAR_WIDTH );  //----(SA)	modified
 		}
+		return;
+	}
+
+	// OSPx - Console print only..
+	if (!Q_stricmp(cmd, "@print")) {
+		CG_Printf("[skipnotify]%s\n", CG_Argv(1)); 
 		return;
 	}
 

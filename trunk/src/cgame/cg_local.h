@@ -1771,13 +1771,16 @@ typedef struct {
 	// Reinforcements
 	int aReinfOffset[TEAM_NUM_TEAMS];
 
+	// Ready
+	int readyState;
+
 	// Stats
 	gameStats_t gamestats;
 	clientGameStats_t clientGameStats;
 	topshotStats_t topshots;
 	fileHandle_t dumpStatsFile;
 	char* dumpStatsFileName;
-	int dumpStatsTime;
+	int dumpStatsTime;	
 // -OSPx
 } cgs_t;
 
@@ -2759,6 +2762,11 @@ void CG_windowNormalizeOnText(cg_window_t *w);
 #define AA_DEMORECORD   0x01
 #define AA_SCREENSHOT   0x02
 #define AA_STATSDUMP    0x04
+
+// Ready
+#define CREADY_NONE		0x00
+#define CREADY_AWAITING	0x01
+#define CREADY_PENDING	0x02
 
 // Macros
 #define Pri( x ) CG_Printf( "[cgnotify]%s", CG_LocalizeServerCommand( x ) )

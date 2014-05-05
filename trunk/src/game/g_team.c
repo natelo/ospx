@@ -1646,3 +1646,62 @@ qboolean G_teamJoinCheck(int team_num, gentity_t *ent) {
 	}
 	return(qtrue);
 }
+
+/*
+=============
+wolfX/Tardo -- Ready/Not Ready
+
+OSPx - Rewrote and simplifed this
+=============
+*/
+// count players
+int G_playersReady(void) {
+	gclient_t *cl;
+	int ready = 0, \
+		i, \
+		state = 0, \
+		count = 0;
+
+	for (i = 0; i < level.numPlayingClients; i++) {
+		cl = level.clients + level.sortedClients[i];
+
+		if (cl->pers.ready)
+			ready++;
+	}
+
+	count = (!level.numPlayingClients) ? -1 : level.numPlayingClients - ready;
+	state = ((ready == level.numPlayingClients) && level.numPlayingClients) ? -2 : count;
+
+	if (g_noTeamSwitching.integer) {
+		state = ((ready >= g_minGameClients.integer) ? -2 : g_minGameClients.integer - ready);
+	}
+
+	return state;
+}
+
+void G_readyReset(qboolean aForced) {
+	if (g_gamestate.integer == GS_WARMUP_COUNTDOWN && !aForced) {
+		AP("print \"*** INFO: ^3Countdown aborted! Going back to warmup..\n\"2");
+	}
+	level.readyAll = qfalse;
+	level.lastRestartTime = level.time;
+	level.readyPrint = qfalse;
+	trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", GS_WARMUP));
+	trap_SetConfigstring(CS_READY, va("%i", (g_noTeamSwitching.integer ? READY_PENDING : READY_AWAITING)));
+}
+
+void G_readyStart(void) {
+	level.readyAll = qtrue;
+	level.cnNum = 0; // Resets countdown
+	trap_SetConfigstring(CS_READY, va("%i", READY_NONE));
+
+	// Prevents joining once countdown starts..
+	if (g_doWarmup.integer == 2)
+		G_readyTeamLock();
+}
+
+void G_readyTeamLock(void) {
+	teamInfo[TEAM_RED].team_lock = qtrue;
+	teamInfo[TEAM_BLUE].team_lock = qtrue;
+}
+

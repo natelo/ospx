@@ -572,7 +572,14 @@ void Svcmd_ResetMatch_f() {
 		trap_SendConsoleCommand( EXEC_APPEND, va( "map_restart 0 %i\n", GS_WARMUP ) );
 		return;
 	} else {
-		trap_SendConsoleCommand( EXEC_APPEND, va( "map_restart 0 %i\n", GS_WAITING_FOR_PLAYERS ) );
+		// OSPx - Ready
+		if (g_doWarmup.integer) {
+			trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", GS_WARMUP));
+			trap_SetConfigstring(CS_READY, va("%i", READY_PENDING));
+		}
+		else {
+			trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", GS_WAITING_FOR_PLAYERS));
+		}
 		return;
 	}
 }

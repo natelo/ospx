@@ -249,3 +249,35 @@ void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore) {
 	}
 	return;
 }
+
+/*
+===========
+Un/Ready all
+
+Ready or unready all..
+===========
+*/
+void cmd_readyHandle(gentity_t *ent, qboolean unready) {
+	char *msg = ((unready) ? "^3UNREADY^7" : "^3READY^7");
+
+	if (!g_doWarmup.integer) {
+		CP("print \"Tourny mode is disabled! Command ignored..\n\"");
+		return;
+	}
+
+	if (!unready) {
+		if (g_gamestate.integer != GS_WARMUP) {
+			CP("print \"^3READYALL ^7command can only be used in warmup!\n\"");
+			return;
+		}
+		G_readyStart();
+	}
+	else {
+		if (g_gamestate.integer != GS_WARMUP_COUNTDOWN) {
+			CP("print \"^3UNREADYALL ^7command can only be used during countdown!\n\"");
+			return;
+		}
+		G_readyReset(qtrue);
+	}
+	AP(va("chat \"console: ^7%s has %s ALL players..\n\"", sortTag(ent), msg));
+}

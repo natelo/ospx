@@ -576,6 +576,9 @@ typedef struct {
 
 	// Stats
 	int life_kills;
+
+	// Ready
+	qboolean ready;
 // -OSPx
 } clientPersistant_t;
 
@@ -843,6 +846,10 @@ typedef struct {
 	qboolean cnStarted;
 	int cnPush;
 	int cnNum;
+
+	// Ready
+	qboolean readyAll;
+	qboolean readyPrint;
 // -OSPx
 
 } level_locals_t;
@@ -1144,6 +1151,10 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 extern char *aTeams[TEAM_NUM_TEAMS];
 extern team_info teamInfo[TEAM_NUM_TEAMS];
 qboolean G_teamJoinCheck(int team_num, gentity_t *ent);
+int G_playersReady(void);
+void G_readyReset(qboolean aForced);
+void G_readyStart(void);
+void G_readyTeamLock(void);
 
 //
 // g_mem.c
@@ -1670,11 +1681,13 @@ void cmd_doLogout(gentity_t *ent);
 void cmd_custom(gentity_t *ent);
 void cmd_incognito(gentity_t *ent, qboolean fParam);
 void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore);
+void cmd_readyHandle(gentity_t *ent, qboolean unready);
 
 //
 // g_players.c
 //
 void pCmd_Players(gentity_t *ent);
+void G_ready_cmd(gentity_t *ent, qboolean state);
 
 //
 // g_files.c
@@ -1722,3 +1735,8 @@ void G_printMatchInfo(gentity_t *ent, qboolean time);
 // - Auto Actions
 #define AA_STATSALL     0x01    // Client AutoAction: Dump ALL player stats
 #define AA_STATSTEAM    0x02    // Client AutoAction: Dump TEAM player stats
+
+// Ready
+#define READY_NONE		0x00	// Countdown, playing..
+#define READY_AWAITING	0x01	// Awaiting all to ready up..
+#define READY_PENDING	0x02	// Awaiting but can start once treshold (minclients) is reached..

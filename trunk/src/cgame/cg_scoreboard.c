@@ -63,6 +63,23 @@ qboolean cf_draw(float x, float y, float fade, int clientNum) {
 
 /*
 =================
+OSPx - Ready state
+=================
+*/
+int is_ready(int clientNum) {
+	int i, rdy = 0;
+
+	for (i = 0; i < cgs.maxclients; i++) {
+		if (cgs.clientinfo[i].team != TEAM_SPECTATOR && cgs.clientinfo[i].clientNum == clientNum) {
+			rdy = (cgs.clientinfo[clientNum].powerups & (1 << PW_READY)) ? 1 : 0;
+			return rdy;
+		}
+	}
+	return rdy;
+}
+
+/*
+=================
 CG_DrawScoreboard
 =================
 */
@@ -463,6 +480,14 @@ static void WM_DrawClientScore( int x, int y, score_t *score, float *color, floa
 			tempx += 18;
 			maxchars -= 2;
 		}
+	}
+
+	// OSPx - Ready
+	if ((cgs.gamestate == GS_WARMUP || cgs.gamestate == GS_WARMUP_COUNTDOWN) && cgs.readyState) {
+		char *rdy = ((is_ready(ci->clientNum)) ? "^2!" : "^n?");
+
+		if (ci->team != TEAM_SPECTATOR)
+			CG_DrawSmallString(tempx - 11, y, va("%s", rdy), fade);
 	}
 
 	// OSPx - Country Flags
