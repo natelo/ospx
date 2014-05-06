@@ -217,8 +217,8 @@ static const cmd_reference_t userCmd[] = {
 	{ "incognito",		cmd_incognito,		qfalse,	"!incognito",						"Toggles your Admin status from visible to hidden."  },
 	{ "ignore",			cmd_ignoreHandle,	qtrue,	"!ignore <unique part of name>",	"Takes ability to (v)chat or call votes from a targeted player." },
 	{ "unignore",		cmd_ignoreHandle,	qfalse,	"!unignore <unique part of name>",	"Restores ability to (v)chat or call votes to a targeted player." },
-	{ "allready",		cmd_readyHandle,	qfalse,	"!readyall",						"Sets status of both teams as Ready and goes to countdown." },
-	{ "cancelready",	cmd_readyHandle,	qtrue,	"!cancelready",						"Cancels countdown and sets match back in warmup state." },
+	{ "allready",		cmd_readyHandle,	qfalse,	"!allready",						"Sets status of both teams as Ready and goes to countdown." },
+	{ "unreadyall",		cmd_readyHandle,	qtrue,	"!unreadyall",						"Cancels countdown and returns match back in warmup state." },
 	{ 0,				NULL,				qfalse,	0,									0 }
 };
 

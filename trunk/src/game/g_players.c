@@ -173,17 +173,17 @@ void G_ready_cmd(gentity_t *ent, qboolean state) {
 	}
 
 	if (g_gamestate.integer == GS_PLAYING || g_gamestate.integer == GS_INTERMISSION) {
-		CP("@print \"Match is already in progress!\n\"");
+		CP("@print \"Match is already in progress.\n\"");
 		return;
 	}
 
 	if (!state && g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
-		CP("print \"Countdown started..^3notready^7 ignored!\n\"");
+		CP("print \"Countdown started, ^3notready^7 ignored.\n\"");
 		return;
 	}
 
 	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
-		CP(va("print \"Specs cannot use ^3%s ^7command!\n\"", status[state]));
+		CP(va("print \"Specs cannot use ^3%s ^7command.\n\"", status[state]));
 		return;
 	}
 
@@ -204,7 +204,7 @@ void G_ready_cmd(gentity_t *ent, qboolean state) {
 			}
 
 			// Doesn't rly matter..score tab will show slow ones..
-			AP(va("cp \"\n%s \n^7is ^3%s!\n\"", ent->client->pers.netname, status[state]));
+			AP(va("cp \"\n%s \n^7is %s%s!\n\"", ent->client->pers.netname, (state ? "^n" : "^z"), status[state]));
 		}
 	}
 }

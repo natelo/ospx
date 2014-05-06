@@ -1151,10 +1151,9 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 extern char *aTeams[TEAM_NUM_TEAMS];
 extern team_info teamInfo[TEAM_NUM_TEAMS];
 qboolean G_teamJoinCheck(int team_num, gentity_t *ent);
-int G_playersReady(void);
+qboolean G_playersReady(void);
 void G_readyReset(qboolean aForced);
 void G_readyStart(void);
-void G_readyTeamLock(void);
 
 //
 // g_mem.c
@@ -1376,6 +1375,8 @@ extern vmCvar_t team_maxplayers;
 extern vmCvar_t match_warmupDamage;
 extern vmCvar_t match_mutespecs;
 extern vmCvar_t match_latejoin;
+extern vmCvar_t match_minplayers;
+extern vmCvar_t match_readypercent;
 
 extern vmCvar_t z_serverflags;
 extern vmCvar_t sv_hostname;

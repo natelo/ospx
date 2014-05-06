@@ -267,7 +267,7 @@ void cmd_readyHandle(gentity_t *ent, qboolean unready) {
 
 	if (!unready) {
 		if (g_gamestate.integer != GS_WARMUP) {
-			CP("print \"^3READYALL ^7command can only be used in warmup!\n\"");
+			CP("print \"^3ALLREADY ^7command can only be used in warmup!\n\"");
 			return;
 		}
 		G_readyStart();

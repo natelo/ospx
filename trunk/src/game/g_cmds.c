@@ -675,12 +675,18 @@ void SetTeam(gentity_t *ent, char *s) {
 	// OSPx - New way of handling..
 	G_TeamDataForString(s, client - level.clients, &team, &specState, &specClient);
 
+	// OSPx - No joining during countdown with tourny (g_doWarmup/ready) turned on
+	if (g_doWarmup.integer && g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
+		CPx(clientNum, "cp \"^nYou cannot switch teams during countdown.\n\"3");
+		return;
+	}
+
 	// OSPx - New way ..
 	if ( team != TEAM_SPECTATOR ) {
 
 		// OSPx - Ensure the player can join
 		if (!G_teamJoinCheck(team, ent)) {
-			// Leave them where they were before the command was issued
+			// Leave them where they were before the command was issued			
 			return;
 		}
 

@@ -197,6 +197,8 @@ vmCvar_t team_maxplayers;
 vmCvar_t match_warmupDamage;
 vmCvar_t match_mutespecs;
 vmCvar_t match_latejoin;
+vmCvar_t match_minplayers;
+vmCvar_t match_readypercent;
 
 // - System
 vmCvar_t z_serverflags;
@@ -368,6 +370,8 @@ cvarTable_t gameCvarTable[] = {
 	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
 	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
 	{ &match_latejoin, "match_latejoin", "1", 0, 0, qfalse, qfalse },
+	{ &match_minplayers, "match_minplayers", "4", 0, 0, qfalse, qfalse },
+	{ &match_readypercent, "match_readypercent", "100", 0, 0, qfalse, qtrue },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
 	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse }
@@ -1102,6 +1106,24 @@ void G_RegisterCvars( void ) {
 	// done
 
 	level.warmupModificationCount = g_warmup.modificationCount;
+
+// OSPx
+	// Ready percents
+	if (match_readypercent.integer < 1) {
+		trap_Cvar_Set("match_readypercent", "1");
+	}
+	else if (match_readypercent.integer > 100) {
+		trap_Cvar_Set("match_readypercent", "1");
+	}
+
+	// Sanity check
+	if (pmove_msec.integer < 8) {
+		trap_Cvar_Set("pmove_msec", "8");
+	}
+	else if (pmove_msec.integer > 33) {
+		trap_Cvar_Set("pmove_msec", "33");
+	}
+// -OSPx
 }
 
 /*
@@ -1129,6 +1151,23 @@ void G_UpdateCvars( void ) {
 				if ( cv->teamShader ) {
 					remapped = qtrue;
 				}
+
+				// OSPx
+				if (cv->vmCvar == &match_readypercent) {
+					if (match_readypercent.integer < 1) {
+						trap_Cvar_Set(cv->cvarName, "1");
+					}
+					else if (match_readypercent.integer > 100) {
+						trap_Cvar_Set(cv->cvarName, "100");
+					}				
+				} else if (cv->vmCvar == &pmove_msec) {
+					if (pmove_msec.integer < 8) {
+						trap_Cvar_Set(cv->cvarName, "8");
+					}
+					else if (pmove_msec.integer > 33) {
+						trap_Cvar_Set(cv->cvarName, "33");
+					}
+				} // -OSPx
 			}
 		}
 	}
@@ -2493,15 +2532,12 @@ void CheckGameState() {
 // OSPx - Ready
 		if (g_doWarmup.integer) {
 
-			if ((G_playersReady() == -2) || level.readyAll) {
+			if (G_playersReady()) {
 				level.warmupTime = level.time + 7000;
 				trap_SetConfigstring(CS_READY, va("%i", READY_NONE));
 				trap_SetConfigstring(CS_WARMUP, va("%i", level.warmupTime));
 				trap_Cvar_Set("gamestate", va("%i", GS_WARMUP_COUNTDOWN));
-				// Prevents joining once countdown starts..
-				if (g_doWarmup.integer == 2)
-					G_readyTeamLock();
-
+			
 				if (!level.readyPrint) {
 					AP(va("cp \"%s\n\"2", (g_noTeamSwitching.integer ? "Ready threshold reached!" : "All players are now ^nready^7!")));
 					level.readyPrint = qtrue;
@@ -2530,7 +2566,7 @@ void CheckGameState() {
 	// OSPx - Reset countdown if ready goes off (eg. player enters, leaves..)
 	if (current_gs == GS_WARMUP_COUNTDOWN) {
 		if (g_doWarmup.integer) {
-			if ((G_playersReady() != -2) && !level.readyAll)
+			if (!G_playersReady())
 				G_readyReset(qfalse);
 		}
 	}

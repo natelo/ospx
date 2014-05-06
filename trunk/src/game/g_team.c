@@ -1654,54 +1654,52 @@ wolfX/Tardo -- Ready/Not Ready
 OSPx - Rewrote and simplifed this
 =============
 */
-// count players
-int G_playersReady(void) {
+qboolean G_playersReady(void) {
+	int i, ready = 0, notReady = match_minplayers.integer;
 	gclient_t *cl;
-	int ready = 0, \
-		i, \
-		state = 0, \
-		count = 0;
 
-	for (i = 0; i < level.numPlayingClients; i++) {
-		cl = level.clients + level.sortedClients[i];
 
-		if (cl->pers.ready)
-			ready++;
+	if (0 == g_doWarmup.integer) {
+		return(qtrue);
 	}
 
-	count = (!level.numPlayingClients) ? -1 : level.numPlayingClients - ready;
-	state = ((ready == level.numPlayingClients) && level.numPlayingClients) ? -2 : count;
+	// Ensure we have enough real players
+	if (level.numNonSpectatorClients >= match_minplayers.integer && level.numPlayingClients > 0) {
+		// Step through all active clients
+		notReady = 0;
+		for (i = 0; i < level.numConnectedClients; i++) {
+			cl = level.clients + level.sortedClients[i];
 
-	if (g_noTeamSwitching.integer) {
-		state = ((ready >= g_minGameClients.integer) ? -2 : g_minGameClients.integer - ready);
+			if (cl->pers.connected != CON_CONNECTED || cl->sess.sessionTeam == TEAM_SPECTATOR) {
+				continue;
+			}
+			else if (cl->pers.ready || (g_entities[level.sortedClients[i]].r.svFlags & SVF_BOT)) {
+				ready++;
+			}
+			else { notReady++; }
+		}
 	}
 
-	return state;
+	notReady = (notReady > 0 || ready > 0) ? notReady : match_minplayers.integer;
+	if (g_minGameClients.integer != notReady) {
+		trap_Cvar_Set("g_minGameClients", va("%d", notReady));
+	}
+
+	AP(va("chat \"Ready: %i - Not Ready: %i - Percents: %i\n\"", ready, notReady, 100 * ready / (ready + notReady) >= match_readypercent.integer));
+	
+	return ( level.readyAll || ((ready + notReady > 0) && 100 * ready / (ready + notReady) >= match_readypercent.integer) );
 }
 
 void G_readyReset(qboolean aForced) {
 	if (g_gamestate.integer == GS_WARMUP_COUNTDOWN && !aForced) {
 		AP("print \"*** INFO: ^3Countdown aborted! Going back to warmup..\n\"2");
 	}
-	level.readyAll = qfalse;
 	level.lastRestartTime = level.time;
-	level.readyPrint = qfalse;
 	trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", GS_WARMUP));
-	trap_SetConfigstring(CS_READY, va("%i", (g_noTeamSwitching.integer ? READY_PENDING : READY_AWAITING)));
 }
 
 void G_readyStart(void) {
 	level.readyAll = qtrue;
 	level.cnNum = 0; // Resets countdown
 	trap_SetConfigstring(CS_READY, va("%i", READY_NONE));
-
-	// Prevents joining once countdown starts..
-	if (g_doWarmup.integer == 2)
-		G_readyTeamLock();
 }
-
-void G_readyTeamLock(void) {
-	teamInfo[TEAM_RED].team_lock = qtrue;
-	teamInfo[TEAM_BLUE].team_lock = qtrue;
-}
-
