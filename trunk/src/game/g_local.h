@@ -521,6 +521,10 @@ typedef struct {
 	int acc_hits;
 	int killPeak;
 	weapon_stat_t aWeaponStats[WS_MAX + 1];	
+
+	// Spec lock
+	int specInvited;
+	int specLocked;
 // -OSPx
 } clientSession_t;
 
@@ -1154,6 +1158,7 @@ qboolean G_teamJoinCheck(int team_num, gentity_t *ent);
 qboolean G_playersReady(void);
 void G_readyReset(qboolean aForced);
 void G_readyStart(void);
+void G_swapTeamLocks(void);
 
 //
 // g_mem.c

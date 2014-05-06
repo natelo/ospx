@@ -1696,3 +1696,15 @@ void G_readyStart(void) {
 	level.cnNum = 0; // Resets countdown
 	trap_SetConfigstring(CS_READY, va("%i", READY_NONE));
 }
+
+/*
+=============
+Track locked stuff (team/specs)
+=============
+*/
+void G_swapTeamLocks(void) {
+	qboolean fLock = teamInfo[TEAM_RED].spec_lock;
+	teamInfo[TEAM_RED].spec_lock = teamInfo[TEAM_BLUE].spec_lock;
+	teamInfo[TEAM_BLUE].spec_lock = fLock;
+}
+
