@@ -717,7 +717,9 @@ void SetTeam(gentity_t *ent, char *s) {
 		}
 	}
 	
-	if (g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer) {
+	// OSPx - Maybe I should remove this? - Since team_maxplayers is essentially a same thing..
+	if (g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer) {		
+		CPx(clientNum, va("cp \"The %s team is full!\n\"2", aTeams[team]));
 		team = TEAM_SPECTATOR;
 	}
 

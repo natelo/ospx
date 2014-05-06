@@ -1589,7 +1589,7 @@ void SP_team_WOLF_checkpoint( gentity_t *ent ) {
 }
 
 // OSPx
-char *aTeams[TEAM_NUM_TEAMS] = { "FFA", "^1Axis^7", "^4Allies^7", "Spectators" };
+char *aTeams[TEAM_NUM_TEAMS] = { "FFA", "^1Axis^7", "^4Allies^7", "^3Spectators^7" };
 team_info teamInfo[TEAM_NUM_TEAMS];
 
 /*
@@ -1636,9 +1636,7 @@ qboolean G_teamJoinCheck(int team_num, gentity_t *ent) {
 		if (team_maxplayers.integer > 0 && team_maxplayers.integer <= cnt) {			
 			CP(va("cp \"The %s team is full!\n\"2", aTeams[team_num]));
 			return(qfalse);
-
-			// Check for locked teams
-		}
+		} // Check for locked teams
 		else if (teamInfo[team_num].team_lock /*&& (!(ent->client->pers.invite & team_num))*/) {			
 			CP(va("cp \"The %s team is LOCKED!\n\"2", aTeams[team_num]));
 			return(qfalse);
@@ -1649,22 +1647,19 @@ qboolean G_teamJoinCheck(int team_num, gentity_t *ent) {
 
 /*
 =============
-wolfX/Tardo -- Ready/Not Ready
-
-OSPx - Rewrote and simplifed this
+Ready/Not Ready
 =============
 */
 qboolean G_playersReady(void) {
 	int i, ready = 0, notReady = match_minplayers.integer;
 	gclient_t *cl;
 
-
 	if (0 == g_doWarmup.integer) {
 		return(qtrue);
 	}
 
 	// Ensure we have enough real players
-	if (level.numNonSpectatorClients >= match_minplayers.integer && level.numPlayingClients > 0) {
+	if (level.numPlayingClients > 0 && level.numPlayingClients >= match_minplayers.integer) {
 		// Step through all active clients
 		notReady = 0;
 		for (i = 0; i < level.numConnectedClients; i++) {
@@ -1685,8 +1680,6 @@ qboolean G_playersReady(void) {
 		trap_Cvar_Set("g_minGameClients", va("%d", notReady));
 	}
 
-	AP(va("chat \"Ready: %i - Not Ready: %i - Percents: %i\n\"", ready, notReady, 100 * ready / (ready + notReady) >= match_readypercent.integer));
-	
 	return ( level.readyAll || ((ready + notReady > 0) && 100 * ready / (ready + notReady) >= match_readypercent.integer) );
 }
 

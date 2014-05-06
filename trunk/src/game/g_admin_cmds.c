@@ -271,6 +271,7 @@ void cmd_readyHandle(gentity_t *ent, qboolean unready) {
 			return;
 		}
 		G_readyStart();
+		AP(va("chat \"console: ^7%s has %s ALL players..\n\"", sortTag(ent), msg));
 	}
 	else {
 		if (g_gamestate.integer != GS_WARMUP_COUNTDOWN) {
@@ -278,6 +279,6 @@ void cmd_readyHandle(gentity_t *ent, qboolean unready) {
 			return;
 		}
 		G_readyReset(qtrue);
-	}
-	AP(va("chat \"console: ^7%s has %s ALL players..\n\"", sortTag(ent), msg));
+		AP(va("chat \"console: Countdown has been ^3cancelled ^7by %s..\n\"", sortTag(ent)));
+	}	
 }
