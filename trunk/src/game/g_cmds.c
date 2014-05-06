@@ -657,7 +657,7 @@ void G_TeamDataForString(const char* teamstr, int clientNum, team_t* team, spect
 SetTeam
 =================
 */
-void SetTeam(gentity_t *ent, char *s) {
+void SetTeam(gentity_t *ent, char *s, qboolean forced) {
 	team_t team, oldTeam;
 	gclient_t           *client;
 	int clientNum;
@@ -682,7 +682,7 @@ void SetTeam(gentity_t *ent, char *s) {
 	}
 
 	// OSPx - New way ..
-	if ( team != TEAM_SPECTATOR ) {
+	if ( team != TEAM_SPECTATOR && !forced) {
 
 		// OSPx - Ensure the player can join
 		if (!G_teamJoinCheck(team, ent)) {
@@ -718,7 +718,7 @@ void SetTeam(gentity_t *ent, char *s) {
 	}
 	
 	// OSPx - Maybe I should remove this? - Since team_maxplayers is essentially a same thing..
-	if (g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer) {		
+	if (g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer && !forced) {		
 		CPx(clientNum, va("cp \"The %s team is full!\n\"2", aTeams[team]));
 		team = TEAM_SPECTATOR;
 	}
@@ -733,14 +733,14 @@ void SetTeam(gentity_t *ent, char *s) {
 
 	// NERVE - SMF - prevent players from switching to regain deployments
 	if ( g_maxlives.integer > 0 && ent->client->ps.persistant[PERS_RESPAWNS_LEFT] == 0 &&
-		 oldTeam != TEAM_SPECTATOR ) {
+		 oldTeam != TEAM_SPECTATOR && !forced) {
 		CPx( clientNum, "cp \"You can't switch teams because you are out of lives.\n\" 3" );
 		return; // ignore the request
 	}
 
 	// DHM - Nerve :: Force players to wait 30 seconds before they can join a new team.
 	if ( g_gametype.integer >= GT_WOLF && team != oldTeam && level.warmupTime == 0 && !client->pers.initialSpawn
-		 && ( ( level.time - client->pers.connectTime ) > 5000 ) && ( ( level.time - client->pers.enterTime ) < 5000 ) ) {
+		 && ((level.time - client->pers.connectTime) > 5000) && ((level.time - client->pers.enterTime) < 5000) && !forced ) {
 		CPx( ent - g_entities, va( "cp \"^3You must wait %i seconds before joining ^3a new team.\n\"3", (int)( 5 - ( ( level.time - client->pers.enterTime ) / 1000 ) ) ) );
 		return;
 	}
@@ -748,7 +748,7 @@ void SetTeam(gentity_t *ent, char *s) {
 
 	// OSPx - Handle warmup team switch nuke
 	// - In warmup without a check, one can switch teams (scripted) which floods and eventually crashes the server..
-	if (team != oldTeam && level.warmupTime && ((level.time - client->pers.connectTime) > 5000) && ((level.time - client->pers.enterTime) < 2000)) {
+	if (team != oldTeam && level.warmupTime && ((level.time - client->pers.connectTime) > 5000) && ((level.time - client->pers.enterTime) < 2000) && !forced) {
 		CPx(ent - g_entities, va("cp \"^3You must wait %i seconds before joining ^3a new team.\n\"3", (int)(2 - ((level.time - client->pers.enterTime) / 1000))));
 		return;
 	}
@@ -842,7 +842,7 @@ void StopFollowing( gentity_t *ent ) {
 		VectorCopy( client->ps.viewangles, angle );
 		// ATVI Wolfenstein Misc #414, backup enterTime
 		enterTime = client->pers.enterTime;
-		SetTeam( ent, "spectator" );
+		SetTeam( ent, "spectator", qfalse );
 		client->pers.enterTime = enterTime;
 		VectorCopy( pos, client->ps.origin );
 		SetClientViewAngle( ent, angle );
@@ -903,7 +903,7 @@ void Cmd_Team_f( gentity_t *ent ) {
 
 	trap_Argv( 1, s, sizeof( s ) );
 
-	SetTeam( ent, s );
+	SetTeam( ent, s, qfalse );
 }
 
 /*
@@ -951,7 +951,7 @@ void Cmd_Follow_f( gentity_t *ent ) {
 
 	// first set them to spectator
 	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		SetTeam( ent, "spectator" );
+		SetTeam( ent, "spectator", qfalse );
 	}
 
 	ent->client->sess.spectatorState = SPECTATOR_FOLLOW;
@@ -973,7 +973,7 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 	}
 	// first set them to spectator
 	if ( ( ent->client->sess.spectatorState == SPECTATOR_NOT ) && ( !( ent->client->ps.pm_flags & PMF_LIMBO ) ) ) { // JPW NERVE for limbo state
-		SetTeam( ent, "spectator" );
+		SetTeam( ent, "spectator", qfalse );
 	}
 
 	if ( dir != 1 && dir != -1 ) {
