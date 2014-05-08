@@ -1073,7 +1073,7 @@ void SetWolfSpawnWeapons( gclient_t *client ) {
 				client->ps.ammoclip[BG_FindClipForWeapon( WP_THOMPSON )] += 30;
 				// JPW NERVE
 				if ( pc == PC_ENGINEER ) {
-					client->ps.ammo[BG_FindAmmoForWeapon( WP_THOMPSON )] += 32;
+					client->ps.ammo[BG_FindAmmoForWeapon( WP_THOMPSON )] += 30;
 				}
 				// jpw
 				client->ps.weapon = WP_THOMPSON;
