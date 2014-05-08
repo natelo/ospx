@@ -319,6 +319,17 @@ void CG_ParseReady(const char *pState) {
 
 /*
 ================
+OSPx - Pause
+
+Parse Pause state
+================
+*/
+void CG_ParsePause(const char *pState) {
+	cgs.pauseState = atoi(pState);
+}
+
+/*
+================
 CG_SetConfigValues
 
 Called on load to set the initial values from configure strings
@@ -339,6 +350,8 @@ void CG_SetConfigValues( void ) {
 	CG_ParseReinforcementTimes(CG_ConfigString(CS_REINFSEEDS));
 	// Ready	
 	CG_ParseReady(CG_ConfigString(CS_READY));
+	// L0 - Pause
+	CG_ParsePause(CG_ConfigString(CS_PAUSED));
 // -OSPx
 }
 
@@ -418,9 +431,12 @@ static void CG_ConfigStringModified( void ) {
 	// Set reinforcement times for each team
 	} else if (num == CS_REINFSEEDS) {
 		CG_ParseReinforcementTimes(str);
-		// Ready
+	// Ready
 	} else if (num == CS_READY) {
 		CG_ParseReady(str);
+	// Pause
+	} else if (num == CS_PAUSED) {
+		CG_ParsePause(str);
 // OSPx
 	} else if ( num == CS_LEVEL_START_TIME ) {
 		cgs.levelStartTime = atoi( str );

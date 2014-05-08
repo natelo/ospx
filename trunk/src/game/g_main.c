@@ -200,6 +200,7 @@ vmCvar_t match_mutespecs;
 vmCvar_t match_latejoin;
 vmCvar_t match_minplayers;
 vmCvar_t match_readypercent;
+vmCvar_t match_timeoutlength;
 
 // - System
 vmCvar_t z_serverflags;
@@ -374,6 +375,7 @@ cvarTable_t gameCvarTable[] = {
 	{ &match_latejoin, "match_latejoin", "1", 0, 0, qfalse, qfalse },
 	{ &match_minplayers, "match_minplayers", "4", 0, 0, qfalse, qfalse },
 	{ &match_readypercent, "match_readypercent", "100", 0, 0, qfalse, qtrue },
+	{ &match_timeoutlength, "match_timeoutlength", "180", 0, 0, qfalse, qtrue },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
 	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse }
@@ -2727,6 +2729,12 @@ Runs thinking code for this frame if necessary
 void G_RunThink( gentity_t *ent ) {
 	float thinktime;
 
+	// OSPx - Pause
+	if (level.match_pause != PAUSE_NONE && (ent - g_entities) >= g_maxclients.integer &&
+		ent->nextthink > level.time && strstr(ent->classname, "DPRINTF_") == NULL) {
+		ent->nextthink += level.time - level.previousTime;
+	}
+
 	// RF, run scripting
 	if ( ent->s.number >= MAX_CLIENTS ) {
 //----(SA)	this causes trouble in various maps
@@ -2795,9 +2803,22 @@ void G_RunFrame( int levelTime ) {
 		return;
 	}
 
-	// OSPx - FIXME (pause)
-	level.timeCurrent = levelTime /*- level.timeDelta*/;
+	// OSPx - Handling of pause offsets
+	if (level.match_pause == PAUSE_NONE) {
+		level.timeCurrent = levelTime - level.timeDelta;
+	}
+	else {
+		level.timeDelta = levelTime - level.timeCurrent;
+		if ((level.time % 500) == 0) {
+			// Respawn and time issuses
+			trap_SetConfigstring(CS_LEVEL_START_TIME, va("%i", level.startTime + level.timeDelta));
 
+			// Print stuff.. FIXME one day...
+			trap_SetConfigstring(CS_PAUSED, va("%i", level.startTime + level.timeDelta));
+		}
+	}
+
+	// Antilag
 	level.frameStartTime = trap_Milliseconds();
 
 	level.framenum++;
@@ -2903,7 +2924,20 @@ void G_RunFrame( int levelTime ) {
 			 || ent->s.eType == ET_FIRE_COLUMN_SMOKE
 			 || ent->s.eType == ET_EXPLO_PART
 			 || ent->s.eType == ET_RAMJET ) {
-			G_RunMissile( ent );
+			// OSPx - pausing
+			if (level.match_pause == PAUSE_NONE) {
+				G_RunMissile(ent);
+			}
+			else {
+				// During a pause, gotta keep track of stuff in the air
+				ent->s.pos.trTime += level.time - level.previousTime;
+				// Keep pulsing right for dynmamite
+				if (ent->methodOfDeath == MOD_DYNAMITE) {
+					ent->s.effect1Time += level.time - level.previousTime;
+				}
+				G_RunThink(ent);
+			}
+			// -OSPx
 			continue;
 		}
 

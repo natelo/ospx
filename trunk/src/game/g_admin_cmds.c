@@ -382,3 +382,31 @@ void cmd_specHandle(gentity_t *ent, qboolean lock) {
 		ent->client->pers.netname, clientIP(ent, qtrue), act);
 	admLog(log);
 }
+
+/*
+==================
+Pause/Unpause
+==================
+*/
+void cmd_pauseHandle(gentity_t *ent, qboolean fPause) {
+	char *status[2] = { "^5UN", "^1" };	
+
+	if ((PAUSE_UNPAUSING >= level.match_pause && !fPause) || (PAUSE_NONE != level.match_pause && fPause)) {
+		CP(va("print \"^1Error^7: The match is already %sPAUSED!\n\"", status[fPause]));
+		return;
+	}
+
+	// Trigger the auto-handling of pauses
+	if (fPause) {
+		level.match_pause = 100 + ((ent) ? (1 + ent - g_entities) : 0);		
+		G_spawnPrintf(DP_PAUSEINFO, level.time + 15000, NULL);
+		AP(va("chat \"console: %s ^3PAUSED^7 the match!\n", sortTag(ent)));
+		CP("cp \"Match is ^1PAUSED^7!\n\"3");
+	}
+	else {
+		AP(va("chat \"console: %s ^3UNPAUSES^7 the match ... resuming in 10 seconds!\n\n\"", sortTag(ent)));
+		level.match_pause = PAUSE_UNPAUSING;		
+		G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
+		return;
+	}
+}

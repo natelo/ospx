@@ -1774,6 +1774,9 @@ typedef struct {
 	// Ready
 	int readyState;
 
+	// Pause
+	int pauseState;
+
 	// Stats
 	gameStats_t gamestats;
 	clientGameStats_t clientGameStats;

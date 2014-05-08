@@ -2607,6 +2607,32 @@ static qboolean CG_DrawFollow( void ) {
 	return qtrue;
 }
 
+/*
+=================
+OSPx - CG_DrawPause
+
+Deals with client views/prints when paused.
+=================
+*/
+static void CG_PausePrint(void) {
+	const char  *s;
+	int w;
+
+	// Not in warmup...
+	if (cg.warmup)
+		return;
+
+	if (cgs.pauseState) {
+		s = va("%s", CG_TranslateString(va("(^1PAUSED^7) Resumimg Match in %i", cgs.levelStartTime)));
+		cgs.fadeAlpha = .2;
+	}
+	else {
+		return;
+	}
+
+	w = CG_DrawStrlen(s);
+	CG_DrawStringExt(320 - w * 6, 120, s, colorWhite, qfalse, qtrue, 12, 18, 0);
+}
 
 /*
 =================
@@ -3785,6 +3811,9 @@ static void CG_Draw2D( void ) {
 	// don't draw center string if scoreboard is up
 	if ( !CG_DrawScoreboard() ) {
 		CG_DrawCenterString();
+
+		// OSPx - Pause		
+		CG_PausePrint();
 
 		CG_DrawFollow();
 		CG_DrawWarmup();

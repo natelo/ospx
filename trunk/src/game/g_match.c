@@ -165,7 +165,7 @@ void CountDown( qboolean restart ) {
 
 	if (level.cnNum == 0) {
 		index = "prepare.wav";
-		AP("cp \"Prepare to fight^2!\n\"2"); 
+		AP("cp \"Prepare to fight^2!\n\"2");
 	}
 	else if (level.cnNum < 6) {
 		index = va("cn_%d.wav", (6 - level.cnNum) );
@@ -202,4 +202,100 @@ void CountDown( qboolean restart ) {
 		AAPS(va("sound/match/%s", index));
 
 	level.cnNum++;
+}
+
+/*
+=================
+Pause
+
+Deals with pause related functionality
+=================
+*/
+
+void G_delayPrint(gentity_t *dpent) {
+	int think_next = 0;
+	qboolean fFree = qtrue;
+
+	switch (dpent->spawnflags) {
+		case DP_PAUSEINFO:
+		{
+			if (level.match_pause > PAUSE_UNPAUSING) {
+				int cSeconds = match_timeoutlength.integer * 1000 - (level.time - dpent->timestamp);
+
+				if (cSeconds > 1000) {
+					//AP(va("cp \"Match resuming in ^1%d^7 seconds!\n\"", cSeconds / 1000));
+					think_next = level.time + 15000;
+					fFree = qfalse;
+					trap_SetConfigstring(CS_PAUSED, va("%d", cSeconds));
+				}
+				else {
+					level.match_pause = PAUSE_UNPAUSING;
+					AP("cp \"Resuming..Prepare to fight^2!\n\"2");
+					G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
+					AAPS("sound/match/prepare.wav");
+				}
+			}
+			break;
+		}
+
+		case DP_UNPAUSING:
+		{
+			if (level.match_pause == PAUSE_UNPAUSING) {
+				int cSeconds = 11 * 1000 - (level.time - dpent->timestamp);
+
+				if (cSeconds > 1000) {
+					AP(va("cp \"Match resuming in ^3%d^7 seconds!\n\"", cSeconds / 1000));
+					think_next = level.time + 1000;
+					fFree = qfalse;
+					AAPS(va("sound/match/cn_%d.wav", cSeconds / 1000));
+				}
+				else {
+					level.match_pause = PAUSE_NONE;					
+					AP("print \"^1FIGHT!\n\"");
+					AP("cp \"\n\"3");	// Clears the screen..
+					AAPS("sound/match/fight.wav");
+					trap_SetConfigstring(CS_LEVEL_START_TIME, va("%i", level.startTime + level.timeDelta));			
+					//trap_SetConfigstring(CS_PAUSED, va("%d",cSeconds / 1000));
+				}
+			}
+			break;
+		}
+		default:
+			break;
+	}
+
+	dpent->nextthink = think_next;
+	if (fFree) {
+		dpent->think = 0;
+		G_FreeEntity(dpent);
+	}
+}
+
+static char *pszDPInfo[] = {
+	"DPRINTF_PAUSEINFO",
+	"DPRINTF_UNPAUSING",
+	"DPRINTF_CONNECTINFO",
+	"DPRINTF_MVSPAWN",
+	"DPRINTF_UNK1",
+	"DPRINTF_UNK2",
+	"DPRINTF_UNK3",
+	"DPRINTF_UNK4",
+	"DPRINTF_UNK5"
+};
+
+void G_spawnPrintf(int print_type, int print_time, gentity_t *owner) {
+	gentity_t   *ent = G_Spawn();
+
+	ent->classname = pszDPInfo[print_type];
+	ent->clipmask = 0;
+	ent->parent = owner;
+	ent->r.svFlags |= SVF_NOCLIENT;
+	ent->s.eFlags |= EF_NODRAW;
+	ent->s.eType = ET_ITEM;
+
+	ent->spawnflags = print_type; 
+	ent->timestamp = level.time;
+
+	ent->nextthink = print_time;
+	ent->think = G_delayPrint;
 }

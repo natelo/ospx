@@ -570,10 +570,10 @@ Cmd_Kill_f
 void Cmd_Kill_f( gentity_t *ent ) {
 	int dmg = 0; // OSPx - Needed for Team Damage stats..
 
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		return;
-	}
-	if ( g_gametype.integer >= GT_WOLF && ent->client->ps.pm_flags & PMF_LIMBO ) {
+	// OSPx - Account for pause as well..
+	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR ||
+		(ent->client->ps.pm_flags & PMF_LIMBO) ||
+		ent->health <= 0 || level.match_pause != PAUSE_NONE) {
 		return;
 	}
 
@@ -594,18 +594,13 @@ Same as kill, just doesn't gib so player can still be revived.
 void Cmd_SoftKill_f(gentity_t *ent) {
 	int dmg = 0;
 
-	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
+	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR ||
+		(ent->client->ps.pm_flags & PMF_LIMBO) ||
+		ent->health <= 0 || level.match_pause != PAUSE_NONE ||
+		!g_allowSoftKill.integer) {
 		return;
 	}
-	if (g_gametype.integer >= GT_WOLF && ent->client->ps.pm_flags & PMF_LIMBO) {
-		return;
-	}
-
-	if (!g_allowSoftKill.integer)
-	{
-		return;
-	}
-
+	
 	dmg = ent->health;
 	ent->flags &= ~FL_GODMODE;
 	ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;

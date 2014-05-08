@@ -220,7 +220,9 @@ static const cmd_reference_t userCmd[] = {
 	{ "allready",		cmd_readyHandle,	qfalse,	"!allready",						"Sets status of both teams as Ready and goes to countdown." },
 	{ "unreadyall",		cmd_readyHandle,	qtrue,	"!unreadyall",						"Cancels countdown and returns match back in warmup state." },
 	{ "speclock",		cmd_specHandle,		qtrue,	"!speclock <a|b|both>",				"Locks a player's team from spectators." },
-	{ "specunlock",		cmd_specHandle,		qfalse,	"!specunlock <a|b|both>",			"Unlocks a player's team from spectators" },
+	{ "specunlock",		cmd_specHandle,		qfalse,	"!specunlock <a|b|both>",			"Unlocks a player's team from spectators." },
+	{ "pause",			cmd_pauseHandle,	qtrue,	"!pause",							"Pauses a match." },
+	{ "unpause",		cmd_pauseHandle,	qfalse, "!unpause",							"Unpauses a match." },
 	{ 0,				NULL,				qfalse,	0,									0 }
 };
 

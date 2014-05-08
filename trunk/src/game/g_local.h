@@ -843,8 +843,9 @@ typedef struct {
 	qboolean fResetStats;	
 	int sortedStats[MAX_CLIENTS];
 
-	// Real game clock
-	int timeCurrent;	
+	// Timers
+	int timeCurrent;
+	int timeDelta;
 
 	// Countdown	
 	qboolean cnStarted;
@@ -858,9 +859,20 @@ typedef struct {
 	// Track players
 	int alliedPlayers;
 	int axisPlayers;
+
+	// Pause
+	int match_pause;
 // -OSPx
 
 } level_locals_t;
+
+// OSPx - Pause & MW
+typedef enum {
+	DP_PAUSEINFO,
+	DP_UNPAUSING,
+	DP_CONNECTINFO,
+	DP_MVSPAWN
+} enum_t_dp;
 
 // OSPx - Team extras
 typedef struct {
@@ -1395,6 +1407,7 @@ extern vmCvar_t match_mutespecs;
 extern vmCvar_t match_latejoin;
 extern vmCvar_t match_minplayers;
 extern vmCvar_t match_readypercent;
+extern vmCvar_t match_timeoutlength;
 
 extern vmCvar_t z_serverflags;
 extern vmCvar_t sv_hostname;
@@ -1646,6 +1659,7 @@ void G_HistoricalTrace(gentity_t* ent, trace_t *results, const vec3_t start, con
 void G_loadMatchGame(void);
 void G_matchInfoDump(unsigned int dwDumpType);
 void CountDown(qboolean restart);
+void G_spawnPrintf(int print_type, int print_time, gentity_t *owner);
 
 //
 // g_geoip.c
@@ -1702,6 +1716,7 @@ void cmd_incognito(gentity_t *ent, qboolean fParam);
 void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore);
 void cmd_readyHandle(gentity_t *ent, qboolean unready);
 void cmd_specHandle(gentity_t *ent, qboolean lock);
+void cmd_pauseHandle(gentity_t *ent, qboolean fPause);
 
 //
 // g_players.c
@@ -1765,3 +1780,7 @@ void G_printMatchInfo(gentity_t *ent, qboolean time);
 #define READY_NONE		0x00	// Countdown, playing..
 #define READY_AWAITING	0x01	// Awaiting all to ready up..
 #define READY_PENDING	0x02	// Awaiting but can start once treshold (minclients) is reached..
+
+// Pause
+#define PAUSE_NONE		0x00	// Match is not paused..
+#define PAUSE_UNPAUSING 0x02    // Pause is about to expire

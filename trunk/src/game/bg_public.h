@@ -186,6 +186,7 @@ extern const unsigned int aReinfSeeds[MAX_REINFSEEDS];
 // OSPx
 #define CS_REINFSEEDS           37      // Reinforcement seeds
 #define CS_READY				38		// Ready
+#define CS_PAUSED				39		// Pause
 // -OSPx
 
 #define CS_MODELS               64

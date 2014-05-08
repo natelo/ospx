@@ -687,7 +687,11 @@ void G_RunMover( gentity_t *ent ) {
 
 	// if stationary at one of the positions, don't move anything
 	if ( ent->s.pos.trType != TR_STATIONARY || ent->s.apos.trType != TR_STATIONARY ) {
-		G_MoverTeam( ent );
+		// OSPx - Pause
+		if (level.match_pause == PAUSE_NONE) {
+			G_MoverTeam(ent);
+		}
+		else { ent->s.pos.trTime += level.time - level.previousTime; }
 	}
 
 	// check think function
