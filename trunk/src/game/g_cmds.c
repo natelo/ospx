@@ -949,6 +949,12 @@ void Cmd_Follow_f( gentity_t *ent ) {
 		ent->client->sess.losses++;
 	}
 
+	// OSP - can't follow a player on a speclocked team, unless allowed
+	if (!G_allowFollow(ent, level.clients[i].sess.sessionTeam)) {
+		CP(va("print \"Sorry, the %s team is locked from spectators.\n\"", aTeams[level.clients[i].sess.sessionTeam]));
+		return;
+	}
+
 	// first set them to spectator
 	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		SetTeam( ent, "spectator", qfalse );
@@ -1016,6 +1022,11 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 			if ( level.clients[clientnum].ps.pm_flags & PMF_LIMBO ) {
 				continue;
 			}
+		}
+
+		// OSPx - Speclock
+		if (!G_desiredFollow(ent, level.clients[clientnum].sess.sessionTeam)) {
+			continue;
 		}
 
 		// this is good, we can use it
@@ -2727,9 +2738,18 @@ void ClientCommand( int clientNum ) {
 		Cmd_SoftKill_f(ent);
 	} else if (Q_stricmp(cmd, "ready") == 0)  {
 		G_ready_cmd(ent, qtrue);
-	}
-	else if (Q_stricmp(cmd, "notready") == 0)  {
+	} else if (Q_stricmp(cmd, "notready") == 0)  {
 		G_ready_cmd(ent, qfalse);
+	} else if (!Q_stricmp(cmd, "speclock")) { 
+		cmd_speclock(ent, qtrue);		
+	} else if (!Q_stricmp(cmd, "specunlock")) { 
+		cmd_speclock(ent, qfalse); 		
+	} else if (!Q_stricmp(cmd, "specinvite")) { 
+		cmd_specInvite(ent);
+	} else if (!Q_stricmp(cmd, "specuninvite")) { 
+		cmd_specUnInvite(ent);
+	} else if (!Q_stricmp(cmd, "specuninviteall")) { 
+		cmd_uninviteAll(ent);
 // -OSPx
 	} else if ( Q_stricmp( cmd, "levelshot" ) == 0 )  {
 		Cmd_LevelShot_f( ent );

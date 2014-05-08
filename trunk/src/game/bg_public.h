@@ -468,6 +468,7 @@ typedef enum {
 
 // OSPx	
 	PW_READY,			// Ready
+	PW_BLACKOUT = 14,	// Specklock
 // -OSPx
 
 	PW_NUM_POWERUPS

@@ -127,6 +127,7 @@ NOTE: Hooked under g_cmds.c
 ===========
 */
 void cmd_doLogout(gentity_t *ent) {
+
 	// If user is not logged in do nothing
 	if (ent->client->sess.admin == USER_REGULAR) {
 		return;
@@ -144,6 +145,11 @@ void cmd_doLogout(gentity_t *ent) {
 		// Set incognito to visible..
 		ent->client->sess.incognito = 0;
 
+		// Clear speclock		
+		ent->client->sess.specInvited = 0;
+
+		// Black out client if needed
+		G_setClientSpeclock( ent );
 		return;
 	}
 }
@@ -156,12 +162,10 @@ NOTE: Only called directly from cmds_admin..
 ===========
 */
 void cmd_custom(gentity_t *ent) {
-	char *tag, *log;
-
-	tag = sortTag(ent);
-
+	char *log;
+	
 	if (!strcmp(ent->client->pers.cmd2, "")) {
-		CP(va("print \"^Error^7: Command ^1%s ^7must have a value!\n\"", ent->client->pers.cmd1));
+		CP(va("print \"^1Error^7: Command ^1%s ^7must have a value!\n\"", ent->client->pers.cmd1));
 		return;
 	}
 	else {
@@ -169,7 +173,7 @@ void cmd_custom(gentity_t *ent) {
 		if (!strcmp(ent->client->pers.cmd3, "@"))
 			CP(va("print \"Info: ^2%s ^7was silently changed to ^2%s^7!\n\"", ent->client->pers.cmd1, ent->client->pers.cmd2));
 		else
-			AP(va("chat \"console: %s ^7changed ^3%s ^7to ^3%s %s\n\"", tag, ent->client->pers.cmd1, ent->client->pers.cmd2, ent->client->pers.cmd3));
+			AP(va("chat \"console: %s ^7changed ^3%s ^7to ^3%s %s\n\"", sortTag(ent), ent->client->pers.cmd1, ent->client->pers.cmd2, ent->client->pers.cmd3));
 
 		// Change the stuff
 		trap_SendConsoleCommand(EXEC_APPEND, va("%s %s %s", ent->client->pers.cmd1, ent->client->pers.cmd2, ent->client->pers.cmd3));
@@ -213,18 +217,16 @@ void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore) {
 	int count = 0;
 	int i;
 	int nums[MAX_CLIENTS];
-	char *tag, *log;
+	char *log;
 	char *action = (dIgnore ? "ignored" : "unignored");	
-
-	tag = sortTag(ent);
-
+	
 	count = ClientNumberFromNameMatch(ent->client->pers.cmd2, nums);
 	if (count == 0){
-		CP("print \"^Error^7: Client not on server!\n\"");
+		CP("print \"^1Error^7: Client not on server!\n\"");
 		return;
 	}
 	else if (count > 1) {
-		CP(va("print \"^Error^7: Too many people with ^1%s ^7in their name!\n\"", ent->client->pers.cmd2));
+		CP(va("print \"^1Error^7: Too many people with ^1%s ^7in their name!\n\"", ent->client->pers.cmd2));
 		return;
 	}
 
@@ -234,13 +236,13 @@ void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore) {
 			return;
 
 		if (g_entities[nums[i]].client->sess.ignored == dIgnore){
-			CP(va("print \"^Error^7: Player %s ^7is already %s!\n\"", g_entities[nums[i]].client->pers.netname, action));
+			CP(va("print \"^1Error^7: Player %s ^7is already %s!\n\"", g_entities[nums[i]].client->pers.netname, action));
 			return;
 		}
 		else
 			g_entities[nums[i]].client->sess.ignored = dIgnore;
 
-		AP(va("chat \"console: %s has ^3%s ^7player %s^7!\n\"", tag, action, g_entities[nums[i]].client->pers.netname));
+		AP(va("chat \"console: %s has ^3%s ^7player %s^7!\n\"", sortTag(ent), action, g_entities[nums[i]].client->pers.netname));
 
 		// Log it
 		log = va("Player %s (IP: %s) has %s user %s.",
@@ -259,6 +261,7 @@ Ready or unready all..
 */
 void cmd_readyHandle(gentity_t *ent, qboolean unready) {
 	char *msg = ((unready) ? "^3UNREADY^7" : "^3READY^7");
+	char *log;
 
 	if (!g_doWarmup.integer) {
 		CP("print \"Tourny mode is disabled! Command ignored..\n\"");
@@ -280,5 +283,98 @@ void cmd_readyHandle(gentity_t *ent, qboolean unready) {
 		}
 		G_readyReset(qtrue);
 		AP(va("chat \"console: Countdown has been ^3cancelled ^7by %s..\n\"", sortTag(ent)));
-	}	
+	}
+
+	// Log it
+	log = va("Player %s (IP: %s) has %s users.",
+		ent->client->pers.netname, clientIP(ent, qtrue), msg);
+	admLog(log);
+}
+
+/*
+==================
+Speclock/unlock
+==================
+*/
+qboolean specAlready(int team, qboolean lock) {
+	if (team > 0 && team < 3) {
+		if (teamInfo[team].spec_lock == lock)
+			return qtrue;
+		else
+			return qfalse;
+	}
+	else if (team == 3) {
+		if ((teamInfo[TEAM_RED].spec_lock == lock) &&
+			(teamInfo[TEAM_BLUE].spec_lock == lock))
+			return qtrue;
+		else
+			return qfalse;
+	}
+	return qfalse;
+}
+
+void cmd_specHandle(gentity_t *ent, qboolean lock) {
+	int team;
+	char *act = ((lock) ? "locked" : "unlocked");
+	char *log;
+
+	if (!ent->client->pers.cmd2) {
+		CP(va("print \"^1Error: ^7You need to specify a team!\nUse ^3?spec%s ^7for help.\n\"", (lock ? "lock" : "unlock")));
+		return;
+	}
+
+#define STM(x) !(strcmp(ent->client->pers.cmd2,x))
+
+	if (STM("both")) {
+		team = 3;
+	}
+	else if (STM("red") || STM("axis"))	{
+		team = TEAM_RED;
+	}
+	else if (STM("blue") || STM("allied") || STM("allies")) {
+		team = TEAM_BLUE;
+	}
+	else {
+		CP(va("print \"^1Error: ^7Unknown argument ^1%s^7!\nUse ^1?spec%s ^7for help.\n\"",
+			ent->client->pers.cmd2, (lock ? "lock" : "unlock")));
+		return;
+	}
+
+	if (specAlready(team, lock)) {
+		CP(va("print \"^1Error^7: %s already spec%s!\n\"",
+			((team == 3) ? "^3Both ^7teams are" : va("Team %s is", aTeams[team])), act));
+		return;
+	}
+
+	// Sanity check
+	if (lock) {
+		if (team == TEAM_BLUE && !level.alliedPlayers) {
+			CP(va("print \"^1Error^7: %s team has no players!\n\"", aTeams[team]));
+			return;
+		}
+		else if (team == TEAM_RED && !level.axisPlayers) {
+			CP(va("print \"^1Error^7: %s team has no players!\n\"", aTeams[team]));
+			return;
+		}
+		else if (team == TEAM_SPECTATOR && (!level.axisPlayers || !level.alliedPlayers)) {
+			CP("print \"^1Error^7: Not all teams have players!\n\"");
+			return;
+		}
+	}
+
+	if (team != 3) {
+		G_updateSpecLock(team, lock);
+	}
+	else {
+		G_updateSpecLock(TEAM_RED, lock);
+		G_updateSpecLock(TEAM_BLUE, lock);
+	}
+
+	aTeams[team] = (team == 3) ? "^3Both^7" : aTeams[team];
+	AP(va("chat \"console: ^7%s has spec%s %s team%s\"", sortTag(ent), act, aTeams[team], ((team == 3) ? "s" : "")));
+
+	// Log it
+	log = va("Player %s (IP: %s) has %s team(s).",
+		ent->client->pers.netname, clientIP(ent, qtrue), act);
+	admLog(log);
 }

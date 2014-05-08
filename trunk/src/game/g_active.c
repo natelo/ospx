@@ -427,7 +427,8 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 		( client->sess.sessionTeam == TEAM_SPECTATOR ) && // don't let dead team players do free fly
 		( client->sess.spectatorState == SPECTATOR_FOLLOW ) &&
 		( client->buttons & BUTTON_ACTIVATE ) &&
-		!( client->oldbuttons & BUTTON_ACTIVATE ) ) {
+		!( client->oldbuttons & BUTTON_ACTIVATE ) &&
+		G_allowFollow(ent, TEAM_RED) && G_allowFollow(ent, TEAM_BLUE) ) { // OSPx - Speclock
 		// code moved to StopFollowing
 		StopFollowing( ent );
 	}
@@ -1511,6 +1512,10 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 	} else {
 		ent->client->ps.pm_flags &= ~PMF_SCOREBOARD;
 	}
+
+	// OSPx - Speclock
+	ent->client->ps.powerups[PW_BLACKOUT] = (G_blockoutTeam(ent, TEAM_RED) * TEAM_RED) |
+											(G_blockoutTeam(ent, TEAM_BLUE) * TEAM_BLUE);
 }
 
 
@@ -1678,6 +1683,11 @@ while a slow client may have multiple ClientEndFrame between ClientThink.
 */
 void ClientEndFrame( gentity_t *ent ) {
 	int i;
+
+	// OSPx
+	// used for informing of speclocked teams.
+	// Zero out here and set only for certain specs
+	ent->client->ps.powerups[PW_BLACKOUT] = 0;
 
 	if ( ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) || ( ent->client->ps.pm_flags & PMF_LIMBO ) ) { // JPW NERVE
 		SpectatorClientEndFrame( ent );

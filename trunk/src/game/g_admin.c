@@ -219,6 +219,8 @@ static const cmd_reference_t userCmd[] = {
 	{ "unignore",		cmd_ignoreHandle,	qfalse,	"!unignore <unique part of name>",	"Restores ability to (v)chat or call votes to a targeted player." },
 	{ "allready",		cmd_readyHandle,	qfalse,	"!allready",						"Sets status of both teams as Ready and goes to countdown." },
 	{ "unreadyall",		cmd_readyHandle,	qtrue,	"!unreadyall",						"Cancels countdown and returns match back in warmup state." },
+	{ "speclock",		cmd_specHandle,		qtrue,	"!speclock <a|b|both>",				"Locks a player's team from spectators." },
+	{ "specunlock",		cmd_specHandle,		qfalse,	"!specunlock <a|b|both>",			"Unlocks a player's team from spectators" },
 	{ 0,				NULL,				qfalse,	0,									0 }
 };
 

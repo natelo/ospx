@@ -854,6 +854,10 @@ typedef struct {
 	// Ready
 	qboolean readyAll;
 	qboolean readyPrint;
+
+	// Track players
+	int alliedPlayers;
+	int axisPlayers;
 // -OSPx
 
 } level_locals_t;
@@ -1152,6 +1156,7 @@ void G_RunClient( gentity_t *ent );
 // g_team.c
 //
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
+// OSPx
 extern char *aTeams[TEAM_NUM_TEAMS];
 extern team_info teamInfo[TEAM_NUM_TEAMS];
 qboolean G_teamJoinCheck(int team_num, gentity_t *ent);
@@ -1159,6 +1164,13 @@ qboolean G_playersReady(void);
 void G_readyReset(qboolean aForced);
 void G_readyStart(void);
 void G_swapTeamLocks(void);
+int G_blockoutTeam(gentity_t *ent, int nTeam);
+qboolean G_allowFollow(gentity_t *ent, int nTeam);
+qboolean G_desiredFollow(gentity_t *ent, int nTeam);
+void G_updateSpecLock(int nTeam, qboolean fLock);
+void G_setClientSpeclock(gentity_t *ent);
+void G_removeSpecInvite(int team);
+// -OSPx
 
 //
 // g_mem.c
@@ -1376,6 +1388,7 @@ extern vmCvar_t server_autoconfig;
 extern vmCvar_t g_fixedphysics;
 
 extern vmCvar_t team_maxplayers;
+extern vmCvar_t team_nocontrols;
 
 extern vmCvar_t match_warmupDamage;
 extern vmCvar_t match_mutespecs;
@@ -1688,12 +1701,18 @@ void cmd_custom(gentity_t *ent);
 void cmd_incognito(gentity_t *ent, qboolean fParam);
 void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore);
 void cmd_readyHandle(gentity_t *ent, qboolean unready);
+void cmd_specHandle(gentity_t *ent, qboolean lock);
 
 //
 // g_players.c
 //
 void pCmd_Players(gentity_t *ent);
 void G_ready_cmd(gentity_t *ent, qboolean state);
+void cmd_specInvite(gentity_t *ent);
+void cmd_specUnInvite(gentity_t *ent);
+void cmd_uninviteAll(gentity_t *ent);
+void cmd_speclock(gentity_t *ent, qboolean lock);
+
 
 //
 // g_files.c

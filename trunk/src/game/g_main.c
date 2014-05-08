@@ -193,6 +193,7 @@ vmCvar_t g_fixedphysics;
 
 // Game
 vmCvar_t team_maxplayers;
+vmCvar_t team_nocontrols;
 
 vmCvar_t match_warmupDamage;
 vmCvar_t match_mutespecs;
@@ -366,6 +367,7 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_fixedphysics, "g_fixedphysics", "1", CVAR_ARCHIVE | CVAR_SERVERINFO },
 
 	{ &team_maxplayers, "team_maxplayers", "0", 0, 0, qfalse, qfalse },
+	{ &team_nocontrols, "team_nocontrols", "1", CVAR_ARCHIVE, 0, qfalse },
 
 	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
 	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
@@ -2755,6 +2757,28 @@ void G_RunThink( gentity_t *ent ) {
 
 /*
 ================
+OSPx - sortedActivePlayers
+
+Sort players per teams so we can re-use this call where need it..
+================
+*/
+void sortedActivePlayers(void) {
+	int i;
+	level.axisPlayers = 0;
+	level.alliedPlayers = 0;
+
+	for (i = 0; i < level.maxclients; i++){
+		if (level.clients[i].pers.connected != CON_CONNECTED)
+			continue;
+		if (level.clients[i].sess.sessionTeam == TEAM_RED)
+			level.axisPlayers++;
+		if (level.clients[i].sess.sessionTeam == TEAM_BLUE)
+			level.alliedPlayers++;
+	}
+}
+
+/*
+================
 G_RunFrame
 
 Advances the non-player objects in the world
@@ -2971,4 +2995,7 @@ void G_RunFrame( int levelTime ) {
 
 	// Ridah, check if we are reloading, and times have expired
 	CheckReloadStatus();
+
+	// OSPx - Track active players (per team)
+	sortedActivePlayers();
 }

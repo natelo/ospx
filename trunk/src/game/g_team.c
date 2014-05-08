@@ -1708,3 +1708,106 @@ void G_swapTeamLocks(void) {
 	teamInfo[TEAM_BLUE].spec_lock = fLock;
 }
 
+/*
+=============
+Speclock
+=============
+*/
+// Return blockout status for a player
+int G_blockoutTeam(gentity_t *ent, int nTeam) {
+	return(!G_allowFollow(ent, nTeam));
+}
+
+// Figure out if we are allowed/want to follow a given player
+qboolean G_allowFollow(gentity_t *ent, int nTeam) {
+
+	if (level.time - level.startTime > 2500) {
+		if (TeamCount(-1, TEAM_RED) == 0) {
+			teamInfo[TEAM_RED].spec_lock = qfalse;
+		}
+		if (TeamCount(-1, TEAM_BLUE) == 0) {
+			teamInfo[TEAM_BLUE].spec_lock = qfalse;
+		}
+	}
+
+	return((!teamInfo[nTeam].spec_lock || ent->client->sess.sessionTeam != TEAM_SPECTATOR || (ent->client->sess.specInvited & nTeam) == nTeam));
+}
+
+// Figure out if we are allowed/want to follow a given player
+qboolean G_desiredFollow(gentity_t *ent, int nTeam) {
+	if (G_allowFollow(ent, nTeam) &&
+		(ent->client->sess.specLocked == 0 || ent->client->sess.specLocked == nTeam)) {
+		return(qtrue);
+	}
+	return(qfalse);
+}
+
+// Update specs for blackout, as needed
+void G_updateSpecLock(int nTeam, qboolean fLock) {
+	int i;
+	gentity_t *ent;
+
+	teamInfo[nTeam].spec_lock = fLock;
+	for (i = 0; i < level.numConnectedClients; i++) {
+		ent = g_entities + level.sortedClients[i];
+
+		if (ent->client->sess.admin) {
+			continue;
+		}
+
+		ent->client->sess.specInvited &= ~nTeam;
+
+		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+			continue;
+		}
+
+		if (!fLock) {
+			continue;
+		}
+
+		if (ent->client->sess.spectatorState == SPECTATOR_FOLLOW) {
+			StopFollowing(ent);
+			ent->client->sess.specLocked &= ~nTeam;
+		}
+
+		// ClientBegin sets blackout		
+		SetTeam(ent, "s", qtrue);
+	}
+}
+
+// Removes everyone's specinvite for a particular team.
+void G_removeSpecInvite(int team) {
+	int i;
+	gentity_t *cl;
+	qboolean update = qfalse;
+
+	for (i = 0; i < level.numConnectedClients; i++) {
+		cl = g_entities + level.sortedClients[i];
+		if (!cl->inuse || cl->client->sess.admin) {
+			continue;
+		}
+
+		if (cl->client->sess.specInvited >= team) {
+			cl->client->sess.specInvited &= ~team;
+			update = qtrue;
+		}
+	}
+	if (update)
+		G_updateSpecLock(team, qtrue);
+}
+
+// Set player's spec status after logout/voted out..
+void G_setClientSpeclock(gentity_t *ent) {
+	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR &&
+		!ent->client->sess.specInvited &&
+		(teamInfo[TEAM_RED].spec_lock || teamInfo[TEAM_BLUE].spec_lock))
+	{
+		SetTeam(ent, "s", qtrue);
+	}		
+	// This needs to get tested under various conditions
+	else if (teamInfo[TEAM_RED].spec_lock || teamInfo[TEAM_BLUE].spec_lock)
+	{
+		G_updateSpecLock(ent->client->sess.specInvited, qtrue);
+	}
+}
+
