@@ -1730,7 +1730,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
 	}
 
-	trap_SendServerCommand( -1, va( "print \"[lof]%s [lon]called a vote.\n\"", ent->client->pers.netname ) );
+	trap_SendServerCommand( -1, va( "print \"%s ^7called a vote.\n\"", ent->client->pers.netname ) );
 
 	// start the voting, the caller autoamtically votes yes
 	level.voteTime = level.time;

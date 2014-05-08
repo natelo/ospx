@@ -495,7 +495,7 @@ void pCmd_speclock(gentity_t *ent, qboolean lock) {
 
 /*
 ===========
-Admin structure
+Player's structure
 ===========
 */
 typedef struct {

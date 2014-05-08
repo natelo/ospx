@@ -2622,9 +2622,22 @@ static void CG_PausePrint(void) {
 	if (cg.warmup)
 		return;
 
-	if (cgs.pauseState) {
-		s = va("%s", CG_TranslateString(va("(^1PAUSED^7) Resumimg Match in %i", cgs.levelStartTime)));
-		cgs.fadeAlpha = .1;
+	if (cgs.match_paused == PAUSE_ON) {
+		s = va("%s", CG_TranslateString(va("(^1PAUSED^7) Timeout expires in %i", cgs.match_resumes - cgs.match_expired )));
+
+		if (cg.time > cgs.match_stepTimer) {
+			cgs.match_expired++;
+			cgs.match_stepTimer = cg.time + 1000;
+		}
+		//cgs.fadeAlpha = .1;
+	}
+	else if (cgs.match_paused == PAUSE_RESUMING) {
+		s = va("%s", CG_TranslateString(va("^3PREPARE TO FIGHT! ^7Resumimg Match in %i", 8 - cgs.match_expired )));
+		
+		if (cg.time > cgs.match_stepTimer) {
+			cgs.match_expired++;
+			cgs.match_stepTimer = cg.time + 1000;
+		}
 	}
 	else {
 		return;

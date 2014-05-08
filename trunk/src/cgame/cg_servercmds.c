@@ -321,11 +321,25 @@ void CG_ParseReady(const char *pState) {
 ================
 OSPx - Pause
 
-Parse Pause state
+Parse & Sort Pause state so client can work with it..
 ================
 */
-void CG_ParsePause(const char *pState) {
-	cgs.pauseState = atoi(pState);
+void CG_ParsePause(const char *pTime) {	
+	if (atoi(pTime) == 10000) {
+		cgs.match_paused = PAUSE_RESUMING;
+		cgs.match_resumes = 0;
+		cgs.match_expired = 0;
+	}
+	else if (atoi(pTime) > 0) {
+		cgs.match_paused = PAUSE_ON;
+		cgs.match_resumes = atoi(pTime);
+		cgs.match_expired = 0;
+	}
+	else {
+		cgs.match_paused = PAUSE_NONE;
+		cgs.match_resumes = 0;
+		cgs.match_expired = 0;
+	}
 }
 
 /*
@@ -339,6 +353,17 @@ void CG_SetConfigValues( void ) {
 #ifdef MISSIONPACK
 	const char *s;
 #endif
+	// OSPx - Pause
+	int pState = atoi(CG_ConfigString(CS_PAUSED));
+	cgs.match_resumes = (pState > 0 ? pState : 0);
+
+	if (pState && pState == 10000)
+		cgs.match_paused = PAUSE_RESUMING;
+	else if (pState && (pState > 0 && pState < 10000))
+		cgs.match_paused = PAUSE_ON;
+	else if (!pState || pState == 0)
+		cgs.match_paused = PAUSE_NONE;
+	// -OSPx
 
 	cgs.scores1 = atoi( CG_ConfigString( CS_SCORES1 ) );
 	cgs.scores2 = atoi( CG_ConfigString( CS_SCORES2 ) );
@@ -350,8 +375,6 @@ void CG_SetConfigValues( void ) {
 	CG_ParseReinforcementTimes(CG_ConfigString(CS_REINFSEEDS));
 	// Ready	
 	CG_ParseReady(CG_ConfigString(CS_READY));
-	// L0 - Pause
-	CG_ParsePause(CG_ConfigString(CS_PAUSED));
 // -OSPx
 }
 
@@ -430,13 +453,13 @@ static void CG_ConfigStringModified( void ) {
 // OSPx 
 	// Set reinforcement times for each team
 	} else if (num == CS_REINFSEEDS) {
-		CG_ParseReinforcementTimes(str);
+		CG_ParseReinforcementTimes( str );
 	// Ready
 	} else if (num == CS_READY) {
-		CG_ParseReady(str);
+		CG_ParseReady( str );
 	// Pause
 	} else if (num == CS_PAUSED) {
-		CG_ParsePause(str);
+		CG_ParsePause( str );
 // OSPx
 	} else if ( num == CS_LEVEL_START_TIME ) {
 		cgs.levelStartTime = atoi( str );

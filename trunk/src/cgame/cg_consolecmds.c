@@ -889,6 +889,12 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand("specuninvite");
 	trap_AddCommand("specuninviteall");
 
+	// Pause
+	trap_AddCommand("pause");
+	trap_AddCommand("unpause");
+	trap_AddCommand("timein");
+	trap_AddCommand("timeout");
+
 	// Misc
 	trap_AddCommand("time");
 	trap_AddCommand("currenttime");

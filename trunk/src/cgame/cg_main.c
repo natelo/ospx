@@ -2522,11 +2522,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 // OSPx
 	// Reinforcements offset
 	CG_ParseReinforcementTimes(CG_ConfigString(CS_REINFSEEDS));
-
-	// Pause	
-	// So if client disconnects during pause..
-	if (!cgs.pauseState)
-		cgs.fadeAlpha = 0;
 // -OSPx
 
 // JPW NERVE -- pick a direction for smoke drift on the client -- cheap trick because it can be different on different clients, but who cares?

@@ -1661,6 +1661,14 @@ typedef struct {
 
 } cgMedia_t;
 
+// OSPx - Pause states
+typedef enum {
+	PAUSE_NONE,
+	PAUSE_ON,
+	PAUSE_RESUMING
+} cPauseSts_t;
+// -OSPx
+
 
 // The client game static (cgs) structure hold everything
 // loaded or calculated from the gamestate.  It will NOT
@@ -1775,7 +1783,10 @@ typedef struct {
 	int readyState;
 
 	// Pause
-	int pauseState;
+	cPauseSts_t match_paused;
+	int match_resumes;
+	int match_expired;
+	int match_stepTimer;
 
 	// Stats
 	gameStats_t gamestats;

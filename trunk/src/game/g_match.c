@@ -222,41 +222,36 @@ void G_delayPrint(gentity_t *dpent) {
 			if (level.match_pause > PAUSE_UNPAUSING) {
 				int cSeconds = match_timeoutlength.integer * 1000 - (level.time - dpent->timestamp);
 
-				if (cSeconds > 1000) {
-					//AP(va("cp \"Match resuming in ^1%d^7 seconds!\n\"", cSeconds / 1000));
-					think_next = level.time + 15000;
-					fFree = qfalse;
+				if (cSeconds > 1000) {					
+					think_next = level.time + 1000;
+					fFree = qfalse;					
 				}
 				else {
 					level.match_pause = PAUSE_UNPAUSING;
-					AP("cp \"Resuming..Prepare to fight^2!\n\"2");
-					G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
-					AAPS("sound/match/prepare.wav");
+					G_spawnPrintf(DP_UNPAUSING, level.time + 7, NULL);
+					AAPS("sound/match/prepare.wav");					
 				}
-				trap_SetConfigstring(CS_PAUSED, va("%d", cSeconds/1000));
-			}
+			}			
 			break;
 		}
 
 		case DP_UNPAUSING:
 		{
 			if (level.match_pause == PAUSE_UNPAUSING) {
-				int cSeconds = 11 * 1000 - (level.time - dpent->timestamp);
+				int cSeconds = 8 * 1000 - (level.time - dpent->timestamp);
 
-				if (cSeconds > 1000) {
-					AP(va("cp \"Match resuming in ^3%d^7 seconds!\n\"", cSeconds / 1000));
+				if (cSeconds > 1000) {					
 					think_next = level.time + 1000;
 					fFree = qfalse;
 					AAPS(va("sound/match/cn_%d.wav", cSeconds / 1000));
 				}
 				else {
 					level.match_pause = PAUSE_NONE;					
-					AP("print \"^1FIGHT!\n\"");
-					AP("cp \"\n\"3");	// Clears the screen..
+					AP("print \"^1FIGHT!\n\"");					
 					AAPS("sound/match/fight.wav");
-					trap_SetConfigstring(CS_LEVEL_START_TIME, va("%i", level.startTime + level.timeDelta));
+					trap_SetConfigstring(CS_PAUSED, "0");
+					trap_SetConfigstring(CS_LEVEL_START_TIME, va("%i", level.startTime + level.timeDelta));					
 				}
-				trap_SetConfigstring(CS_PAUSED, 0);
 			}
 			break;
 		}
@@ -297,5 +292,11 @@ void G_spawnPrintf(int print_type, int print_time, gentity_t *owner) {
 	ent->timestamp = level.time;
 
 	ent->nextthink = print_time;
-	ent->think = G_delayPrint;
+	ent->think = G_delayPrint;		
+	
+	// Set it here so client can do it's own magic..
+	if (print_type == DP_PAUSEINFO)
+		trap_SetConfigstring(CS_PAUSED, va("%d", match_timeoutlength.integer));
+	else if (print_type == DP_UNPAUSING)
+		trap_SetConfigstring(CS_PAUSED, "10000");
 }
