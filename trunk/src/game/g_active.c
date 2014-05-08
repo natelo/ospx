@@ -1472,7 +1472,9 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 			cl = &level.clients[ clientNum ];
 			if ( cl->pers.connected == CON_CONNECTED && cl->sess.sessionTeam != TEAM_SPECTATOR ) {
 				// DHM - Nerve :: carry flags over
+				int ping = ent->client->ps.ping;
 				flags = ( cl->ps.eFlags & ~( EF_VOTED ) ) | ( ent->client->ps.eFlags & ( EF_VOTED ) );
+
 				// JPW NERVE -- limbo latch
 				if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->ps.pm_flags & PMF_LIMBO ) {
 					// abuse do_respawn var
@@ -1494,8 +1496,11 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 					ent->client->ps.pm_flags |= PMF_FOLLOW;
 				}
 				// jpw
+
 				// DHM - Nerve :: carry flags over
 				ent->client->ps.eFlags = flags;
+				ent->client->ps.ping = ping;
+
 				return;
 			} else {
 				// drop them to free spectators unless they are dedicated camera followers
