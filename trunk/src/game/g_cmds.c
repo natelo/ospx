@@ -777,9 +777,11 @@ void SetTeam(gentity_t *ent, char *s, qboolean forced) {
 		client->sess.spectatorTime = level.time;
 	}
 
+	client->sess.specLocked = 0;
 	client->sess.sessionTeam = team;
 	client->sess.spectatorState = specState;
 	client->sess.spectatorClient = specClient;
+	client->pers.ready = qfalse;
 
 	if ( team == TEAM_RED ) {
 		AP(va( "print \"[lof]%s" S_COLOR_WHITE " [lon]joined the ^1Axis ^7team.\n\"", client->pers.netname ) );
@@ -795,6 +797,12 @@ void SetTeam(gentity_t *ent, char *s, qboolean forced) {
 	ClientUserinfoChanged( clientNum );
 
 	ClientBegin( clientNum );
+
+	// OSPx- ET Port ..
+	// ydnar: restore old respawn count (players cannot jump from team to team to regain lives)
+	if (ent->client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0 && oldTeam != TEAM_SPECTATOR) {
+		client->ps.persistant[PERS_RESPAWNS_LEFT] = client->ps.persistant[PERS_RESPAWNS_LEFT];
+	}
 }
 
 // DHM - Nerve
@@ -922,9 +930,47 @@ void Cmd_Follow_f( gentity_t *ent ) {
 		return;
 	}
 
+	// OSPx - Et port..
+	if (ent->client->ps.pm_flags & PMF_LIMBO) {
+		CP("print \"Can't issue a follow command while in limbo.\n\"");
+		CP("print \"Hit FIRE to switch between teammates.\n\"");
+		return;
+	}
+
 	trap_Argv( 1, arg, sizeof( arg ) );
 	i = ClientNumberFromString( ent, arg );
 	if ( i == -1 ) {
+		// OSPx - Account for speclock & empty teams
+		if (!Q_stricmp(arg, "allies")) {
+			i = TEAM_BLUE;
+		}
+		else if (!Q_stricmp(arg, "axis")) {
+			i = TEAM_RED;
+		}
+		else { return; }
+
+		if (!TeamCount(ent - g_entities, i)) {
+			CP(va("print \"The %s team %s empty! Follow command ignored.\n\"", aTeams[i],
+				((ent->client->sess.sessionTeam != i) ? "is" : "would be")));
+			return;
+		}
+
+		// Allow for simple toggle
+		if (ent->client->sess.specLocked != i) {
+			if (teamInfo[i].spec_lock && !(ent->client->sess.specInvited & i)) {
+				CP(va("print \"Sorry, the %s team is locked from spectators.\n\"", aTeams[i]));
+			}
+			else {
+				ent->client->sess.specLocked = i;
+				CP(va("print \"Spectator follow is now locked on the %s team.\n\"", aTeams[i]));
+				Cmd_FollowCycle_f(ent, 1);
+			}
+		}
+		else {
+			ent->client->sess.specLocked = 0;
+			CP(va("print \"%s team spectating is now disabled.\n\"", aTeams[i]));
+		}
+		// -OSPx
 		return;
 	}
 

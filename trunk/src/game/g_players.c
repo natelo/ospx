@@ -384,6 +384,9 @@ void cmd_speclock(gentity_t *ent, qboolean lock) {
 		G_updateSpecLock(team, lock);
 		AP(va("cp \"%s is now ^3SPEC%s\"2", aTeams[team], (lock ? "LOCKED" : "UNLOCKED")));
 
+		if (lock) {
+			CP("print \"Use ^3specinvite^7 to invite people to spectate.\n\"");
+		}
 	}
 	else { CP(va("print \"Spectators can't use ^3spec%s ^7command!\n\"", (lock ? "lock" : "unlock"))); }
 }
