@@ -510,9 +510,11 @@ void limbo( gentity_t *ent, qboolean makeCorpse ) {
 		}
 
 		for ( i = 0 ; i < level.maxclients ; i++ ) {
-			if ( level.clients[i].ps.pm_flags & PMF_LIMBO
-				 && level.clients[i].sess.spectatorClient == ent->s.number ) {
-				Cmd_FollowCycle_f( &g_entities[i], 1 );
+			gclient_t *cl = &level.clients[level.sortedClients[i]];
+			if (((cl->ps.pm_flags & PMF_LIMBO) ||
+				(cl->sess.sessionTeam == TEAM_SPECTATOR && cl->sess.spectatorState == SPECTATOR_FOLLOW)) &&
+				cl->sess.spectatorClient == ent - g_entities) { //ent->s.number ) {
+				Cmd_FollowCycle_f(&g_entities[level.sortedClients[i]], 1);
 			}
 		}
 	}
@@ -2264,6 +2266,9 @@ void ClientDisconnect( int clientNum ) {
 				ent->message = NULL;
 			}
 		}
+
+		// OSPx - Log stats too
+		G_LogPrintf("WeaponStats: %s\n", G_createStats(ent));
 	}
 
 	G_LogPrintf( "ClientDisconnect: %i\n", clientNum );
