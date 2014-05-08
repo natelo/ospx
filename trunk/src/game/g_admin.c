@@ -208,22 +208,49 @@ typedef struct {
 	char *command;	
 	void( *pCommand )(gentity_t *ent, qboolean fParam);
 	qboolean fParam;
+	qboolean dWarmup;
 	const char *cUsage;
 	const char *cHelp;	
 } cmd_reference_t;
 
 static const cmd_reference_t userCmd[] = {
-	{ "help",			NULL,				qfalse, "?command",							"Shows property and usage info of specified command." },	
-	{ "incognito",		cmd_incognito,		qfalse,	"!incognito",						"Toggles your Admin status from visible to hidden."  },
-	{ "ignore",			cmd_ignoreHandle,	qtrue,	"!ignore <unique part of name>",	"Takes ability to (v)chat or call votes from a targeted player." },
-	{ "unignore",		cmd_ignoreHandle,	qfalse,	"!unignore <unique part of name>",	"Restores ability to (v)chat or call votes to a targeted player." },
-	{ "allready",		cmd_readyHandle,	qfalse,	"!allready",						"Sets status of both teams as Ready and goes to countdown." },
-	{ "unreadyall",		cmd_readyHandle,	qtrue,	"!unreadyall",						"Cancels countdown and returns match back in warmup state." },
-	{ "speclock",		cmd_specHandle,		qtrue,	"!speclock <a|b|both>",				"Locks a player's team from spectators." },
-	{ "specunlock",		cmd_specHandle,		qfalse,	"!specunlock <a|b|both>",			"Unlocks a player's team from spectators." },
-	{ "pause",			cmd_pauseHandle,	qtrue,	"!pause",							"Pauses a match." },
-	{ "unpause",		cmd_pauseHandle,	qfalse, "!unpause",							"Unpauses a match." },
-	{ 0,				NULL,				qfalse,	0,									0 }
+	{ "help",			NULL,				qfalse,	qtrue,	"?command",								"Shows property and usage info of specified command." },	
+	{ "incognito",		cmd_incognito,		qfalse,	qtrue,	"!incognito",							"Toggles your Admin status from visible to hidden."  },
+	{ "ignore",			cmd_ignoreHandle,	qtrue,	qtrue,	"!ignore <unique part of name>",		"Takes ability to (v)chat or call votes from a targeted player." },
+	{ "unignore",		cmd_ignoreHandle,	qfalse,	qtrue,	"!unignore <unique part of name>",		"Restores ability to (v)chat or call votes to a targeted player." },
+	{ "allready",		cmd_readyHandle,	qfalse,	qtrue,	"!allready",							"Sets status of both teams as Ready and goes to countdown." },
+	{ "unreadyall",		cmd_readyHandle,	qtrue,	qtrue,	"!unreadyall",							"Cancels countdown and returns match back in warmup state." },
+	{ "speclock",		cmd_specHandle,		qtrue,	qtrue,	"!speclock <a|b|both>",					"Locks a player's team from spectators." },
+	{ "specunlock",		cmd_specHandle,		qfalse,	qtrue,	"!specunlock <a|b|both>",				"Unlocks a player's team from spectators." },
+	{ "pause",			cmd_pauseHandle,	qtrue,	qfalse,	"!pause",								"Pauses a match." },
+	{ "unpause",		cmd_pauseHandle,	qfalse, qfalse,	"!unpause",								"Unpauses a match." },
+	{ "kick",			cmd_kick,			qfalse, qtrue,	"!kick <unique part of name> <msg>",	"Removes player from a server."},
+	{ "clientkick",		cmd_clientkick,		qfalse, qtrue,	"!clientkick <client slot> <msg>",		"Removes player from a server." },
+	{ "rename",			cmd_rename,			qfalse,	qtrue,	"!rename <client slot> <new name>"		"Renames a players."},
+	{ "slap",			cmd_slap,			qfalse, qtrue,	"!slap <client slot>",					"Does 20 hp damage to a player."},
+	{ "kill",			cmd_kill,			qfalse, qtrue,	"!kill <client slot>",					"Kills a player." },
+	{ "axis",			cmd_forceToTeam,	qfalse, qtrue,	"!axis <unique part of name>",			"Forces a player to Axis team." },
+	{ "allies",			cmd_forceToTeam,	qfalse, qtrue,	"!allies <unique part of name>",		"Forces a player to Allied team."},
+	{ "specs",			cmd_forceToTeam,	qtrue,	qtrue,	"!specs <unique part of name>",			"Forces a player to Spectator team."},
+	{ "exec",			cmd_exec,			qfalse, qtrue,	"!exec <config file>",					"Executes a config file - assuming it exists on a server.." },
+	{ "nextmap",		cmd_nextmap,		qfalse, qtrue,	"!nextmap",								"Loads the nextmap.." },
+	{ "map",			cmd_map,			qfalse, qtrue,	"!map <map name>",						"Loads the map." },
+	{ "vstr",			cmd_vstr,			qfalse, qtrue,	"!vstr <rotation marker>",				"Loads a specific part of map rotation."  },
+	{ "cpa",			cmd_cpa,			qfalse, qtrue,	"!cpa <message>",						"Center prints message to everyone on a server." },
+	{ "cp",				cmd_cp,				qfalse, qtrue,	"!cp <client slot> <message>",			"Center prints a message to a player." },
+	{ "warn",			cmd_warn,			qfalse, qtrue,	"!warn <message>",						"Prints on screen and chat a message to everyone." },
+	{ "chat",			cmd_chat,			qfalse, qtrue,	"!chat <message>",						"Print in chat a message to everyone." },
+	{ "cancelvote",		cmd_cancelvote,		qfalse, qtrue,	"!cancelvote",							"Cancels any vote in progress." },
+	{ "passvote",		cmd_passvote,		qfalse, qtrue,	"!passvote",							"Passes any vote in progress." },
+	{ "restart",		cmd_restart,		qfalse, qtrue,	"!restart",								"Issues a map_restart" },
+	{ "reset",			cmd_resetmatch,		qfalse, qtrue,	"!reset",								"Resets a match."},
+	{ "swap",			cmd_swap,			qfalse, qtrue,	"!swap",								"Swaps the teams." },
+	{ "shuffle",		cmd_shuffle,		qfalse, qtrue,	"!shuffle <@>",							"Shuffles the teams. Use @ to shuffle without reseting a match.." },
+	{ "specs999",		cmd_specs999,		qfalse, qtrue,	"!specs999",							"Moves all lagged out player to spectators." },
+	{ "whereis",		cmd_revealCamper,	qfalse, qtrue,	"!whereis <client slot>",				"Reveals to all the current location of a player." },
+	{ "lock",			cmd_handleTeamLock, qtrue, qtrue,	"!lock <a|b|both>",						"Lock the team(s) so players cannot join." },
+	{ "unlock",			cmd_handleTeamLock, qfalse, qtrue,	"!unlock <a|b|both>",					"Unlocks the team(s) so players can join." },
+	{ 0,				NULL,				qfalse,	qfalse,	0,									0 }
 };
 
 /*
@@ -256,8 +283,11 @@ qboolean userCommands(gentity_t *ent, char *cmd, qboolean pHelp) {
 					va("%s", (uCM->cUsage ? va("\n^3Usage^7: %s\n", uCM->cUsage) : ""))));
 			}
 			// Player executed command..
-			else {				
-				uCM->pCommand(ent, uCM->fParam);
+			else {		
+				if (!level.warmupTime || uCM->dWarmup && level.warmupTime)
+					uCM->pCommand(ent, uCM->fParam);
+				else
+					CP(va("print \"^3Denied^7: %s command cannot be used during warmup!\n\"", uCM->command));
 			}
 
 			wasUsed = qtrue;

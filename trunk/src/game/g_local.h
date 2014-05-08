@@ -917,6 +917,7 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir );
 void SanitizeString(char *in, char *out, qboolean fToLower);
 int ClientNumberFromString(gentity_t *to, char *s);
 int ClientNumberFromNameMatch(char *name, int *matches);
+char *ConcatArgs(int start);
 
 //
 // g_items.c
@@ -1147,6 +1148,7 @@ void QDECL G_Error( const char *fmt, ... );
 void G_UpdateCvars(void);
 // OSPx 
 void G_wipeCvars(void);
+void CheckVote(void);
 
 //
 // g_client.c
@@ -1717,6 +1719,29 @@ void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore);
 void cmd_readyHandle(gentity_t *ent, qboolean unready);
 void cmd_specHandle(gentity_t *ent, qboolean lock);
 void cmd_pauseHandle(gentity_t *ent, qboolean fPause);
+void cmd_kick(gentity_t *ent, qboolean fParam);
+void cmd_clientkick(gentity_t *ent, qboolean fParam);
+void cmd_rename(gentity_t *ent, qboolean fParam);
+void cmd_slap(gentity_t *ent, qboolean fParam);
+void cmd_kill(gentity_t *ent, qboolean fParam);
+void cmd_forceToTeam(gentity_t *ent, qboolean tSpecs);
+void cmd_exec(gentity_t *ent, qboolean fParam);
+void cmd_nextmap(gentity_t *ent, qboolean fParam);
+void cmd_map(gentity_t *ent, qboolean fParam);
+void cmd_vstr(gentity_t *ent, qboolean fParam);
+void cmd_cpa(gentity_t *ent, qboolean fParam);
+void cmd_cp(gentity_t *ent, qboolean fParam);
+void cmd_warn(gentity_t *ent, qboolean fParam);
+void cmd_chat(gentity_t *ent, qboolean fParam);
+void cmd_cancelvote(gentity_t *ent, qboolean fParam);
+void cmd_passvote(gentity_t *ent, qboolean fParam);
+void cmd_restart(gentity_t *ent, qboolean fParam);
+void cmd_resetmatch(gentity_t *ent, qboolean fParam);
+void cmd_swap(gentity_t *ent, qboolean fParam);
+void cmd_shuffle(gentity_t *ent, qboolean fParam);
+void cmd_specs999(gentity_t *ent, qboolean fParam);
+void cmd_revealCamper(gentity_t *ent, qboolean fParam);
+void cmd_handleTeamLock(gentity_t *ent, qboolean tLock);
 
 //
 // g_players.c

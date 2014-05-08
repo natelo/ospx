@@ -107,8 +107,8 @@ void pCmd_Players(gentity_t *ent) {
 			}
 		}
 		
-		if (cl->sess.admin) {
-			strcpy(ref, "REF");
+		if (cl->sess.admin && !cl->sess.incognito) {			
+			strcpy(ref, sortTag(ent));
 		}
 		/*
 		if (cl->sess.coach_team) {
