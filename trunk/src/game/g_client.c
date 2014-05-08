@@ -1365,7 +1365,7 @@ char *clientIP(gentity_t *ent, qboolean full)
 			ent->client->sess.ip[0], ent->client->sess.ip[1], ent->client->sess.ip[2], ent->client->sess.ip[3]);
 	}
 	else {
-		return va("%d.%d.*.*", ent->client->sess.ip[0], ent->client->sess.ip[1]);
+		return va("%d.*.*.*", ent->client->sess.ip[0]);
 	}
 }
 

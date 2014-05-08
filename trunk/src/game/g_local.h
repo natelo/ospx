@@ -1747,6 +1747,7 @@ void cmd_handleTeamLock(gentity_t *ent, qboolean tLock);
 // g_players.c
 //
 void pCmd_Players(gentity_t *ent);
+void cmd_getstatus(gentity_t *ent);
 void G_ready_cmd(gentity_t *ent, qboolean state);
 void cmd_specInvite(gentity_t *ent);
 void cmd_specUnInvite(gentity_t *ent);
@@ -1809,3 +1810,6 @@ void G_printMatchInfo(gentity_t *ent, qboolean time);
 // Pause
 #define PAUSE_NONE		0x00	// Match is not paused..
 #define PAUSE_UNPAUSING 0x02    // Pause is about to expire
+
+// Ref tag..
+#define REFEREE	"^3Ref"

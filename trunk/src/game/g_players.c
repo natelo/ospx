@@ -41,7 +41,7 @@ void pCmd_Players(gentity_t *ent) {
 	int user_rate, user_snaps;
 	gclient_t *cl;
 	gentity_t *cl_ent;
-	char n2[MAX_NETNAME], ready[16], ref[16], rate[256];
+	char n1[MAX_NETNAME], ready[16], ref[16], rate[256];
 	char *s, *tc, *coach, userinfo[MAX_INFO_STRING];
 
 
@@ -69,12 +69,13 @@ void pCmd_Players(gentity_t *ent) {
 	max_rate = trap_Cvar_VariableIntegerValue("sv_maxrate");
 
 	for (i = 0; i < level.numConnectedClients; i++) {
-		idnum = level.sortedClients[i]; //level.sortedNames[i];
+		idnum = level.sortedClients[i];
 		cl = &level.clients[idnum];
 		cl_ent = g_entities + idnum;
 
-		SanitizeString(cl->pers.netname, n2, qtrue);
-		n2[26] = 0;
+		SanitizeString(ent->client->pers.netname, n1, qtrue);
+		Q_CleanStr(n1);
+		n1[26] = 0;
 		ref[0] = 0;
 		ready[0] = 0;
 
@@ -131,9 +132,9 @@ void pCmd_Players(gentity_t *ent) {
 		}
 
 		if (ent) {
-			CP(va("print \"%s%s%2d%s^1:%s %-26s^7%s  ^3%s\n\"", ready, tc, idnum, coach, ((ref[0]) ? "^3" : "^7"), n2, rate, ref));
+			CP(va("print \"%s%s%2d%s^1:%s %-26s^7%s  ^3%s\n\"", ready, tc, idnum, coach, ((ref[0]) ? "^3" : "^7"), n1, rate, ref));
 		}
-		else { G_Printf("%s%s%2d%s: %-26s%s  %s\n", ready, tc, idnum, coach, n2, rate, ref); }
+		else { G_Printf("%s%s%2d%s: %-26s%s  %s\n", ready, tc, idnum, coach, n1, rate, ref); }
 
 		cnt++;
 	}
@@ -154,6 +155,114 @@ void pCmd_Players(gentity_t *ent) {
 			}
 		}
 	}
+}
+
+/*
+===========
+Getstatus
+
+NOTE: Hooked under g_cmds.c
+===========
+*/
+void cmd_getstatus(gentity_t *ent) {
+	int	j;
+	// uptime
+	int secs = level.time / 1000;
+	int mins = (secs / 60) % 60;
+	int hours = (secs / 3600) % 24;
+	int days = (secs / (3600 * 24));
+	qboolean teamSpecLocked = qfalse;	
+
+	if (teamInfo[TEAM_RED].spec_lock || teamInfo[TEAM_BLUE].spec_lock)
+		teamSpecLocked = qtrue;
+
+	CP(va("print \"\n^7Server: %s    %s\n\"", sv_hostname.string, getTime()));
+	// N/c..
+	if (teamInfo[TEAM_BLUE].spec_lock || teamInfo[TEAM_RED].spec_lock)
+		CP(va("print \"Speclocked: %s^7\n\"",
+		((teamInfo[TEAM_BLUE].spec_lock && teamInfo[TEAM_RED].spec_lock) ? "^3Both" :
+				((teamInfo[TEAM_BLUE].spec_lock ? "^3Allied" : "^1Axis"))
+			)));
+	if (teamInfo[TEAM_BLUE].team_lock || teamInfo[TEAM_RED].team_lock)
+		CP(va("print \"Teamlocked: %s^7\n\"",
+				( (teamInfo[TEAM_BLUE].team_lock && teamInfo[TEAM_RED].team_lock) ? "^3Both" :
+					( (teamInfo[TEAM_BLUE].team_lock ? "^3Allied" : "^1Axis") )
+				)));
+	CP("print \"^3-----------------------------------------------------------------------------\n\"");
+	CP("print \"^7Slot : Team : Name       : IP              ^7: ^3Nudge  MaxPkts ^7: Status \n\"");
+	CP("print \"^3-----------------------------------------------------------------------------\n\"");
+
+	for (j = 0; j <= (MAX_CLIENTS - 1); j++) {
+
+		if (g_entities[j].client) {
+			char *team, *slot, *ip, *tag = {""};
+			char n1[MAX_NETNAME];
+
+			SanitizeString(ent->client->pers.netname, n1, qtrue);
+			Q_CleanStr(n1);
+			n1[26] = 0;
+
+			// player is connecting
+			if (g_entities[j].client->pers.connected == CON_CONNECTING) {
+				CP(va("print \"%3d  : >><< : %-10s : ^d>>Connecting<<  ^7:\n\"", j, n1));
+			}
+
+			// player is connected
+			if (g_entities[j].client->pers.connected == CON_CONNECTED) {
+
+				// Sort it :C				
+				slot = va("%3d", j);
+				team = (g_entities[j].client->sess.sessionTeam == TEAM_SPECTATOR) ? "^3SPEC^7" :
+					(g_entities[j].client->sess.sessionTeam == TEAM_RED ? "^1Axis^7" : "^4Alld^7");
+								
+				ip = (ent->client->sess.admin == USER_REGULAR) ?
+					va("%s", clientIP(&g_entities[j], qfalse)) :
+					va("%s", clientIP(&g_entities[j], qtrue));
+
+				if (g_entities[j].client->sess.admin && !g_entities[j].client->sess.incognito)
+					tag = sortTag(&g_entities[j]);
+				else if (g_entities[j].client->sess.admin && !g_entities[j].client->sess.incognito && ent->client->sess.admin)
+					tag = va("%s^3*", sortTag(&g_entities[j]));
+				else if (!g_entities[j].client->sess.admin && g_entities[j].client->sess.ignored)
+					tag = "^1Ignored";				
+								
+				// Specing speclocked team (This will override ignored tag but so be it..).
+				if (g_entities[j].client->sess.sessionTeam == TEAM_SPECTATOR &&
+					!g_entities[j].client->sess.admin &&
+					teamSpecLocked) {
+					if (g_entities[j].client->sess.specInvited == 1)
+						tag = "Spec. Axis";
+					else if (g_entities[j].client->sess.specInvited == 2)
+						tag = "Spec. Allies";
+					else if (g_entities[j].client->sess.specInvited == 3)
+						tag = "Spec. Both";
+					else if (teamSpecLocked > 0 && !g_entities[j].client->sess.specInvited)
+						tag = "^3Speclocked";
+					// Hidden admins
+				}
+				else if (g_entities[j].client->sess.sessionTeam == TEAM_SPECTATOR &&
+					g_entities[j].client->sess.admin &&
+					g_entities[j].client->sess.incognito) {
+					tag = "^3Spec. Both";
+				}
+
+				// Print it now
+				CP(va("print \"%-4s : %s : %-10s : %-15s ^7: ^3%5d  %7d ^7%-12s \n\"",
+					slot,
+					team,
+					n1,
+					ip,	
+					g_entities[j].client->pers.clientTimeNudge, 
+					g_entities[j].client->pers.clientMaxPackets,
+					(tag ? va(": %s", tag) : "")
+					));
+			}
+		}
+	}
+	CP("print \"^3-----------------------------------------------------------------------------\n\"");
+	CP(va("print \"^7Uptime: ^3%d ^7day%s ^3%d ^7hours ^3%d ^7minutes\n\"", days, (days != 1 ? "s" : ""), hours, mins));
+	CP("print \"\n\"");
+	return;
 }
 
 /*
