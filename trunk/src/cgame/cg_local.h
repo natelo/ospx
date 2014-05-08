@@ -2001,6 +2001,7 @@ extern vmCvar_t cf_wtopshots;
 
 extern vmCvar_t int_cl_maxpackets;
 extern vmCvar_t int_cl_timenudge;
+extern vmCvar_t int_ui_blackout;
 extern vmCvar_t gender;
 // -OSPx
 

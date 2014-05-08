@@ -322,6 +322,7 @@ vmCvar_t cf_wtopshots;
 // - Mappings
 vmCvar_t int_cl_maxpackets;
 vmCvar_t int_cl_timenudge;
+vmCvar_t int_ui_blackout;
 vmCvar_t gender;
 // -OSPx
 
@@ -561,6 +562,7 @@ cvarTable_t cvarTable[] = {
 
 	{ &int_cl_maxpackets, "cl_maxpackets", "30", CVAR_ARCHIVE },
 	{ &int_cl_timenudge, "cl_timenudge", "0", CVAR_ARCHIVE|CVAR_LATCH },
+	{ &int_ui_blackout, "ui_blackout", "0", CVAR_ROM },
 	{ &gender, "gender", "male", CVAR_ARCHIVE }
 	// -OSPx
 };

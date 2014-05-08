@@ -102,6 +102,10 @@ void cmd_doLogin(gentity_t *ent, qboolean silent) {
 			if (g_extendedLog.integer)
 				logEntry(ADMLOG, log);
 		}
+
+		// Make sure logged in user bypasses any spec lock instantly.
+		ent->client->sess.specInvited = 3;
+
 		return;
 	}
 	else

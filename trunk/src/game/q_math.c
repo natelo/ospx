@@ -92,7 +92,6 @@ vec4_t g_color_table[32] =
 };
 // -OSPx
 
-
 vec3_t bytedirs[NUMVERTEXNORMALS] =
 {
 	{-0.525731, 0.000000, 0.850651}, {-0.442863, 0.238856, 0.864188},

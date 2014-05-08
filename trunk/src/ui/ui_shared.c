@@ -3554,6 +3554,19 @@ static bind_t g_bindings[] =
 	// OSPx	
 	{ "+vstr", -1, -1, -1, -1 },
 	{ "+zoomView", -1, -1, -1, -1 },
+	{ "+stats", -1, -1, -1, -1 },
+	{ "+wstats", -1, -1, -1, -1 },
+	{ "+topshots", -1, -1, -1, -1 },
+	{ "autorecord", -1, -1, -1, -1 },
+	{ "autoScreenshot", -1, -1, -1, -1 },
+	{ "currentTime", -1, -1, -1, -1 },
+	{ "time", -1, -1, -1, -1 },	
+	{ "getstatus", -1, -1, -1, -1 },
+	{ "players", -1, -1, -1, -1 },	
+	{ "sui", -1, -1, -1, -1 },
+	{ "kill", -1, -1, -1, -1 },
+	{ "ready", -1, -1, -1, -1 },
+	{ "notready", -1, -1, -1, -1 },	
 	// -OSPx
 
 	{"weapon 1",     -1,             -1, -1, -1},

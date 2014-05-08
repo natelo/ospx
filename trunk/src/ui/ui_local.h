@@ -137,6 +137,7 @@ extern vmCvar_t ui_crosshairColorAlt;
 extern vmCvar_t ui_crosshairAlpha;
 extern vmCvar_t ui_crosshairAlphaAlt;
 extern vmCvar_t ui_crosshairSize;
+extern vmCvar_t ui_blackout;
 // -OSPx
 
 //

@@ -1061,9 +1061,12 @@ void _UI_Refresh( int realtime ) {
 		uiInfo.uiDC.FPS = 1000 * UI_FPS_FRAMES / total;
 	}
 
-
-
 	UI_UpdateCvars();
+
+	// OSPx - Speclock
+	if (ui_blackout.integer > 0) {
+		UI_FillRect(-10, -10, 650, 490, colorBlack);
+	}
 
 	if ( Menu_Count() > 0 ) {
 		// paint all the menus
@@ -7517,6 +7520,9 @@ vmCvar_t ui_crosshairAlpha;
 vmCvar_t ui_crosshairAlphaAlt;
 vmCvar_t ui_crosshairSize;
 
+// Speclock
+vmCvar_t ui_blackout;
+
 // -OSPx
 
 cvarTable_t cvarTable[] = {
@@ -7653,7 +7659,7 @@ cvarTable_t cvarTable[] = {
 	{ &ui_crosshairAlphaAlt, "cg_crosshairAlphaAlt", "1.0", CVAR_ARCHIVE },
 	{ &ui_crosshairAlpha, "cg_crosshairAlpha", "1.0", CVAR_ARCHIVE },
 
-	//{ NULL, "server_autoconfig", "0", CVAR_ARCHIVE },
+	{ &ui_blackout, "ui_blackout", "0", CVAR_ROM },
 // -OSPx
 
 	{ &ui_hudAlpha, "cg_hudAlpha", "1.0", CVAR_ARCHIVE }
@@ -7675,10 +7681,15 @@ void UI_RegisterCvars( void ) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 	}
 
-	// OSPx - Crosshairs
+// OSPx 
+	// Speclock	
+	trap_Cvar_Set("ui_blackout", "0");
+
+	// Crosshairs
 	BG_setCrosshair(ui_crosshairColor.string, uiInfo.xhairColor, ui_crosshairAlpha.value, "cg_crosshairColor");
 	BG_setCrosshair(ui_crosshairColorAlt.string, uiInfo.xhairColorAlt, ui_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
 	uiInfo.currentCrosshair = ui_drawCrosshair.integer;
+// -OSPx
 }
 
 /*

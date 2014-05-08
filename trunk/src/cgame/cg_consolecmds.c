@@ -882,6 +882,13 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand("logout");
 	trap_AddCommand("getstatus");	
 
+	// Speclock
+	trap_AddCommand("speclock");
+	trap_AddCommand("specunlock");
+	trap_AddCommand("specinvite");
+	trap_AddCommand("specuninvite");
+	trap_AddCommand("specuninviteall");
+
 	// Misc
 	trap_AddCommand("time");
 	trap_AddCommand("currenttime");
