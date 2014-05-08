@@ -37,7 +37,7 @@ char *usrTag(gentity_t *ent, qboolean inquiry) {
 			tag = "Player";
 	}
 	else if (ent->client->sess.admin == USER_REFEREE) {
-		tag = va("%s^7", REFEREE);
+		tag = va("%s", REFEREE);
 	}
 	else if (ent->client->sess.admin == ADMIN_1) {
 		tag = va("%s^7", &a1_tag.string);

@@ -2619,6 +2619,11 @@ void ClientCommand( int clientNum ) {
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
+	// OSPx - New commands for players..
+	if (playerCommandsExt(ent, cmd)) {
+		return;
+	}
+
 	if ( Q_stricmp( cmd, "say" ) == 0 ) {
 		// OSPx - Ignored
 		if (!ent->client->sess.ignored) {
@@ -2714,18 +2719,6 @@ void ClientCommand( int clientNum ) {
 		return;
 	}
 
-	// Players
-	if (Q_stricmp(cmd, "players") == 0) {
-		pCmd_Players(ent);
-		return;
-	}
-
-	// Getstatus
-	if (Q_stricmp(cmd, "getstatus") == 0) {
-		cmd_getstatus(ent);
-		return;
-	}
-
 	// Stats
 	else if (!Q_stricmp(cmd, "wstats"))	{ 
 		G_statsPrint(ent, 1);
@@ -2790,20 +2783,6 @@ void ClientCommand( int clientNum ) {
 // OSPx
 	} else if (Q_stricmp(cmd, "sui") == 0)  {
 		Cmd_SoftKill_f(ent);
-	} else if (Q_stricmp(cmd, "ready") == 0)  {
-		G_ready_cmd(ent, qtrue);
-	} else if (Q_stricmp(cmd, "notready") == 0)  {
-		G_ready_cmd(ent, qfalse);
-	} else if (!Q_stricmp(cmd, "speclock")) { 
-		cmd_speclock(ent, qtrue);		
-	} else if (!Q_stricmp(cmd, "specunlock")) { 
-		cmd_speclock(ent, qfalse); 		
-	} else if (!Q_stricmp(cmd, "specinvite")) { 
-		cmd_specInvite(ent);
-	} else if (!Q_stricmp(cmd, "specuninvite")) { 
-		cmd_specUnInvite(ent);
-	} else if (!Q_stricmp(cmd, "specuninviteall")) { 
-		cmd_uninviteAll(ent);
 // -OSPx
 	} else if ( Q_stricmp( cmd, "levelshot" ) == 0 )  {
 		Cmd_LevelShot_f( ent );

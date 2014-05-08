@@ -1746,14 +1746,7 @@ void cmd_handleTeamLock(gentity_t *ent, qboolean tLock);
 //
 // g_players.c
 //
-void pCmd_Players(gentity_t *ent);
-void cmd_getstatus(gentity_t *ent);
-void G_ready_cmd(gentity_t *ent, qboolean state);
-void cmd_specInvite(gentity_t *ent);
-void cmd_specUnInvite(gentity_t *ent);
-void cmd_uninviteAll(gentity_t *ent);
-void cmd_speclock(gentity_t *ent, qboolean lock);
-
+qboolean playerCommandsExt(gentity_t *ent, char *cmd);
 
 //
 // g_files.c
@@ -1812,4 +1805,4 @@ void G_printMatchInfo(gentity_t *ent, qboolean time);
 #define PAUSE_UNPAUSING 0x02    // Pause is about to expire
 
 // Ref tag..
-#define REFEREE	"^3Ref"
+#define REFEREE	"^3Ref^7"

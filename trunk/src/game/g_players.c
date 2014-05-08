@@ -36,7 +36,7 @@ Created: 5 May/14
 // ************** PLAYERS
 //
 // Show client info
-void pCmd_Players(gentity_t *ent) {
+void pCmd_players(gentity_t *ent, qboolean fParam) {
 	int i, idnum, max_rate, cnt = 0, tteam;
 	int user_rate, user_snaps;
 	gclient_t *cl;
@@ -164,7 +164,7 @@ Getstatus
 NOTE: Hooked under g_cmds.c
 ===========
 */
-void cmd_getstatus(gentity_t *ent) {
+void pCmd_getstatus(gentity_t *ent, qboolean fParam) {
 	int	j;
 	// uptime
 	int secs = level.time / 1000;
@@ -274,23 +274,16 @@ Sets a player's "ready" status.
 Tardo - rewrote this because the parameter handling to the function is different in rtcw.
 ===================
 */
-void G_ready_cmd(gentity_t *ent, qboolean state) {
+void pCmd_ready(gentity_t *ent, qboolean state) {
 	char *status[2] = { "NOT READY", "READY" };
 
 	if (!g_doWarmup.integer) {
 		return;
 	}
-
-	if (g_gamestate.integer == GS_PLAYING || g_gamestate.integer == GS_INTERMISSION) {
-		CP("@print \"Match is already in progress.\n\"");
-		return;
-	}
-
 	if (!state && g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
 		CP("print \"Countdown started, ^3notready^7 ignored.\n\"");
 		return;
 	}
-
 	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
 		CP(va("print \"Specs cannot use ^3%s ^7command.\n\"", status[state]));
 		return;
@@ -325,7 +318,7 @@ Invite player to spectate
 NOTE: Admin can still be invited..so in case logout occurs..
 ===================
 */
-void cmd_specInvite(gentity_t *ent) {
+void pCmd_specInvite(gentity_t *ent, qboolean fParam) {
 	int	target;
 	gentity_t	*player;
 	char arg[MAX_TOKEN_CHARS];
@@ -384,7 +377,7 @@ void cmd_specInvite(gentity_t *ent) {
 unInvite player from spectating
 ===================
 */
-void cmd_specUnInvite(gentity_t *ent) {
+void pCmd_specUnInvite(gentity_t *ent, qboolean fParam) {
 	int	target;
 	gentity_t	*player;
 	char arg[MAX_TOKEN_CHARS];
@@ -443,7 +436,7 @@ void cmd_specUnInvite(gentity_t *ent) {
 Revoke ability from all players to spectate
 ===================
 */
-void cmd_uninviteAll(gentity_t *ent) {
+void pCmd_uninviteAll(gentity_t *ent, qboolean fParam) {
 	int team = ent->client->sess.sessionTeam;
 
 	if (team_nocontrols.integer) {
@@ -475,7 +468,7 @@ void cmd_uninviteAll(gentity_t *ent) {
 Spec lock/unlock team
 ===================
 */
-void cmd_speclock(gentity_t *ent, qboolean lock) {
+void pCmd_speclock(gentity_t *ent, qboolean lock) {
 	int team = ent->client->sess.sessionTeam;
 
 	if (team_nocontrols.integer) {
@@ -498,4 +491,66 @@ void cmd_speclock(gentity_t *ent, qboolean lock) {
 		}
 	}
 	else { CP(va("print \"Spectators can't use ^3spec%s ^7command!\n\"", (lock ? "lock" : "unlock"))); }
+}
+
+/*
+===========
+Admin structure
+===========
+*/
+typedef struct {
+	char *command;
+	void(*pCommand)(gentity_t *ent, qboolean fParam);
+	qboolean fParam;
+	qboolean nWarmup;		// Not allowed in warmup
+	qboolean jWarmup;		// Allowed only in warmup
+	qboolean nIntermission;	// Not allowed during intermission..
+} pCmd_reference_t;
+
+static const pCmd_reference_t pCmd[] = {
+	{ "players",			pCmd_players,		qfalse,	qfalse,	qfalse,	qfalse },
+	{ "getstatus",			pCmd_getstatus,		qfalse,	qfalse,	qfalse,	qfalse },
+	{ "ready",				pCmd_ready,			qfalse, qfalse,	qtrue,	qtrue },
+	{ "notready",			pCmd_ready,			qfalse, qfalse,	qtrue,	qtrue },
+	{ "speclock",			pCmd_speclock,		qtrue,	qfalse,	qfalse,	qtrue },
+	{ "specunlock",			pCmd_speclock,		qfalse, qfalse,	qfalse,	qtrue },
+	{ "specinvite",			pCmd_specInvite,	qtrue,	qfalse,	qfalse,	qtrue },
+	{ "specuninvite",		pCmd_specUnInvite,	qtrue,	qfalse,	qfalse,	qtrue },
+	{ "specuninviteall",	pCmd_uninviteAll,	qtrue,	qfalse,	qfalse,	qtrue },
+	
+	{ 0, NULL, qfalse, qfalse, 0, 0 }
+};
+
+/*
+===========
+Player commands..no help with this one..
+===========
+*/
+qboolean playerCommandsExt(gentity_t *ent, char *cmd) {
+	unsigned int i, \
+		uCmd = ARRAY_LEN(pCmd);
+	const pCmd_reference_t *uCM;
+	qboolean wasUsed = qfalse;
+
+	for (i = 0; i < uCmd; i++) {
+		uCM = &pCmd[i];
+		if (NULL != uCM->command && 0 == Q_stricmp(cmd, uCM->command)) {
+
+			// Warmup check
+			if (level.warmupTime && uCM->nWarmup)
+				CP(va("@print \"%s command cannot be used during warmup!\n\"", uCM->command));
+			// Vice versa
+			else if (!level.warmupTime && uCM->jWarmup)
+				CP(va("@print \"%s command can only be used during warmup!\n\"", uCM->command));
+			// Intermission
+			else if (level.intermissiontime && uCM->nIntermission)
+				CP(va("print \"%s command cannot be used during intermission!\n\"", uCM->command));
+			// We're fine with it...so go for it..
+			else
+				uCM->pCommand(ent, uCM->fParam);
+
+			wasUsed = qtrue;
+		}
+	}
+	return wasUsed;
 }
