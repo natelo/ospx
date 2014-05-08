@@ -226,7 +226,6 @@ void G_delayPrint(gentity_t *dpent) {
 					//AP(va("cp \"Match resuming in ^1%d^7 seconds!\n\"", cSeconds / 1000));
 					think_next = level.time + 15000;
 					fFree = qfalse;
-					trap_SetConfigstring(CS_PAUSED, va("%d", cSeconds));
 				}
 				else {
 					level.match_pause = PAUSE_UNPAUSING;
@@ -234,6 +233,7 @@ void G_delayPrint(gentity_t *dpent) {
 					G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
 					AAPS("sound/match/prepare.wav");
 				}
+				trap_SetConfigstring(CS_PAUSED, va("%d", cSeconds/1000));
 			}
 			break;
 		}
@@ -254,9 +254,9 @@ void G_delayPrint(gentity_t *dpent) {
 					AP("print \"^1FIGHT!\n\"");
 					AP("cp \"\n\"3");	// Clears the screen..
 					AAPS("sound/match/fight.wav");
-					trap_SetConfigstring(CS_LEVEL_START_TIME, va("%i", level.startTime + level.timeDelta));			
-					//trap_SetConfigstring(CS_PAUSED, va("%d",cSeconds / 1000));
+					trap_SetConfigstring(CS_LEVEL_START_TIME, va("%i", level.startTime + level.timeDelta));
 				}
+				trap_SetConfigstring(CS_PAUSED, 0);
 			}
 			break;
 		}

@@ -2624,7 +2624,7 @@ static void CG_PausePrint(void) {
 
 	if (cgs.pauseState) {
 		s = va("%s", CG_TranslateString(va("(^1PAUSED^7) Resumimg Match in %i", cgs.levelStartTime)));
-		cgs.fadeAlpha = .2;
+		cgs.fadeAlpha = .1;
 	}
 	else {
 		return;

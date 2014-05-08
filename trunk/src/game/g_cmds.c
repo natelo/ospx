@@ -676,6 +676,13 @@ void SetTeam(gentity_t *ent, char *s, qboolean forced) {
 		return;
 	}
 
+	// OSPx - Pause check 
+	// NOTE: Admin can still force user/self. but has to be explicitly requested...
+	if (level.match_pause != PAUSE_NONE && !forced) {
+		CPx(clientNum, "cp \"You cannot switch teams while Match is Paused!\n\"");
+		return; // ignore the request
+	}
+
 	// OSPx - New way ..
 	if ( team != TEAM_SPECTATOR && !forced) {
 
@@ -734,7 +741,7 @@ void SetTeam(gentity_t *ent, char *s, qboolean forced) {
 	}
 
 	// DHM - Nerve :: Force players to wait 30 seconds before they can join a new team.
-	if ( g_gametype.integer >= GT_WOLF && team != oldTeam && level.warmupTime == 0 && !client->pers.initialSpawn
+	if ( g_gametype.integer >= GT_WOLF && team != oldTeam && level.warmupTime == 0 && !client->pers.initialSpawn	
 		 && ((level.time - client->pers.connectTime) > 5000) && ((level.time - client->pers.enterTime) < 5000) && !forced ) {
 		CPx( ent - g_entities, va( "cp \"^3You must wait %i seconds before joining ^3a new team.\n\"3", (int)( 5 - ( ( level.time - client->pers.enterTime ) / 1000 ) ) ) );
 		return;

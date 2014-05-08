@@ -2812,9 +2812,6 @@ void G_RunFrame( int levelTime ) {
 		if ((level.time % 500) == 0) {
 			// Respawn and time issuses
 			trap_SetConfigstring(CS_LEVEL_START_TIME, va("%i", level.startTime + level.timeDelta));
-
-			// Print stuff.. FIXME one day...
-			trap_SetConfigstring(CS_PAUSED, va("%i", level.startTime + level.timeDelta));
 		}
 	}
 
