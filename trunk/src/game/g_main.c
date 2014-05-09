@@ -195,7 +195,7 @@ vmCvar_t g_fixedphysics;
 vmCvar_t team_maxplayers;
 vmCvar_t team_nocontrols;
 
-vmCvar_t match_warmupDamage;
+vmCvar_t match_warmupfire;
 vmCvar_t match_mutespecs;
 vmCvar_t match_latejoin;
 vmCvar_t match_minplayers;
@@ -370,7 +370,7 @@ cvarTable_t gameCvarTable[] = {
 	{ &team_maxplayers, "team_maxplayers", "0", 0, 0, qfalse, qfalse },
 	{ &team_nocontrols, "team_nocontrols", "1", CVAR_ARCHIVE, 0, qfalse },
 
-	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
+	{ &match_warmupfire, "match_warmupfire", "1", 0, 0, qfalse },
 	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
 	{ &match_latejoin, "match_latejoin", "1", 0, 0, qfalse, qfalse },
 	{ &match_minplayers, "match_minplayers", "4", 0, 0, qfalse, qfalse },
