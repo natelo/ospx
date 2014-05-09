@@ -1231,11 +1231,11 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	// Admin Chat
 	case SAY_ADMIN:
 		if (ent->client->sess.admin == USER_REGULAR) {
-			CP("print \"^1Error: ^7Private chat is only for Admins, login if you wish to participate^1!\n\"");
+			CP("print \"^1Error: ^7Only Referee and Admins can chat on a private channel.\n\"");
 			return;
 		}
 		G_LogPrintf("say_admin: %s: %s\n", ent->client->pers.netname, chatText);
-		Com_sprintf(name, sizeof(name), "^3Admin Channel(^7%s^3): ", ent->client->pers.netname);
+		Com_sprintf(name, sizeof(name), "^3Private Channel(^7%s^3): ", ent->client->pers.netname);
 		color = COLOR_WHITE;
 		break;
 	// -OSPx
