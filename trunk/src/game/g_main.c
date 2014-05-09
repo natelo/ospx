@@ -190,6 +190,7 @@ vmCvar_t g_showFlags;
 vmCvar_t g_allowSoftKill;
 vmCvar_t server_autoconfig;
 vmCvar_t g_fixedphysics;
+vmCvar_t vote_limit;
 
 // Game
 vmCvar_t team_maxplayers;
@@ -362,10 +363,11 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_extendedLog, "g_extendedLog", "1", CVAR_ARCHIVE, 0, qfalse },
 
 	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },
-	{ &g_showFlags, "g_showFlags", "1", 0 },
+	{ &g_showFlags, "g_showFlags", "1", 0, qfalse, qfalse },
 	{ &g_allowSoftKill, "g_allowSoftKill", "0", CVAR_ARCHIVE, 0, qfalse, qfalse },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
-	{ &g_fixedphysics, "g_fixedphysics", "1", CVAR_ARCHIVE | CVAR_SERVERINFO },
+	{ &g_fixedphysics, "g_fixedphysics", "1", CVAR_ARCHIVE | CVAR_SERVERINFO, qfalse, qfalse },
+	{ &vote_limit, "vote_limit", "3", CVAR_ARCHIVE, qfalse, qfalse },
 
 	{ &team_maxplayers, "team_maxplayers", "0", 0, 0, qfalse, qfalse },
 	{ &team_nocontrols, "team_nocontrols", "1", CVAR_ARCHIVE, 0, qfalse },

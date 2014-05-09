@@ -529,7 +529,6 @@ typedef struct {
 } clientSession_t;
 
 #define MAX_NETNAME         36
-#define MAX_VOTE_COUNT      3
 
 #define PICKUP_ACTIVATE 0   // pickup items only when using "+activate"
 #define PICKUP_TOUCH    1   // pickup items when touched
@@ -1403,6 +1402,7 @@ extern vmCvar_t g_showFlags;
 extern vmCvar_t g_allowSoftKill;
 extern vmCvar_t server_autoconfig;
 extern vmCvar_t g_fixedphysics;
+extern vmCvar_t vote_limit;
 
 extern vmCvar_t team_maxplayers;
 extern vmCvar_t team_nocontrols;
