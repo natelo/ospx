@@ -560,7 +560,9 @@ static const pCmd_reference_t pCmd[] = {					// Properties..
 	{ "specuninvite",		pCmd_specUnInvite,	qtrue,		qfalse,	qfalse,	qtrue },
 	{ "specuninviteall",	pCmd_uninviteAll,	qtrue,		qfalse,	qfalse,	qtrue },
 	{ "pause",				pCmd_pauseHandle,	qtrue,		qtrue,	qfalse,	qtrue },
+	{ "timeout",			pCmd_pauseHandle,	qtrue,		qtrue,	qfalse, qtrue },
 	{ "unpause",			pCmd_pauseHandle,	qfalse,		qtrue,	qfalse,	qtrue },
+	{ "timein",				pCmd_pauseHandle,	qfalse,		qtrue,	qfalse, qtrue },
 
 	{ 0,					NULL,				qfalse,		qtrue,	qtrue,	qtrue }
 };
