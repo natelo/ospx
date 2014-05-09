@@ -2239,7 +2239,7 @@ CG_DrawVote
 static void CG_DrawVote( void ) {
 	char    *s;
 	char str1[32], str2[32];
-	float color[4] = { 1, 1, 0, 1 };
+	float color[4] = { 1, 1, 0.75, 1 };
 	int sec;
 
 	if ( cgs.complaintEndTime > cg.time ) {
@@ -2470,18 +2470,18 @@ static void CG_DrawSpectatorMessage( void ) {
 	if ( !Q_stricmp( str2, "???" ) ) {
 		str2 = "ESCAPE";
 	}
-	str = va( CG_TranslateString( "- Press %s to open Limbo Menu" ), str2 );
-	CG_DrawStringExt( x, y, str, color, qtrue, 0, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
+	str = va( CG_TranslateString( "- Press ^n%s ^7to open Limbo Menu" ), str2 );
+	CG_DrawStringExt( x, y, str, color, qfalse, 0, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
 	y += TINYCHAR_HEIGHT;
 
 	str2 = BindingFromName( "mp_QuickMessage" );
-	str = va( CG_TranslateString( "- Press %s to open quick message menu" ), str2 );
-	CG_DrawStringExt( x, y, str, color, qtrue, 0, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
+	str = va( CG_TranslateString( "- Press ^n%s ^7to open quick message menu" ), str2 );
+	CG_DrawStringExt( x, y, str, color, qfalse, 0, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
 	y += TINYCHAR_HEIGHT;
 
 	str2 = BindingFromName( "+attack" );
-	str = va( CG_TranslateString( "- Press %s to follow next player" ), str2 );
-	CG_DrawStringExt( x, y, str, color, qtrue, 0, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
+	str = va( CG_TranslateString( "- Press ^n%s ^7to follow next player" ), str2 );
+	CG_DrawStringExt( x, y, str, color, qfalse, 0, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
 	y += TINYCHAR_HEIGHT;
 }
 
