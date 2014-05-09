@@ -2782,15 +2782,14 @@ void ClientCommand( int clientNum ) {
 	} else if ( Q_stricmp( cmd, "kill" ) == 0 )  {
 		Cmd_Kill_f( ent );
 // OSPx
+	// Suicide
 	} else if (Q_stricmp(cmd, "sui") == 0)  {
 		Cmd_SoftKill_f(ent);
-	}
-	else if (!Q_stricmp(cmd, "forcetapout")) {
-		if (!ent || !ent->client) {
-			return;
-		}
+	// Instant tapout
+	} else if (!Q_stricmp(cmd, "forcetapout")) {		
 		if (ent->client->ps.stats[STAT_HEALTH] <= 0 &&
-			(ent->client->sess.sessionTeam == TEAM_RED || ent->client->sess.sessionTeam == TEAM_BLUE)) {
+			(ent->client->sess.sessionTeam == TEAM_RED || ent->client->sess.sessionTeam == TEAM_BLUE) ) 
+		{
 			limbo(ent, qtrue);
 		}
 		return;

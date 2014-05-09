@@ -890,6 +890,7 @@ If "g_synchronousClients 1" is set, this will be called exactly
 once for each server frame, which makes for smooth demo recording.
 ==============
 */
+int teamRespawnTime(int team, qboolean warmup); // OSPx
 void ClientThink_real( gentity_t *ent ) {
 	gclient_t   *client;
 	pmove_t pm;
@@ -1336,7 +1337,6 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->client->ps.sprintTime = 20000;
 	}
 
-
 	// check for respawning
 	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
 
@@ -1348,14 +1348,23 @@ void ClientThink_real( gentity_t *ent ) {
 
 		// OSPx - Rewrote this altogether..
 		if (level.time > client->respawnTime  && !(ent->client->ps.pm_flags & PMF_LIMBO)) {
+			qboolean forceTapout = qfalse;
+			int team = client->sess.sessionTeam;
 
 			// wait for the attack button to be pressed
 			if (ucmd->upmove > 0) {
 				limbo(ent, qtrue);
 			}
 
-			// Cap this to 1 seconds checks to avoid flooding the client..
-			if (level.spawnFloodTimer < level.time) {
+			// This has to be outside due flood check as well as to cope with flood & latency issues, 
+			// it's set to little over 1 sec prior actual spawn to ensure client is there on arrival..
+			if ((team == TEAM_RED && ((g_userAxisRespawnTime.integer*1000) - teamRespawnTime(team, qfalse) < 1200)) ||
+				(team == TEAM_BLUE && ((g_userAlliedRespawnTime.integer * 1000) - teamRespawnTime(team, qfalse) < 1200)) ) {
+				forceTapout = qtrue;
+			}
+
+			// Cap this to 1 second checks to avoid flooding the client..
+			if (level.spawnFloodTimer < level.time) {				
 
 				if (g_maxlives.integer || g_alliedmaxlives.integer || g_axismaxlives.integer) {
 					// OSPx					
@@ -1368,28 +1377,56 @@ void ClientThink_real( gentity_t *ent ) {
 					// Both teams..
 					if (g_maxlives.integer) 
 					{
-						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0)
+						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0) {
 							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
+
+							if (forceTapout) {
+								trap_SendServerCommand(ent - g_entities, "reqforcetapout");
+								forceTapout = qfalse;
+							}	
+						}
 					} // Allies only
 					else if (g_axismaxlives.integer &&
 						client->sess.sessionTeam == TEAM_RED) 
 					{
-						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0)
+						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0) {
 							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
+
+							if (forceTapout) {
+								trap_SendServerCommand(ent - g_entities, "reqforcetapout");
+								forceTapout = qfalse;
+							}
+						}
 					} // Axis only
 					else if (g_alliedmaxlives.integer &&
 						client->sess.sessionTeam == TEAM_BLUE) 
 					{
-						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0)
+						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0) {
 							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
+
+							if (forceTapout) {
+								trap_SendServerCommand(ent - g_entities, "reqforcetapout");
+								forceTapout = qfalse;
+							}
+						}
 					} // A team with no max lives ...
 					else {
 						trap_SendServerCommand(ent - g_entities, "reqforcespawn");
+
+						if (forceTapout) {
+							trap_SendServerCommand(ent - g_entities, "reqforcetapout");
+							forceTapout = qfalse;
+						}
 					}
 				}
 				// We're running a normal game with no max lives..so go for it..
 				else {
-					trap_SendServerCommand(ent - g_entities, "reqforcespawn");									
+					trap_SendServerCommand(ent - g_entities, "reqforcespawn");						
+
+					if (forceTapout) {
+						trap_SendServerCommand(ent - g_entities, "reqforcetapout");						
+						forceTapout = qfalse;
+					}
 				}
 				// Timestamp
 				level.spawnFloodTimer = level.time + 1000;
@@ -1455,6 +1492,31 @@ void G_RunClient( gentity_t *ent ) {
 
 /*
 ==================
+OSPx - Respawn check
+
+Moved this here so it can be reused..
+==================
+*/
+int teamRespawnTime(int team, qboolean warmup) {
+	int time = 0; 
+
+	if (team == TEAM_RED) {
+		if (warmup)
+			time = level.time % 3000;
+		else
+			time = (level.dwRedReinfOffset + level.time - level.startTime) % g_redlimbotime.integer;
+	}
+	else {
+		if (warmup)
+			time = level.time % 3000;
+		else
+			time = (level.dwBlueReinfOffset + level.time - level.startTime) % g_bluelimbotime.integer;
+	}
+	return time;
+}
+
+/*
+==================
 SpectatorClientEndFrame
 
 ==================
@@ -1475,10 +1537,10 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 		if ( ent->client->sess.sessionTeam == TEAM_RED ) {
 			// OSPx - Warmup Damage
 			if (match_warmupfire.integer && g_gamestate.integer != GS_PLAYING)
-				testtime = level.time % 3000;
+				testtime = teamRespawnTime(TEAM_RED, qtrue);
 			else
 				// OSPx - Reinforcements Offset (patched)
-				testtime = (level.dwRedReinfOffset + level.time - level.startTime) % g_redlimbotime.integer;
+				testtime = teamRespawnTime(TEAM_RED, qfalse);
 
 			if ( testtime < ent->client->pers.lastReinforceTime ) {
 				do_respawn = 1;
@@ -1487,10 +1549,10 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 		} else if ( ent->client->sess.sessionTeam == TEAM_BLUE ) {
 			// OSPx - Warmup Damage
 			if (match_warmupfire.integer && g_gamestate.integer != GS_PLAYING)
-				testtime = level.time % 3000;
+				testtime = teamRespawnTime(TEAM_BLUE, qtrue);
 			else
 				// OSPx - Reinforcements Offset (patched)
-				testtime = (level.dwBlueReinfOffset + level.time - level.startTime) % g_bluelimbotime.integer;
+				testtime = teamRespawnTime(TEAM_BLUE, qfalse);
 
 			if ( testtime < ent->client->pers.lastReinforceTime ) {
 				do_respawn = 1;

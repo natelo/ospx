@@ -2009,6 +2009,7 @@ extern vmCvar_t cg_announcer;
 extern vmCvar_t cg_autoAction;
 extern vmCvar_t cg_useScreenshotJPEG;
 extern vmCvar_t cg_instanttapout;
+extern vmCvar_t cg_forceTapout;
 extern vmCvar_t cg_uinfo;
 
 extern vmCvar_t cf_wstats;

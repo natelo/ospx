@@ -2040,11 +2040,20 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
-	// Force tapout
+	// Force instant tapout 
+	// NOTE: cg_forceTapout prevails if enabled..
 	if (!Q_stricmp(cmd, "reqforcespawn")) {
-		if (cg_instanttapout.integer) {
+		if (cg_instanttapout.integer && !cg_forceTapout.integer) {
 			CG_ForceTapOut_f();
-		}		
+		} 		
+		return;
+	}
+
+	// Force tapout on respawn (reuse instant tapout..)
+	if (!Q_stricmp(cmd, "reqforcetapout")) {
+		 if (cg_forceTapout.integer) {
+			CG_ForceTapOut_f();
+		}
 		return;
 	}
 // -OSPx

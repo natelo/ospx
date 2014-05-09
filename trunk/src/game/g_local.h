@@ -865,6 +865,7 @@ typedef struct {
 
 	// Forced/Instant tapout timer to cope with flood..
 	int spawnFloodTimer;
+	int axisSpawnTime, alliedSpawnTime;
 // -OSPx
 
 } level_locals_t;
