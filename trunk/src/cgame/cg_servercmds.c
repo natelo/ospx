@@ -757,6 +757,7 @@ static void CG_MapRestart( void ) {
 	cg.centerPrintTime = 0; // reset centerprint counter so previous messages don't re-appear
 	cg.itemPickupTime = 0;  // reset item pickup counter so previous messages don't re-appear
 	cg.cursorHintFade = 0;  // reset cursor hint timer
+	cg.popinPrintTime = 0;	// OSPx - reset pop in prints..
 
 	// DHM - Nerve :: Reset complaint system
 	cgs.complaintClient = -1;
@@ -1982,6 +1983,18 @@ static void CG_ServerCommand( void ) {
 	// OSPx - Console print only..
 	if (!Q_stricmp(cmd, "@print")) {
 		CG_Printf("[skipnotify]%s\n", CG_Argv(1)); 
+		return;
+	}
+
+	// Pop In
+	if (!Q_stricmp(cmd, "popin")) {
+		int args = trap_Argc();		
+		qboolean fade=qfalse;
+
+		if (args >= 3) {
+			fade = qtrue;
+		}
+		CG_PopinPrint(CG_LocalizeServerCommand(CG_Argv(1)), SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.25), SMALLCHAR_WIDTH, fade);		
 		return;
 	}
 

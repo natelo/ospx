@@ -1595,7 +1595,122 @@ static void CG_DrawCenterString( void ) {
 	trap_R_SetColor( NULL );
 }
 
+/*
+===================
+OSPx - Cg_PopinPrint
 
+Pops in messages
+===================
+*/
+#define CP_PMWIDTH 84
+void CG_PopinPrint(const char *str, int y, int charWidth, qboolean blink) {
+	char    *s;
+	int i, len;                         // NERVE - SMF
+	qboolean neednewline = qfalse;      // NERVE - SMF
+
+	Q_strncpyz(cg.popinPrint, str, sizeof(cg.popinPrint));
+
+	// Turn spaces into newlines, if we've run over the linewidth
+	len = strlen(cg.popinPrint);
+	for (i = 0; i < len; i++) {
+
+		// Subtract a few chars here so long words still get displayed properly
+		if (i % (CP_PMWIDTH - 20) == 0 && i > 0) {
+			neednewline = qtrue;
+		}
+		if (cg.popinPrint[i] == ' ' && neednewline) {
+			cg.popinPrint[i] = '\n';
+			neednewline = qfalse;
+		}
+	}
+	// -NERVE - SMF
+
+	cg.popinPrintTime = cg.time;
+	cg.popinPrintY = y + 45;
+	cg.popinPrintCharWidth = charWidth;
+	cg.popinBlink = blink;
+
+	// count the number of lines for centering
+	cg.popinPrintLines = 1;
+	s = cg.popinPrint;
+	while (*s) {
+		if (*s == '\n') {
+			cg.popinPrintLines++;
+		}
+		s++;
+	}
+}
+
+/*
+===================
+L0 - CG_DrawPopinString
+===================
+*/
+static void CG_DrawPopinString(void) {
+	char    *start;
+	int l;
+	int y;
+	int x;
+	float   *color;
+
+	if (!cg.popinPrintTime) {
+		return;
+	}
+
+	color = CG_FadeColor(cg.popinPrintTime, 1000 * 3);
+	if (!color) {
+		cg.popinPrintTime = 0;
+		return;
+	}
+
+	trap_R_SetColor(color);
+	start = cg.popinPrint;
+
+	// Specs see prints at different possition...
+	if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR)
+	{
+		y = (cg.popinPrintY + 75) - cg.popinPrintLines * TINYCHAR_HEIGHT / 2;
+		x = 3 + (cg.popinPrintLines * TINYCHAR_HEIGHT / 2);
+	}
+	else
+	{
+		y = (cg.popinPrintY - 7) - cg.popinPrintLines * TINYCHAR_HEIGHT / 2;
+		x = 25 + (cg.popinPrintLines * TINYCHAR_HEIGHT / 2);
+	}
+
+	if (cg.popinBlink)
+		color[3] = fabs(sin(cg.time * 0.001)) * cg_hudAlpha.value;
+
+	while (1) {
+		char linebuffer[1024];
+
+		for (l = 0; l < CP_PMWIDTH; l++) {          // NERVE - SMF - added CP_LINEWIDTH
+			if (!start[l] || start[l] == '\n') {
+				break;
+			}
+			linebuffer[l] = start[l];
+		}
+		linebuffer[l] = 0;
+
+		if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR)
+			CG_DrawStringExt(x, y, linebuffer, color, qfalse, qfalse,
+			TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+		else
+			CG_DrawStringExt(x, y, linebuffer, color, qfalse, qfalse,
+			TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+
+		y += cg.popinPrintCharWidth * 1.5;
+
+		while (*start && (*start != '\n')) {
+			start++;
+		}
+		if (!*start) {
+			break;
+		}
+		start++;
+	}
+	trap_R_SetColor(NULL);
+}
 
 /*
 ================================================================================
@@ -3839,6 +3954,9 @@ static void CG_Draw2D( void ) {
 
 		// OSPx - Pause		
 		CG_PausePrint();
+
+		// OSPx - Pop in print..
+		CG_DrawPopinString();
 
 		CG_DrawFollow();
 		CG_DrawWarmup();

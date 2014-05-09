@@ -1160,6 +1160,14 @@ typedef struct {
 	cg_windowHandler_t winHandler;	
 	cg_window_t *clientStatsWindow;
 	cg_window_t *msgClientStatsWindow;
+
+	// Pop In prints
+	int popinPrintTime;
+	int popinPrintCharWidth;
+	int popinPrintY;
+	char popinPrint[1024];
+	int popinPrintLines;
+	qboolean popinBlink;
 // -OSPx
 
 	pmoveExt_t pmext;
@@ -2184,6 +2192,8 @@ float CG_CalculateReinfTime_Float(void);
 int CG_Text_Width_Ext(const char *text, float scale, int limit, fontInfo_t* font);
 int CG_Text_Height_Ext(const char *text, float scale, int limit, fontInfo_t* font);
 void CG_Text_Paint_Ext(float x, float y, float scalex, float scaley, vec4_t color, const char *text, float adjust, int limit, int style, fontInfo_t* font);
+// PopIn
+void CG_PopinPrint(const char *str, int y, int charWidth, qboolean blink);
 // - Hud names
 void CG_Text_Paint_ext2(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
 int CG_Text_Width_ext2(const char *text, float scale, int limit);

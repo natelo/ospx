@@ -227,9 +227,8 @@ void G_delayPrint(gentity_t *dpent) {
 					fFree = qfalse;		
 
 					if (cSeconds > 30000) {
-						AP(va("cp \"Timeouts Remaning\n[^1Axis^7] %d / [^4Allies^7] %d\n\"", 
-							teamInfo[TEAM_RED].timeouts, teamInfo[TEAM_BLUE].timeouts
-							));
+						AP(va("popin \"Timeouts Available: [^1Axis^7] %d - [^4Allies^7] %d\n\"y", 
+							teamInfo[TEAM_RED].timeouts, teamInfo[TEAM_BLUE].timeouts ));
 					}
 				}
 				else {
