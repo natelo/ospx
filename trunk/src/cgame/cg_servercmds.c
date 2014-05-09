@@ -135,8 +135,8 @@ void CG_ParseServerinfo( void ) {
 	char    *mapname;
 
 	info = CG_ConfigString( CS_SERVERINFO );
-	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
-	cgs.antilag = atoi( Info_ValueForKey( info, "g_antilag" ) );
+	cg_gameType.integer = cgs.gametype = atoi(Info_ValueForKey(info, "g_gametype"));
+	cg_antilag.integer = cgs.antilag = atoi(Info_ValueForKey(info, "g_antilag"));
 	if ( !cgs.localServer ) {
 		trap_Cvar_Set( "g_gametype", va( "%i", cgs.gametype ) );
 		trap_Cvar_Set( "g_antilag", va( "%i", cgs.antilag ) );
