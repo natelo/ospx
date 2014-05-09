@@ -505,7 +505,7 @@ typedef struct {
 static const pCmd_reference_t pCmd[] = {					// Properties..
 	{ "players",			pCmd_players,		qfalse,		qfalse,	qfalse,	qfalse },
 	{ "getstatus",			pCmd_getstatus,		qfalse,		qfalse,	qfalse,	qfalse },
-	{ "ready",				pCmd_ready,			qfalse,		qfalse,	qtrue,	qtrue },
+	{ "ready",				pCmd_ready,			qtrue,		qfalse,	qtrue,	qtrue },
 	{ "notready",			pCmd_ready,			qfalse,		qfalse,	qtrue,	qtrue },
 	{ "speclock",			pCmd_speclock,		qtrue,		qfalse,	qfalse,	qtrue },
 	{ "specunlock",			pCmd_speclock,		qfalse,		qfalse,	qfalse,	qtrue },
@@ -535,7 +535,7 @@ qboolean playerCommandsExt(gentity_t *ent, char *cmd) {
 			if (level.warmupTime && uCM->nWarmup)
 				CP(va("@print \"%s command cannot be used during warmup!\n\"", uCM->command));
 			// Vice versa
-			else if (!level.warmupTime && uCM->jWarmup)
+			else if (g_gamestate.integer != GS_WARMUP && uCM->jWarmup)
 				CP(va("@print \"%s command can only be used during warmup!\n\"", uCM->command));
 			// Intermission
 			else if (level.intermissiontime && uCM->nIntermission)
