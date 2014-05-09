@@ -1453,7 +1453,7 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 
 		if ( ent->client->sess.sessionTeam == TEAM_RED ) {
 			// OSPx - Warmup Damage
-			if (match_warmupDamage.integer && g_gamestate.integer != GS_PLAYING)
+			if (match_warmupfire.integer && g_gamestate.integer != GS_PLAYING)
 				testtime = level.time % 3000;
 			else
 				// OSPx - Reinforcements Offset (patched)
@@ -1465,7 +1465,7 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 			ent->client->pers.lastReinforceTime = testtime;
 		} else if ( ent->client->sess.sessionTeam == TEAM_BLUE ) {
 			// OSPx - Warmup Damage
-			if (match_warmupDamage.integer && g_gamestate.integer != GS_PLAYING)
+			if (match_warmupfire.integer && g_gamestate.integer != GS_PLAYING)
 				testtime = level.time % 3000;
 			else
 				// OSPx - Reinforcements Offset (patched)

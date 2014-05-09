@@ -905,7 +905,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	// the intermission has allready been qualified for, so don't
 	// allow any extra scoring										  // OSPx - Warmup damage
-	if (level.intermissionQueued || g_gamestate.integer != GS_PLAYING && match_warmupDamage.integer == 0) {
+	if (level.intermissionQueued || g_gamestate.integer != GS_PLAYING && match_warmupfire.integer == 0) {
 		return;
 	}
 
@@ -1043,7 +1043,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// if the attacker was on the same team
 		if ( targ != attacker && OnSameTeam( targ, attacker )  ) {
 			// OSPx - Warmup Damage
-			if ((g_gamestate.integer != GS_PLAYING && match_warmupDamage.integer == 1)) {
+			if ((g_gamestate.integer != GS_PLAYING && match_warmupfire.integer == 1)) {
 				return;
 			} // - OSPx
 			else if (!g_friendlyFire.integer) {
