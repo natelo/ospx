@@ -496,6 +496,7 @@ Pause/Unpause
 void pCmd_pauseHandle(gentity_t *ent, qboolean dPause) {
 	int team = ent->client->sess.sessionTeam;
 	char *status[2] = { "^3UN", "^3" };
+	char tName[MAX_NETNAME];
 
 	if (team_nocontrols.integer) {
 		CP("print \"Team commands are not enabled on this server.\n\"");
@@ -512,6 +513,8 @@ void pCmd_pauseHandle(gentity_t *ent, qboolean dPause) {
 		return;
 	}
 
+	Q_decolorString(aTeams[team], tName);
+
 	// Trigger the auto-handling of pauses
 	if (dPause) {
 		if (!teamInfo[team].timeouts) {
@@ -522,7 +525,7 @@ void pCmd_pauseHandle(gentity_t *ent, qboolean dPause) {
 			teamInfo[team].timeouts--;
 			level.match_pause = team + 128;		
 			G_spawnPrintf(DP_PAUSEINFO, level.time + 15000, NULL);
-			AP(va("chat \"console: %s ^3Paused ^7the match.\n\"", aTeams[team]));
+			AP(va("chat \"console: %s ^3Paused ^7the match.\n\"", tName));
 			AP(va("cp \"[%s^7] %d Timeouts Remaining\n\"3", aTeams[team], teamInfo[team].timeouts));
 			
 		}
@@ -532,7 +535,7 @@ void pCmd_pauseHandle(gentity_t *ent, qboolean dPause) {
 		return;
 	}
 	else {
-		AP(va("chat \"console: %s ^7have ^3UNPAUSED^7 the match.!\n\n\"", aTeams[team]));
+		AP(va("chat \"console: %s ^7have ^3UNPAUSED^7 the match!\n\"", tName));
 		level.match_pause = PAUSE_UNPAUSING;
 		G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
 	}
