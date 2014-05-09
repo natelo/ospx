@@ -1099,6 +1099,7 @@ G_Say
 #define SAY_TELL    2
 #define SAY_LIMBO   3	// NERVE - SMF
 #define SAY_TEAMNL	4	// OSPx
+#define SAY_ADMIN	5	// OSPx
 
 void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message, qboolean localize ) { // removed static so it would link
 	if ( !other ) {
@@ -1109,9 +1110,15 @@ void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char 
 	}
 	if ( !other->client ) {
 		return;
-	}
+	}					  // OSPx
 	if ((mode == SAY_TEAM || mode == SAY_TEAMNL) && !OnSameTeam(ent, other)) {
 		return;
+	}
+
+	// OSPx - Admin chat is visible only to admins..
+	if (mode == SAY_ADMIN) {
+		if (!ent->client->sess.admin || !other->client->sess.admin)
+			return;
 	}
 
 	// NERVE - SMF - if spectator, no chatting to players in WolfMP
@@ -1214,11 +1221,22 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		color = COLOR_GREEN;
 		break;
 		// -NERVE - SMF
-	// OSPx - Team with no location..
+	// OSPx 
+	// Team chat with no location..
 	case SAY_TEAMNL:
 		G_LogPrintf("sayteamnl: %s: %s\n", ent->client->pers.netname, chatText);
 		Com_sprintf(name, sizeof(name), "(%s^7): ", ent->client->pers.netname);
 		color = COLOR_CYAN;
+		break;
+	// Admin Chat
+	case SAY_ADMIN:
+		if (ent->client->sess.admin == USER_REGULAR) {
+			CP("print \"^1Error: ^7Private chat is only for Admins, login if you wish to participate^1!\n\"");
+			return;
+		}
+		G_LogPrintf("say_admin: %s: %s\n", ent->client->pers.netname, chatText);
+		Com_sprintf(name, sizeof(name), "^3Admin Channel(^7%s^3): ", ent->client->pers.netname);
+		color = COLOR_WHITE;
 		break;
 	// -OSPx
 	}
@@ -2656,7 +2674,8 @@ void ClientCommand( int clientNum ) {
 		}
 	}
 
-	// OSPx - Say team with no location..
+// OSPx
+	// Team chat with no location..
 	if (Q_stricmp(cmd, "say_teamnl") == 0) {
 		// Ignored
 		if (!ent->client->sess.ignored) {
@@ -2668,7 +2687,15 @@ void ClientCommand( int clientNum ) {
 			return;
 		}
 	}
-	// -OSPx
+
+	// Admin chat
+	if (Q_stricmp(cmd, "say_admin") == 0 || 
+		Q_stricmp(cmd, "private") == 0) {
+		Cmd_Say_f(ent, SAY_ADMIN, qfalse);
+		return;
+	}
+
+// -OSPx
 
 	// NERVE - SMF
 	if ( Q_stricmp( cmd, "say_limbo" ) == 0 ) {

@@ -906,7 +906,11 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand("currenttime");
 	trap_AddCommand("sui");			// Suicide (soft kill)
 	trap_AddCommand("players");
+
+	// Chats
 	trap_AddCommand("say_teamnl");
+	trap_AddCommand("say_admin");
+	trap_AddCommand("private");
 
 	// Stats
 	trap_AddCommand("scores");
