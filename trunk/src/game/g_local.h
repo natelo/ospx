@@ -26,8 +26,6 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-
-
 // g_local.h -- local definitions for game module
 
 #include "q_shared.h"
@@ -1668,6 +1666,7 @@ void G_loadMatchGame(void);
 void G_matchInfoDump(unsigned int dwDumpType);
 void CountDown(qboolean restart);
 void G_spawnPrintf(int print_type, int print_time, gentity_t *owner);
+void G_verifyMatchState(int nTeam);
 
 //
 // g_geoip.c
@@ -1788,7 +1787,7 @@ void G_printMatchInfo(gentity_t *ent, qboolean time);
 #define ARRAY_LEN(x) (sizeof(x) / sizeof(*(x)))					// Saves some time..
 
 //
-// Bit Flags
+// Constants / Bit Flags
 //
 // - Config
 #define ZSF_COMP        0x01    // Have comp settings loaded for current gametype?

@@ -1128,12 +1128,15 @@ void G_RegisterCvars( void ) {
 		trap_Cvar_Set("match_readypercent", "1");
 	}
 
-	// Sanity check
+	// Sanity check (clamps)
 	if (pmove_msec.integer < 8) {
 		trap_Cvar_Set("pmove_msec", "8");
 	}
 	else if (pmove_msec.integer > 33) {
 		trap_Cvar_Set("pmove_msec", "33");
+	}
+	if (match_timeoutcount.integer > 999) {
+		trap_Cvar_Set("match_timeoutcount", "999");
 	}
 // -OSPx
 }

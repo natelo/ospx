@@ -800,11 +800,20 @@ void SetTeam(gentity_t *ent, char *s, qboolean forced) {
 
 	ClientBegin( clientNum );
 
-	// OSPx- ET Port ..
+// OSPx
 	// ydnar: restore old respawn count (players cannot jump from team to team to regain lives)
 	if (ent->client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0 && oldTeam != TEAM_SPECTATOR) {
 		client->ps.persistant[PERS_RESPAWNS_LEFT] = client->ps.persistant[PERS_RESPAWNS_LEFT];
 	}
+
+	// Track stuff..
+	G_verifyMatchState(oldTeam);
+
+	// Reset stats when changing teams
+	if (team != oldTeam) {
+		G_deleteStats(clientNum);
+	}
+// -OSPx
 }
 
 // DHM - Nerve

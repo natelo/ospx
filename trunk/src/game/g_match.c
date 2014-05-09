@@ -211,7 +211,6 @@ Pause
 Deals with pause related functionality
 =================
 */
-
 void G_delayPrint(gentity_t *dpent) {
 	int think_next = 0;
 	qboolean fFree = qtrue;
@@ -304,4 +303,33 @@ void G_spawnPrintf(int print_type, int print_time, gentity_t *owner) {
 		trap_SetConfigstring(CS_PAUSED, va("%d", match_timeoutlength.integer));
 	else if (print_type == DP_UNPAUSING)
 		trap_SetConfigstring(CS_PAUSED, "10000");
+}
+
+/*
+=================
+G_verifyMatchState
+
+Check if we need to reset the game state due to an empty team..
+=================
+*/
+void G_verifyMatchState(int nTeam) {
+	gamestate_t gs = g_gamestate.integer;
+
+	if ((level.lastRestartTime + 1000) < level.time && (nTeam == TEAM_RED || nTeam == TEAM_BLUE) &&
+		(gs == GS_PLAYING || gs == GS_WARMUP_COUNTDOWN || gs == GS_INTERMISSION)) {
+		if (TeamCount(-1, nTeam) == 0) {
+			if (g_doWarmup.integer > 0) {
+				level.lastRestartTime = level.time;
+				if (g_gametype.integer == GT_WOLF_STOPWATCH) {
+					trap_Cvar_Set("g_currentRound", "0");
+					trap_Cvar_Set("g_nextTimeLimit", "0");
+				}
+				trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", GS_WARMUP));
+			}
+			else {
+				teamInfo[nTeam].team_lock = qfalse;
+			}
+			G_teamReset(nTeam, qtrue);
+		}
+	}
 }
