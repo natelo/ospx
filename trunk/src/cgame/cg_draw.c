@@ -3929,7 +3929,9 @@ static void CG_Draw2D( void ) {
 			// DHM - Nerve :: Don't draw icon in upper-right when switching weapons
 			//CG_DrawWeaponSelect();
 
-			CG_DrawPickupItem();
+			// OSPx - In warmup we print ready intel there..
+			if (!(cgs.gamestate == GS_WARMUP && cgs.readyState != CREADY_NONE))
+				CG_DrawPickupItem();
 		}
 		if ( cgs.gametype >= GT_TEAM ) {
 			CG_DrawTeamInfo();

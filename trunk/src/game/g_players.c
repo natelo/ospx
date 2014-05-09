@@ -304,7 +304,7 @@ void pCmd_ready(gentity_t *ent, qboolean state) {
 			}
 
 			// Doesn't rly matter..score tab will show slow ones..
-			AP(va("cp \"\n%s \n^7is %s%s!\n\"", ent->client->pers.netname, (state ? "^n" : "^z"), status[state]));
+			AP(va("popin \"%s ^7is %s%s!\n\"", ent->client->pers.netname, (state ? "^n" : "^z"), status[state]));
 		}
 	}
 }
@@ -499,6 +499,11 @@ void pCmd_pauseHandle(gentity_t *ent, qboolean dPause) {
 
 	if (team_nocontrols.integer) {
 		CP("print \"Team commands are not enabled on this server.\n\"");
+		return;
+	}
+
+	if ((!level.alliedPlayers || !level.axisPlayers) && dPause) {		
+		CP("print \"^1Error^7: Pause can only be used when both teams have players!\n\"");
 		return;
 	}
 

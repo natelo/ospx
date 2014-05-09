@@ -2814,6 +2814,30 @@ void sortedActivePlayers(void) {
 
 /*
 ================
+OSPx - check for team stuff..
+================
+*/
+void handleEmptyTeams(void) {
+	if (g_gamestate.integer == GS_PLAYING) {
+		if (!level.axisPlayers) {			
+			G_teamReset(TEAM_RED, qtrue);
+
+			// Reset match if paused with an empty team
+			if (level.match_pause > PAUSE_UNPAUSING)
+				trap_SendConsoleCommand(EXEC_APPEND, va("reset_match"));
+		}
+		else if (!level.alliedPlayers) {			
+			G_teamReset(TEAM_BLUE, qtrue);
+
+			// Reset match if paused with an empty team
+			if (level.match_pause > PAUSE_UNPAUSING)
+				trap_SendConsoleCommand(EXEC_APPEND, va("reset_match"));
+		}
+	}
+}
+
+/*
+================
 G_RunFrame
 
 Advances the non-player objects in the world
@@ -3054,6 +3078,10 @@ void G_RunFrame( int levelTime ) {
 	// Ridah, check if we are reloading, and times have expired
 	CheckReloadStatus();
 
-	// OSPx - Track active players (per team)
+// OSPx
+	// Track active players (per team)
 	sortedActivePlayers();
+
+	// Track any team stuff..
+	handleEmptyTeams();
 }

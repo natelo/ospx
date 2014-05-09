@@ -392,6 +392,11 @@ void cmd_pauseHandle(gentity_t *ent, qboolean fPause) {
 	char *status[2] = { "^3UN", "^3" };	
 	char *log;
 
+	if ((!level.alliedPlayers || !level.axisPlayers) && fPause) {
+		CP("print \"^1Error^7: Pause can only be used when both teams have players!\n\"");
+		return;
+	}
+
 	if ((PAUSE_UNPAUSING >= level.match_pause && !fPause) || (PAUSE_NONE != level.match_pause && fPause)) {
 		CP(va("print \"^1Error^7: The match is already %sPAUSED!\n\"", status[fPause]));
 		return;
