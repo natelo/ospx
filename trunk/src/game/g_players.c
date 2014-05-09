@@ -489,6 +489,53 @@ void pCmd_speclock(gentity_t *ent, qboolean lock) {
 }
 
 /*
+===================
+Pause/Unpause
+===================
+*/
+void pCmd_pauseHandle(gentity_t *ent, qboolean dPause) {
+	int team = ent->client->sess.sessionTeam;
+	char *status[2] = { "^3UN", "^3" };
+
+	if (team_nocontrols.integer) {
+		CP("print \"Team commands are not enabled on this server.\n\"");
+		return;
+	}
+
+	if ((PAUSE_UNPAUSING >= level.match_pause && !dPause) || (PAUSE_NONE != level.match_pause && dPause)) {
+		CP(va("print \"The match is already %sPAUSED^7!\n\"", status[dPause]));
+		return;
+	}
+
+	// Trigger the auto-handling of pauses
+	if (dPause) {
+		if (0 == teamInfo[team].timeouts) {
+			CP("print \"^3Denied^7: Your team has no more timeouts remaining!\n\"");
+			return;
+		}
+		else {
+			teamInfo[team].timeouts--;
+			level.match_pause = team + 128;		
+			G_spawnPrintf(DP_PAUSEINFO, level.time + 15000, NULL);
+			AP(va("chat \"console: %s ^3Paused ^7the match.\n\"", aTeams[team]));
+			AP(va("cp \"[%s^7] %d Timeouts Remaining\n\"3", aTeams[team], teamInfo[team].timeouts));
+			
+		}
+	}
+	else if (team + 128 != level.match_pause) {
+		CP("print \"^3Denied^7: Your team didn't call the timeout!\n\"");
+		return;
+	}
+	else {
+		AP(va("chat \"console: %s ^7have ^3UNPAUSED^7 the match.!\n\n\"", aTeams[team]));
+		level.match_pause = PAUSE_UNPAUSING;
+		G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
+	}
+}
+
+/*------------------------------------------------------------------------------*/
+
+/*
 ===========
 Player's structure
 ===========
@@ -512,6 +559,8 @@ static const pCmd_reference_t pCmd[] = {					// Properties..
 	{ "specinvite",			pCmd_specInvite,	qtrue,		qfalse,	qfalse,	qtrue },
 	{ "specuninvite",		pCmd_specUnInvite,	qtrue,		qfalse,	qfalse,	qtrue },
 	{ "specuninviteall",	pCmd_uninviteAll,	qtrue,		qfalse,	qfalse,	qtrue },
+	{ "pause",				pCmd_pauseHandle,	qtrue,		qtrue,	qfalse,	qtrue },
+	{ "unpause",			pCmd_pauseHandle,	qfalse,		qtrue,	qfalse,	qtrue },
 
 	{ 0,					NULL,				qfalse,		qtrue,	qtrue,	qtrue }
 };

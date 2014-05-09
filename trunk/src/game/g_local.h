@@ -1415,6 +1415,7 @@ extern vmCvar_t match_latejoin;
 extern vmCvar_t match_minplayers;
 extern vmCvar_t match_readypercent;
 extern vmCvar_t match_timeoutlength;
+extern vmCvar_t match_timeoutcount;
 
 extern vmCvar_t z_serverflags;
 extern vmCvar_t sv_hostname;

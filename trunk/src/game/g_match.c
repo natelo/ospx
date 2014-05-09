@@ -224,7 +224,13 @@ void G_delayPrint(gentity_t *dpent) {
 
 				if (cSeconds > 1000) {					
 					think_next = level.time + 1000;
-					fFree = qfalse;					
+					fFree = qfalse;		
+
+					if (cSeconds > 30000) {
+						AP(va("cp \"Timeouts Remaning\n[^1Axis^7] %d / [^4Allies^7] %d\n\"", 
+							teamInfo[TEAM_RED].timeouts, teamInfo[TEAM_BLUE].timeouts
+							));
+					}
 				}
 				else {
 					level.match_pause = PAUSE_UNPAUSING;

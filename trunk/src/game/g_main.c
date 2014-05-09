@@ -204,6 +204,7 @@ vmCvar_t match_latejoin;
 vmCvar_t match_minplayers;
 vmCvar_t match_readypercent;
 vmCvar_t match_timeoutlength;
+vmCvar_t match_timeoutcount;
 
 // - System
 vmCvar_t z_serverflags;
@@ -382,6 +383,7 @@ cvarTable_t gameCvarTable[] = {
 	{ &match_minplayers, "match_minplayers", "4", 0, 0, qfalse, qfalse },
 	{ &match_readypercent, "match_readypercent", "100", 0, 0, qfalse, qtrue },
 	{ &match_timeoutlength, "match_timeoutlength", "180", 0, 0, qfalse, qtrue },
+	{ &match_timeoutcount, "match_timeoutcount", "3", 0, 0, qfalse, qtrue },
 
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
 	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse }
