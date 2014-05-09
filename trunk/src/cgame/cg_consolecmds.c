@@ -702,6 +702,11 @@ void CG_dumpStats_f(void) {
 	}
 }
 
+// Force tapout
+void CG_ForceTapOut_f(void) {
+	trap_SendClientCommand("forcetapout");
+}
+
 /*	OSPx - New stuff ends here	*/
 
 typedef struct {
@@ -773,6 +778,7 @@ static consoleCommand_t commands[] = {
 	{ "-stats", CG_StatsUp_f },
 	{ "+wtopshots", CG_topshotsDown_f },
 	{ "-wtopshots", CG_topshotsUp_f },
+	{ "forcetapout", CG_ForceTapOut_f },
 	// -OSPx
 
 	// Arnout

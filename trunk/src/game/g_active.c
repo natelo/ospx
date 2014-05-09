@@ -1346,40 +1346,61 @@ void ClientThink_real( gentity_t *ent ) {
 		}
 		// dhm - end
 
-		// wait for the attack button to be pressed
-		if ( level.time > client->respawnTime ) {
-			// forcerespawn is to prevent users from waiting out powerups
-			if ( ( g_gametype.integer != GT_SINGLE_PLAYER ) &&
-				 ( g_forcerespawn.integer > 0 ) &&
-				 ( ( level.time - client->respawnTime ) > g_forcerespawn.integer * 1000 )  &&
-				 ( !( ent->client->ps.pm_flags & PMF_LIMBO ) ) ) { // JPW NERVE
-				// JPW NERVE
-				if ( g_gametype.integer >= GT_WOLF ) {
-					limbo( ent, qtrue );
-				} else {
-					respawn( ent );
-				}
-				// jpw
-				return;
+		// OSPx - Rewrote this altogether..
+		if (level.time > client->respawnTime  && !(ent->client->ps.pm_flags & PMF_LIMBO)) {
+
+			// wait for the attack button to be pressed
+			if (ucmd->upmove > 0) {
+				limbo(ent, qtrue);
 			}
 
-			// DHM - Nerve :: Single player game respawns immediately as before,
-			//				  but in multiplayer, require button press before respawn
-			if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
-				respawn( ent );
-			}
-			// NERVE - SMF - we want to only respawn on jump button now
-			else if ( ( ucmd->upmove > 0 ) &&
-					  ( !( ent->client->ps.pm_flags & PMF_LIMBO ) ) ) { // JPW NERVE
-				// JPW NERVE
-				if ( g_gametype.integer >= GT_WOLF ) {
-					limbo( ent, qtrue );
-				} else {
-					respawn( ent );
+			// Cap this to 1 seconds checks to avoid flooding the client..
+			if (level.spawnFloodTimer < level.time) {
+
+				if (g_maxlives.integer || g_alliedmaxlives.integer || g_axismaxlives.integer) {
+					// OSPx					
+					// If you wonder what's this all about..we don't want to force a 
+					// tapout when client has no lives left- although they can manually tap out..
+					//
+					// This may look like an overkill but in some cases you can set max lives for 
+					// one team only, thus other team (with no maxlives) will always be skipped...
+
+					// Both teams..
+					if (g_maxlives.integer) 
+					{
+						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0)
+							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
+					} // Allies only
+					else if (g_axismaxlives.integer &&
+						client->sess.sessionTeam == TEAM_RED) 
+					{
+						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0)
+							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
+					} // Axis only
+					else if (g_alliedmaxlives.integer &&
+						client->sess.sessionTeam == TEAM_BLUE) 
+					{
+						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0)
+							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
+					} // A team with no max lives ...
+					else {
+						trap_SendServerCommand(ent - g_entities, "reqforcespawn");
+					}
 				}
-				// jpw
+				// We're running a normal game with no max lives..so go for it..
+				else {
+					trap_SendServerCommand(ent - g_entities, "reqforcespawn");									
+				}
+				// Timestamp
+				level.spawnFloodTimer = level.time + 1000;
 			}
-			// dhm - Nerve :: end
+
+			// forcerespawn is to prevent users from waiting out powerups
+			if ( (g_forcerespawn.integer > 0) &&
+				((level.time - client->respawnTime) > g_forcerespawn.integer * 1000) )
+			{
+				limbo(ent, qfalse);
+			} 
 			// NERVE - SMF - we want to immediately go to limbo mode if gibbed
 			else if ( client->ps.stats[STAT_HEALTH] <= GIB_HEALTH && !( ent->client->ps.pm_flags & PMF_LIMBO ) ) {
 				if ( g_gametype.integer >= GT_WOLF ) {
@@ -1389,7 +1410,7 @@ void ClientThink_real( gentity_t *ent ) {
 				}
 			}
 			// -NERVE - SMF
-		}
+		} // -OSPx
 		return;
 	}
 

@@ -2608,6 +2608,7 @@ void G_weaponStats_cmd(gentity_t *ent) {
 ClientCommand
 =================
 */
+void limbo(gentity_t *ent, qboolean makeCorpse); // OSPx
 void ClientCommand( int clientNum ) {
 	gentity_t *ent;
 	char cmd[MAX_TOKEN_CHARS];
@@ -2783,6 +2784,16 @@ void ClientCommand( int clientNum ) {
 // OSPx
 	} else if (Q_stricmp(cmd, "sui") == 0)  {
 		Cmd_SoftKill_f(ent);
+	}
+	else if (!Q_stricmp(cmd, "forcetapout")) {
+		if (!ent || !ent->client) {
+			return;
+		}
+		if (ent->client->ps.stats[STAT_HEALTH] <= 0 &&
+			(ent->client->sess.sessionTeam == TEAM_RED || ent->client->sess.sessionTeam == TEAM_BLUE)) {
+			limbo(ent, qtrue);
+		}
+		return;
 // -OSPx
 	} else if ( Q_stricmp( cmd, "levelshot" ) == 0 )  {
 		Cmd_LevelShot_f( ent );

@@ -1933,6 +1933,7 @@ The string has been tokenized and can be retrieved with
 Cmd_Argc() / Cmd_Argv()
 =================
 */
+void CG_ForceTapOut_f(void); // OSPx - Tapout
 static void CG_ServerCommand( void ) {
 	const char  *cmd;
 	char text[MAX_SAY_TEXT];
@@ -2036,6 +2037,14 @@ static void CG_ServerCommand( void ) {
 	// /stats (1.0/shrub alike..)
 	if (!Q_stricmp(cmd, "cgsp")) {
 		CG_parseClientStats_cmd(CG_printConsoleString);
+		return;
+	}
+
+	// Force tapout
+	if (!Q_stricmp(cmd, "reqforcespawn")) {
+		if (cg_instanttapout.integer) {
+			CG_ForceTapOut_f();
+		}		
 		return;
 	}
 // -OSPx

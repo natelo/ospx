@@ -862,6 +862,9 @@ typedef struct {
 
 	// Pause
 	int match_pause;
+
+	// Forced/Instant tapout timer to cope with flood..
+	int spawnFloodTimer;
 // -OSPx
 
 } level_locals_t;
