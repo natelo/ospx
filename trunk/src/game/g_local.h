@@ -881,7 +881,6 @@ typedef struct {
 	qboolean spec_lock;
 	qboolean team_lock;
 	char team_name[24];
-	int team_score;
 	int timeouts;
 } team_info;
 // -OSP
@@ -1175,6 +1174,7 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 // OSPx
 extern char *aTeams[TEAM_NUM_TEAMS];
 extern team_info teamInfo[TEAM_NUM_TEAMS];
+void G_teamReset(int team_num, qboolean fClearSpecLock);
 qboolean G_teamJoinCheck(int team_num, gentity_t *ent);
 qboolean G_playersReady(void);
 void G_readyReset(qboolean aForced);

@@ -943,6 +943,9 @@ void cmd_shuffle(gentity_t *ent, qboolean fParam) {
 	int count = 0, tmpCount, i;
 	int players[MAX_CLIENTS];
 
+	G_teamReset(TEAM_RED, qtrue);
+	G_teamReset(TEAM_BLUE, qtrue);
+
 	memset(players, -1, sizeof(players));
 	for (i = 0; i < MAX_CLIENTS; i++) {
 		if ((!g_entities[i].inuse) || (level.clients[i].pers.connected != CON_CONNECTED))

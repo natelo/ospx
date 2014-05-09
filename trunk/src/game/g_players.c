@@ -509,7 +509,7 @@ void pCmd_pauseHandle(gentity_t *ent, qboolean dPause) {
 
 	// Trigger the auto-handling of pauses
 	if (dPause) {
-		if (0 == teamInfo[team].timeouts) {
+		if (!teamInfo[team].timeouts) {
 			CP("print \"^3Denied^7: Your team has no more timeouts remaining!\n\"");
 			return;
 		}
