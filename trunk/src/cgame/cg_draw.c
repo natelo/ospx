@@ -2615,7 +2615,8 @@ Deals with client views/prints when paused.
 =================
 */
 static void CG_PausePrint(void) {
-	const char  *s;
+	const char  *s, *s2;
+	float color[4];
 	int w;
 
 	// Not in warmup...
@@ -2623,7 +2624,10 @@ static void CG_PausePrint(void) {
 		return;
 
 	if (cgs.match_paused == PAUSE_ON) {
-		s = va("%s", CG_TranslateString(va("(^1PAUSED^7) Timeout expires in %i", cgs.match_resumes - cgs.match_expired )));
+		s = va("%s", CG_TranslateString("^nMatch is Paused!"));
+		s2 = va("%s", CG_TranslateString(va("Timeout expires in ^n%i ^7seconds", cgs.match_resumes - cgs.match_expired)));
+
+		color[3] = fabs(sin(cg.time * 0.001)) * cg_hudAlpha.value;
 
 		if (cg.time > cgs.match_stepTimer) {
 			cgs.match_expired++;
@@ -2632,8 +2636,11 @@ static void CG_PausePrint(void) {
 		//cgs.fadeAlpha = .1;
 	}
 	else if (cgs.match_paused == PAUSE_RESUMING) {
-		s = va("%s", CG_TranslateString(va("^3PREPARE TO FIGHT! ^7Resumimg Match in %i", 8 - cgs.match_expired )));
+		s = va("%s", CG_TranslateString("^3Prepare to fight!"));
+		s2 = va("%s", CG_TranslateString(va("Resuming Match in ^3%d", 8 - cgs.match_expired)));		
 		
+		color[3] = fabs(sin(cg.time * 0.002)) * cg_hudAlpha.value;
+
 		if (cg.time > cgs.match_stepTimer) {
 			cgs.match_expired++;
 			cgs.match_stepTimer = cg.time + 1000;
@@ -2643,8 +2650,13 @@ static void CG_PausePrint(void) {
 		return;
 	}
 
+	color[0] = color[1] = color[2] = 1.0;
+
 	w = CG_DrawStrlen(s);
-	CG_DrawStringExt(320 - w * 6, 120, s, colorWhite, qfalse, qtrue, 12, 18, 0);
+	CG_DrawStringExt(320 - w * 6, 100, s, color, qfalse, qtrue, 12, 18, 0);
+
+	w = CG_DrawStrlen(s2);
+	CG_DrawStringExt(320 - w * 6, 120, s2, colorWhite, qfalse, qtrue, 12, 18, 0);
 }
 
 /*
