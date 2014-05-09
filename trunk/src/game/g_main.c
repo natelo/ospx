@@ -190,7 +190,9 @@ vmCvar_t g_showFlags;
 vmCvar_t g_allowSoftKill;
 vmCvar_t server_autoconfig;
 vmCvar_t g_fixedphysics;
+
 vmCvar_t vote_limit;
+vmCvar_t vote_percent;
 
 // Game
 vmCvar_t team_maxplayers;
@@ -367,7 +369,9 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_allowSoftKill, "g_allowSoftKill", "0", CVAR_ARCHIVE, 0, qfalse, qfalse },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
 	{ &g_fixedphysics, "g_fixedphysics", "1", CVAR_ARCHIVE | CVAR_SERVERINFO, qfalse, qfalse },
+
 	{ &vote_limit, "vote_limit", "3", CVAR_ARCHIVE, qfalse, qfalse },
+	{ &vote_percent, "vote_percent", "50", CVAR_ARCHIVE, qfalse, qfalse },
 
 	{ &team_maxplayers, "team_maxplayers", "0", 0, 0, qfalse, qfalse },
 	{ &team_nocontrols, "team_nocontrols", "1", CVAR_ARCHIVE, 0, qfalse },
@@ -2626,12 +2630,25 @@ void CheckVote( void ) {
 	}
 	if ( level.time - level.voteTime >= VOTE_TIME ) {
 		trap_SendServerCommand( -1, "print \"Vote failed.\n\"" );
+		G_LogPrintf("Vote Failed: %s\n", level.voteString);
 	} else {
-		if ( level.voteYes > level.numVotingClients / 2 ) {
+// OSPx - Vote percent..
+		int vCnt = (!Q_stricmp(level.voteString, "start_match") ? 75 : vote_percent.integer);
+		int total = level.numVotingClients;
+
+		if (vCnt > 99)
+			vCnt = 99;
+		else if (vCnt < 1)
+			vCnt = 1;
+				
+		// Vote will always pass with single client..rest is perc depended..
+		if ( (total == 1) || ( 100 * level.voteYes / total >= vCnt) ) {
+// -OSPx
 			// execute the command, then remove the vote
 			trap_SendServerCommand( -1, "print \"Vote passed.\n\"" );
 			level.voteExecuteTime = level.time + 3000;
 			level.prevVoteExecuteTime = level.time + 4000;
+			G_LogPrintf("Vote Passed: %s\n", level.voteString);
 
 // JPW NERVE
 #ifndef PRE_RELEASE_DEMO
