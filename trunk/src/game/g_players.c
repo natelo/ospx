@@ -160,8 +160,6 @@ void pCmd_players(gentity_t *ent, qboolean fParam) {
 /*
 ===========
 Getstatus
-
-NOTE: Hooked under g_cmds.c
 ===========
 */
 void pCmd_getstatus(gentity_t *ent, qboolean fParam) {
@@ -367,7 +365,6 @@ void pCmd_specInvite(gentity_t *ent, qboolean fParam) {
 		CP(va("print \"%s^7 has been sent a spectator invitation.\n\"", player->client->pers.netname));
 		CPx(player - g_entities, va("cp \"%s ^7invited you to spec the %s team.\n\"2",
 			ent->client->pers.netname, aTeams[team]));
-
 	}
 	else { CP("print \"Spectators can't specinvite players!\n\""); }
 }
@@ -457,10 +454,8 @@ void pCmd_uninviteAll(gentity_t *ent, qboolean fParam) {
 		TP(team, va("chat \"^3TEAM NOTICE: ^7%s ^7has revoked ALL spec's invites for your team.\n\"", ent->client->pers.netname));
 		// Inform specs..
 		TP(TEAM_SPECTATOR, va("print \"%s ^7revoked ALL spec invites from %s team.\n\"", ent->client->pers.netname, aTeams[team]));
-
 	}
 	else { CP("print \"Spectators can't specuninviteall!\n\""); }
-
 }
 
 /*
@@ -507,18 +502,18 @@ typedef struct {
 	qboolean nIntermission;	// Not allowed during intermission..
 } pCmd_reference_t;
 
-static const pCmd_reference_t pCmd[] = {
-	{ "players",			pCmd_players,		qfalse,	qfalse,	qfalse,	qfalse },
-	{ "getstatus",			pCmd_getstatus,		qfalse,	qfalse,	qfalse,	qfalse },
-	{ "ready",				pCmd_ready,			qfalse, qfalse,	qtrue,	qtrue },
-	{ "notready",			pCmd_ready,			qfalse, qfalse,	qtrue,	qtrue },
-	{ "speclock",			pCmd_speclock,		qtrue,	qfalse,	qfalse,	qtrue },
-	{ "specunlock",			pCmd_speclock,		qfalse, qfalse,	qfalse,	qtrue },
-	{ "specinvite",			pCmd_specInvite,	qtrue,	qfalse,	qfalse,	qtrue },
-	{ "specuninvite",		pCmd_specUnInvite,	qtrue,	qfalse,	qfalse,	qtrue },
-	{ "specuninviteall",	pCmd_uninviteAll,	qtrue,	qfalse,	qfalse,	qtrue },
-	
-	{ 0, NULL, qfalse, qfalse, 0, 0 }
+static const pCmd_reference_t pCmd[] = {					// Properties..
+	{ "players",			pCmd_players,		qfalse,		qfalse,	qfalse,	qfalse },
+	{ "getstatus",			pCmd_getstatus,		qfalse,		qfalse,	qfalse,	qfalse },
+	{ "ready",				pCmd_ready,			qfalse,		qfalse,	qtrue,	qtrue },
+	{ "notready",			pCmd_ready,			qfalse,		qfalse,	qtrue,	qtrue },
+	{ "speclock",			pCmd_speclock,		qtrue,		qfalse,	qfalse,	qtrue },
+	{ "specunlock",			pCmd_speclock,		qfalse,		qfalse,	qfalse,	qtrue },
+	{ "specinvite",			pCmd_specInvite,	qtrue,		qfalse,	qfalse,	qtrue },
+	{ "specuninvite",		pCmd_specUnInvite,	qtrue,		qfalse,	qfalse,	qtrue },
+	{ "specuninviteall",	pCmd_uninviteAll,	qtrue,		qfalse,	qfalse,	qtrue },
+
+	{ 0,					NULL,				qfalse,		qtrue,	qtrue,	qtrue }
 };
 
 /*

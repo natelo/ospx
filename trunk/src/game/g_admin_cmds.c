@@ -389,7 +389,7 @@ Pause/Unpause
 ==================
 */
 void cmd_pauseHandle(gentity_t *ent, qboolean fPause) {
-	char *status[2] = { "^5UN", "^1" };	
+	char *status[2] = { "^3UN", "^3" };	
 	char *log;
 
 	if ((PAUSE_UNPAUSING >= level.match_pause && !fPause) || (PAUSE_NONE != level.match_pause && fPause)) {
@@ -404,7 +404,7 @@ void cmd_pauseHandle(gentity_t *ent, qboolean fPause) {
 		AP(va("chat \"console: %s ^3PAUSED^7 the match!\n", sortTag(ent)));		
 	}
 	else {
-		AP(va("chat \"console: %s ^3UNPAUSED^7 the match...resuming in 10 seconds!\n\n\"", sortTag(ent)));
+		AP(va("chat \"console: %s ^3UNPAUSED^7 the match.\n\n\"", sortTag(ent)));
 		level.match_pause = PAUSE_UNPAUSING;		
 		G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
 	}
