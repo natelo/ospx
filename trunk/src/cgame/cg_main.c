@@ -313,7 +313,7 @@ vmCvar_t cg_showFlags;
 vmCvar_t cg_announcer;
 vmCvar_t cg_autoAction;
 vmCvar_t cg_useScreenshotJPEG;
-vmCvar_t cg_instanttapout;
+vmCvar_t cg_instantTapout;
 vmCvar_t cg_forceTapout;
 vmCvar_t cg_uinfo;
 
@@ -557,7 +557,7 @@ cvarTable_t cvarTable[] = {
 	{ &cg_announcer, "cg_announcer", "1", CVAR_ARCHIVE },
 	{ &cg_autoAction, "cg_autoAction", "0", CVAR_ARCHIVE },
 	{ &cg_useScreenshotJPEG, "cg_useScreenshotJPEG", "1", CVAR_ARCHIVE },
-	{ &cg_instanttapout, "cg_instanttapout", "0", CVAR_ARCHIVE },
+	{ &cg_instantTapout, "cg_instantTapout", "0", CVAR_ARCHIVE },
 	{ &cg_forceTapout, "cg_forceTapout", "0", CVAR_ARCHIVE },
 	{ &cg_uinfo, "cg_uinfo", "0", CVAR_ROM | CVAR_USERINFO },
 

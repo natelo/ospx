@@ -1350,6 +1350,8 @@ void ClientThink_real( gentity_t *ent ) {
 		if (level.time > client->respawnTime  && !(ent->client->ps.pm_flags & PMF_LIMBO)) {
 			qboolean forceTapout = qfalse;
 			int team = client->sess.sessionTeam;
+			int axisTime = ((g_userAxisRespawnTime.integer * 1000) - teamRespawnTime(TEAM_RED, qfalse));
+			int alliedTime = ((g_userAlliedRespawnTime.integer * 1000) - teamRespawnTime(TEAM_BLUE, qfalse));
 
 			// wait for the attack button to be pressed
 			if (ucmd->upmove > 0) {
@@ -1358,21 +1360,29 @@ void ClientThink_real( gentity_t *ent ) {
 
 			// This has to be outside due flood check as well as to cope with flood & latency issues, 
 			// it's set to little over 1 sec prior actual spawn to ensure client is there on arrival..
-			if ((team == TEAM_RED && ((g_userAxisRespawnTime.integer*1000) - teamRespawnTime(team, qfalse) < 1200)) ||
-				(team == TEAM_BLUE && ((g_userAlliedRespawnTime.integer * 1000) - teamRespawnTime(team, qfalse) < 1200)) ) {
+			if (!forceTapout &&
+				( (team == TEAM_RED) && (axisTime < 1200) )|| 
+				( (team == TEAM_BLUE) && (alliedTime < 1200) )
+				) {
 				forceTapout = qtrue;
 			}
 
-			// Cap this to 1 second checks to avoid flooding the client..
+			// Cap this to approx half a second checks to avoid flooding the client..
 			if (level.spawnFloodTimer < level.time) {				
 
 				if (g_maxlives.integer || g_alliedmaxlives.integer || g_axismaxlives.integer) {
 					// OSPx					
-					// If you wonder what's this all about..we don't want to force a 
-					// tapout when client has no lives left- although they can manually tap out..
+					// If you wonder what's this all about..we don't want to force a tapout when 
+					// client has no lives left- although they can manually tapout in that case..
 					//
-					// This may look like an overkill but in some cases you can set max lives for 
-					// one team only, thus other team (with no maxlives) will always be skipped...
+					// It may look like an overkill but lives can be either set for both teams or 
+					// independently (just for one team), thus it would break the feature as
+					// it would never reach it (client respawn defaults to -1 when not set..).
+					//
+					// FYI: 
+					// reqforcespawn	= instant tapout when player dies "& is not gibbed" (cg_instantTapout)
+					// reqforcetapout	= tapout occurs just before respawn is due (cg_forceTapout)
+					// - If both enabled, client solves that by favouring cg_forceTapout and ignoring cg_instantTapout..
 
 					// Both teams..
 					if (g_maxlives.integer) 
@@ -1380,42 +1390,33 @@ void ClientThink_real( gentity_t *ent ) {
 						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0) {
 							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
 
-							if (forceTapout) {
-								trap_SendServerCommand(ent - g_entities, "reqforcetapout");
-								forceTapout = qfalse;
-							}	
+							if (forceTapout) 
+								trap_SendServerCommand(ent - g_entities, "reqforcetapout");	
 						}
 					} // Allies only
-					else if (g_axismaxlives.integer &&
-						client->sess.sessionTeam == TEAM_RED) 
+					else if (g_axismaxlives.integer && team == TEAM_RED) 
 					{
 						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0) {
 							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
 
-							if (forceTapout) {
+							if (forceTapout) 
 								trap_SendServerCommand(ent - g_entities, "reqforcetapout");
-								forceTapout = qfalse;
-							}
 						}
 					} // Axis only
-					else if (g_alliedmaxlives.integer &&
-						client->sess.sessionTeam == TEAM_BLUE) 
+					else if (g_alliedmaxlives.integer && team == TEAM_BLUE) 
 					{
 						if (client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0) {
 							trap_SendServerCommand(ent - g_entities, "reqforcespawn");
 
-							if (forceTapout) {
+							if (forceTapout)
 								trap_SendServerCommand(ent - g_entities, "reqforcetapout");
-								forceTapout = qfalse;
-							}
 						}
 					} // A team with no max lives ...
 					else {
 						trap_SendServerCommand(ent - g_entities, "reqforcespawn");
 
 						if (forceTapout) {
-							trap_SendServerCommand(ent - g_entities, "reqforcetapout");
-							forceTapout = qfalse;
+							trap_SendServerCommand(ent - g_entities, "reqforcetapout");							
 						}
 					}
 				}
@@ -1423,13 +1424,12 @@ void ClientThink_real( gentity_t *ent ) {
 				else {
 					trap_SendServerCommand(ent - g_entities, "reqforcespawn");						
 
-					if (forceTapout) {
-						trap_SendServerCommand(ent - g_entities, "reqforcetapout");						
-						forceTapout = qfalse;
-					}
+					if (forceTapout)
+						trap_SendServerCommand(ent - g_entities, "reqforcetapout");
 				}
 				// Timestamp
-				level.spawnFloodTimer = level.time + 1000;
+				level.spawnFloodTimer = level.time + 600;
+				forceTapout = qfalse;
 			}
 
 			// forcerespawn is to prevent users from waiting out powerups

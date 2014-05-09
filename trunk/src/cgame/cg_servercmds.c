@@ -2043,7 +2043,7 @@ static void CG_ServerCommand( void ) {
 	// Force instant tapout 
 	// NOTE: cg_forceTapout prevails if enabled..
 	if (!Q_stricmp(cmd, "reqforcespawn")) {
-		if (cg_instanttapout.integer && !cg_forceTapout.integer) {
+		if (cg_instantTapout.integer && !cg_forceTapout.integer) {
 			CG_ForceTapOut_f();
 		} 		
 		return;
