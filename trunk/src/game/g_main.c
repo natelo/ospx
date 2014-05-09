@@ -1282,7 +1282,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// NERVE - SMF - intialize gamestate
 	if ( g_gamestate.integer == GS_INITIALIZE ) {
 		if ( g_noTeamSwitching.integer ) {
-			// OSPx - Rady
+			// OSPx - Ready
 			if (g_doWarmup.integer) {
 				trap_Cvar_Set("gamestate", va("%i", GS_WARMUP));
 				trap_SetConfigstring(CS_READY, va("%i", READY_PENDING));
@@ -1408,6 +1408,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// OSPx - Reinforcements offset
 	G_loadMatchGame();
+
+	// OSPx - Make sure pause is 0..
+	trap_SetConfigstring(CS_PAUSED, "0");
 }
 
 
