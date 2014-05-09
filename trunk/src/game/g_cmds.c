@@ -1097,7 +1097,8 @@ G_Say
 #define SAY_ALL     0
 #define SAY_TEAM    1
 #define SAY_TELL    2
-#define SAY_LIMBO   3           // NERVE - SMF
+#define SAY_LIMBO   3	// NERVE - SMF
+#define SAY_TEAMNL	4	// OSPx
 
 void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message, qboolean localize ) { // removed static so it would link
 	if ( !other ) {
@@ -1109,7 +1110,7 @@ void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char 
 	if ( !other->client ) {
 		return;
 	}
-	if ( mode == SAY_TEAM  && !OnSameTeam( ent, other ) ) {
+	if ((mode == SAY_TEAM || mode == SAY_TEAMNL) && !OnSameTeam(ent, other)) {
 		return;
 	}
 
@@ -1213,6 +1214,13 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		color = COLOR_GREEN;
 		break;
 		// -NERVE - SMF
+	// OSPx - Team with no location..
+	case SAY_TEAMNL:
+		G_LogPrintf("sayteamnl: %s: %s\n", ent->client->pers.netname, chatText);
+		Com_sprintf(name, sizeof(name), "(%s^7): ", ent->client->pers.netname);
+		color = COLOR_CYAN;
+		break;
+	// -OSPx
 	}
 
 	if ( target ) {
@@ -2647,6 +2655,21 @@ void ClientCommand( int clientNum ) {
 			return;
 		}
 	}
+
+	// OSPx - Say team with no location..
+	if (Q_stricmp(cmd, "say_teamnl") == 0) {
+		// Ignored
+		if (!ent->client->sess.ignored) {
+			Cmd_Say_f(ent, SAY_TEAMNL, qfalse);
+			return;
+		}
+		else {
+			CP("print \"You are ^1ignored^7!\n\"");
+			return;
+		}
+	}
+	// -OSPx
+
 	// NERVE - SMF
 	if ( Q_stricmp( cmd, "say_limbo" ) == 0 ) {
 		// OSPx - Ignored

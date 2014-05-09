@@ -563,7 +563,6 @@ static const pCmd_reference_t pCmd[] = {					// Properties..
 	{ "timeout",			pCmd_pauseHandle,	qtrue,		qtrue,	qfalse, qtrue },
 	{ "unpause",			pCmd_pauseHandle,	qfalse,		qtrue,	qfalse,	qtrue },
 	{ "timein",				pCmd_pauseHandle,	qfalse,		qtrue,	qfalse, qtrue },
-
 	{ 0,					NULL,				qfalse,		qtrue,	qtrue,	qtrue }
 };
 
