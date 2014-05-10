@@ -426,7 +426,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			if ( !item ) {
 				item = BG_FindItem( "Objective" );
 			}
-
+			G_matchPrintInfo(va("Allies have lost %s!", self->message));
 			self->client->ps.powerups[PW_REDFLAG] = 0;
 		}
 		if ( self->client->ps.powerups[PW_BLUEFLAG] ) {
@@ -434,7 +434,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			if ( !item ) {
 				item = BG_FindItem( "Objective" );
 			}
-
+			G_matchPrintInfo(va("Axis have lost %s!", self->message));
 			self->client->ps.powerups[PW_BLUEFLAG] = 0;
 		}
 

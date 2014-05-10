@@ -504,7 +504,7 @@ void Weapon_Engineer( gentity_t *ent ) {
 					return;
 				}
 
-				trap_SendServerCommand( ent - g_entities, "cp \"Arming dynamite...\" 1" );
+				trap_SendServerCommand( ent - g_entities, "cp \"^nArming dynamite...\" 1" );
 
 				// Give health until it is full, don't continue
 				traceEnt->health += 7;
@@ -524,7 +524,7 @@ void Weapon_Engineer( gentity_t *ent ) {
 				traceEnt->s.effect1Time = level.time;
 
 				// ARM IT!
-				trap_SendServerCommand( ent - g_entities, "cp \"Dynamite is now armed with a 30 second timer!\" 1" );
+				trap_SendServerCommand( ent - g_entities, "cp \"Dynamite is now armed with a ^n30 ^7second timer!\" 1" );
 				traceEnt->nextthink = level.time + 30000;
 				traceEnt->think = G_ExplodeMissile;
 
@@ -577,9 +577,9 @@ void Weapon_Engineer( gentity_t *ent ) {
 						if ( ( ( hit->spawnflags & AXIS_OBJECTIVE ) && ( ent->client->sess.sessionTeam == TEAM_BLUE ) ) ||
 							 ( ( hit->spawnflags & ALLIED_OBJECTIVE ) && ( ent->client->sess.sessionTeam == TEAM_RED ) ) ) {
 							if ( hit->track ) {
-								trap_SendServerCommand( -1, va( "cp \"%s\" 1", va( "Dynamite planted near %s!", hit->track ) ) );
+								G_matchPrintInfo(va("Dynamite planted near %s!", hit->track));
 							} else {
-								trap_SendServerCommand( -1, va( "cp \"%s\" 1", va( "Dynamite planted near objective #%d!", hit->count ) ) );
+								G_matchPrintInfo(va("Dynamite planted near objective #%d!", hit->count));
 							}
 						}
 						i = num;
@@ -645,8 +645,8 @@ void Weapon_Engineer( gentity_t *ent ) {
 									AddScore( ent,WOLF_DYNAMITE_DIFFUSE ); // FIXME add team info to *dynamite* so we don't get points for diffusing own team dynamite
 									scored++;
 									hit->spawnflags &= ~OBJECTIVE_DESTROYED; // "re-activate" objective since it wasn't destroyed.  kludgy, I know; see G_ExplodeMissile for the other half
-								}
-								trap_SendServerCommand( -1, "cp \"Axis engineer disarmed the Dynamite!\n\"" );
+								}								
+								G_matchPrintInfo(va("Axis defused dynamite near %s!", hit->track));
 								traceEnt->s.eventParm = G_SoundIndex( "sound/multiplayer/axis/g-dynamite_defused.wav" );
 								traceEnt->s.teamNum = TEAM_RED;
 							} else { // TEAM_BLUE
@@ -655,7 +655,7 @@ void Weapon_Engineer( gentity_t *ent ) {
 									scored++;
 									hit->spawnflags &= ~OBJECTIVE_DESTROYED; // "re-activate" objective since it wasn't destroyed
 								}
-								trap_SendServerCommand( -1, "cp \"Allied engineer disarmed the Dynamite!\n\"" );
+								G_matchPrintInfo(va("Allies defused dynamite near %s!", hit->track));
 								traceEnt->s.eventParm = G_SoundIndex( "sound/multiplayer/allies/a-dynamite_defused.wav" );
 								traceEnt->s.teamNum = TEAM_BLUE;
 							}

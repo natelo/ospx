@@ -402,7 +402,7 @@ void Team_ReturnFlagSound( gentity_t *ent, int team ) {
 
 void Team_ReturnFlag( int team ) {
 	Team_ReturnFlagSound( Team_ResetFlag( team ), team );
-	PrintMsg( NULL, "The %s flag has returned!\n", TeamName( team ) );
+	G_matchPrintInfo(va("The %s flag has returned!\n", (team == TEAM_RED ? "Axis" : "Allied")));
 }
 
 void Team_FreeEntity( gentity_t *ent ) {
@@ -433,13 +433,13 @@ void Team_DroppedFlagThink( gentity_t *ent ) {
 	if ( ent->item->giTag == PW_REDFLAG ) {
 		Team_ReturnFlagSound( Team_ResetFlag( TEAM_RED ), TEAM_RED );
 		if ( gm ) {
-			trap_SendServerCommand( -1, "cp \"Axis have returned the objective!\" 2" );
+			G_matchPrintInfo( "Axis have returned the objective!");
 			G_Script_ScriptEvent( gm, "trigger", "axis_object_returned" );
 		}
 	} else if ( ent->item->giTag == PW_BLUEFLAG )     {
 		Team_ReturnFlagSound( Team_ResetFlag( TEAM_BLUE ), TEAM_BLUE );
-		if ( gm ) {
-			trap_SendServerCommand( -1, "cp \"Allies have returned the objective!\" 2" );
+		if ( gm ) {			
+			G_matchPrintInfo("Allies have returned the objective!");
 			G_Script_ScriptEvent( gm, "trigger", "allied_object_returned" );
 		}
 	}
@@ -474,14 +474,14 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 			gm = G_Find( NULL, FOFS( scriptName ), "game_manager" );
 
 			if ( cl->sess.sessionTeam == TEAM_RED ) {
-				te->s.eventParm = G_SoundIndex( "sound/multiplayer/axis/g-objective_secure.wav" );
-				trap_SendServerCommand( -1, va( "cp \"Axis have returned %s!\n\" 2", ent->message ) );
+				te->s.eventParm = G_SoundIndex( "sound/multiplayer/axis/g-objective_secure.wav" );				
+				G_matchPrintInfo(va("Axis have returned %s!", ent->message));
 				if ( gm ) {
 					G_Script_ScriptEvent( gm, "trigger", "axis_object_returned" );
 				}
 			} else {
 				te->s.eventParm = G_SoundIndex( "sound/multiplayer/allies/a-objective_secure.wav" );
-				trap_SendServerCommand( -1, va( "cp \"Allies have returned %s!\n\" 2", ent->message ) );
+				G_matchPrintInfo(va("Allies have returned %s!", ent->message));
 				if ( gm ) {
 					G_Script_ScriptEvent( gm, "trigger", "allied_object_returned" );
 				}
@@ -607,14 +607,14 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 		gm = G_Find( NULL, FOFS( scriptName ), "game_manager" );
 
 		if ( cl->sess.sessionTeam == TEAM_RED ) {
-			te->s.eventParm = G_SoundIndex( "sound/multiplayer/axis/g-objective_taken.wav" );
-			trap_SendServerCommand( -1, va( "cp \"Axis have stolen %s!\n\" 2", ent->message ) );
+			te->s.eventParm = G_SoundIndex( "sound/multiplayer/axis/g-objective_taken.wav" );			
+			G_matchPrintInfo(va("Axis have stolen %s!", ent->message));
 			if ( gm ) {
 				G_Script_ScriptEvent( gm, "trigger", "allied_object_stolen" );
 			}
 		} else {
-			te->s.eventParm = G_SoundIndex( "sound/multiplayer/allies/a-objective_taken.wav" );
-			trap_SendServerCommand( -1, va( "cp \"Allies have stolen %s!\n\" 2", ent->message ) );
+			te->s.eventParm = G_SoundIndex( "sound/multiplayer/allies/a-objective_taken.wav" );			
+			G_matchPrintInfo(va("Allies have stolen %s!", ent->message));
 			if ( gm ) {
 				G_Script_ScriptEvent( gm, "trigger", "axis_object_stolen" );
 			}
@@ -1366,9 +1366,9 @@ void checkpoint_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 
 // JPW NERVE
 	if ( self->s.frame == WCP_ANIM_NOFLAG ) {
-		AddScore( other, WOLF_CP_CAPTURE );
+		AddScore( other, WOLF_CP_CAPTURE );		
 	} else {
-		AddScore( other, WOLF_CP_RECOVER );
+		AddScore( other, WOLF_CP_RECOVER );		
 	}
 // jpw
 
@@ -1426,8 +1426,10 @@ void checkpoint_spawntouch( gentity_t *self, gentity_t *other, trace_t *trace ) 
 // JPW NERVE
 	if ( self->s.frame == WCP_ANIM_NOFLAG ) {
 		AddScore( other, WOLF_SP_CAPTURE );
+		//G_matchPrintInfo(va("%s captured the flag!\n", ((other->client->sess.sessionTeam == TEAM_RED) ? "Axis" : "Allies")));		
 	} else {
 		AddScore( other, WOLF_SP_RECOVER );
+		//G_matchPrintInfo(va("%s reclaimed the flag!\n", ((other->client->sess.sessionTeam == TEAM_RED) ? "Axis" : "Allies")));
 	}
 // jpw
 

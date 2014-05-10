@@ -2240,7 +2240,7 @@ void ClientDisconnect( int clientNum ) {
 				if ( !item ) {
 					item = BG_FindItem( "Objective" );
 				}
-
+				G_matchPrintInfo(va("Allies have lost %s!", ent->message));
 				ent->client->ps.powerups[PW_REDFLAG] = 0;
 			}
 			if ( ent->client->ps.powerups[PW_BLUEFLAG] ) {
@@ -2248,7 +2248,7 @@ void ClientDisconnect( int clientNum ) {
 				if ( !item ) {
 					item = BG_FindItem( "Objective" );
 				}
-
+				G_matchPrintInfo(va("Axis have lost %s!", ent->message));
 				ent->client->ps.powerups[PW_BLUEFLAG] = 0;
 			}
 

@@ -1668,6 +1668,7 @@ void G_matchInfoDump(unsigned int dwDumpType);
 void CountDown(qboolean restart);
 void G_spawnPrintf(int print_type, int print_time, gentity_t *owner);
 void G_verifyMatchState(int nTeam);
+void G_matchPrintInfo(char *msg);
 
 //
 // g_geoip.c
