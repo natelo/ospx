@@ -73,7 +73,7 @@ void pCmd_players(gentity_t *ent, qboolean fParam) {
 		cl = &level.clients[idnum];
 		cl_ent = g_entities + idnum;
 
-		SanitizeString(ent->client->pers.netname, n1, qtrue);
+		SanitizeString(cl->pers.netname, n1, qtrue);
 		Q_CleanStr(n1);
 		n1[26] = 0;
 		ref[0] = 0;
