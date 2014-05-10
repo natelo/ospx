@@ -215,6 +215,7 @@ typedef struct {
 
 static const cmd_reference_t userCmd[] = {
 	{ "help",			NULL,				qfalse,	qtrue,	"?command",								"Shows property and usage info of specified command." },	
+	{ "commands",		cmd_getCommands,	qfalse, qtrue,	"!commands",							"Shows the list of all the commands your level can use." },
 	{ "incognito",		cmd_incognito,		qfalse,	qtrue,	"!incognito",							"Toggles your Admin status from visible to hidden."  },
 	{ "ignore",			cmd_ignoreHandle,	qtrue,	qtrue,	"!ignore <unique part of name>",		"Takes ability to (v)chat or call votes from a targeted player." },
 	{ "unignore",		cmd_ignoreHandle,	qfalse,	qtrue,	"!unignore <unique part of name>",		"Restores ability to (v)chat or call votes to a targeted player." },
@@ -296,6 +297,29 @@ qboolean userCommands(gentity_t *ent, char *cmd, qboolean pHelp) {
 	return wasUsed;
 }
 
+/*
+===========
+List all commands 
+===========
+*/
+char *adminCommandsList(void) {
+	unsigned int i, \
+		uCmd = ARRAY_LEN(userCmd);
+	const cmd_reference_t *uCM;
+	char command[MAX_TOKEN_CHARS - 1] = { 0 };
+
+	for (i = 0; i < uCmd; i++) {
+		uCM = &userCmd[i];
+		if (NULL != uCM->command) {
+
+			// Helpers have no function..but they exist for some
+			// reason, so print usage info as chances are it's help..
+			if (Q_stricmp(uCM->command, "commands"))
+				Q_strcat(command, sizeof(command), va("%s ", uCM->command));
+		}
+	}
+	return va("%s", command);
+}
 /*
 ===========
 Command's Entry Point

@@ -181,7 +181,6 @@ vmCvar_t a3_cmds;
 vmCvar_t a4_cmds;
 vmCvar_t a5_cmds;
 vmCvar_t a5_allowAll;
-vmCvar_t adm_help;
 vmCvar_t g_extendedLog;
 
 // - General
@@ -363,7 +362,6 @@ cvarTable_t gameCvarTable[] = {
 	{ &a4_cmds, "a4_cmds", "", CVAR_ARCHIVE, 0, qfalse },
 	{ &a5_cmds, "a5_cmds", "", CVAR_ARCHIVE, 0, qfalse },
 	{ &a5_allowAll, "a5_allowAll", "0", CVAR_ARCHIVE, 0, qfalse },
-	{ &adm_help, "adm_help", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_extendedLog, "g_extendedLog", "1", CVAR_ARCHIVE, 0, qfalse },
 
 	{ &g_spectatorInactivity, "g_spectatorInactivity", "0", 0, 0, qfalse, qfalse },

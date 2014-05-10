@@ -1393,7 +1393,6 @@ extern vmCvar_t	a3_cmds;
 extern vmCvar_t	a4_cmds;
 extern vmCvar_t	a5_cmds;
 extern vmCvar_t	a5_allowAll;
-extern vmCvar_t	adm_help;
 extern vmCvar_t g_extendedLog;
 
 extern vmCvar_t g_spectatorInactivity;
@@ -1712,6 +1711,7 @@ char *sortTag(gentity_t *ent);
 char *usrTag(gentity_t *ent, qboolean inquiry);
 void ParseAdmStr(const char *strInput, char *strCmd, char *strArgs);
 qboolean cmds_admin(gentity_t *ent, qboolean dHelp);
+char *adminCommandsList(void);
 int ClientNumberFromNameMatch(char *name, int *matches);
 qboolean isHigher(gentity_t *ent, gentity_t *target);
 
@@ -1721,6 +1721,7 @@ qboolean isHigher(gentity_t *ent, gentity_t *target);
 void cmd_doLogin(gentity_t *ent, qboolean silent);
 void cmd_doLogout(gentity_t *ent);
 void cmd_custom(gentity_t *ent);
+void cmd_getCommands(gentity_t *ent, qboolean fParam);
 void cmd_incognito(gentity_t *ent, qboolean fParam);
 void cmd_ignoreHandle(gentity_t *ent, qboolean dIgnore);
 void cmd_readyHandle(gentity_t *ent, qboolean unready);

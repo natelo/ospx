@@ -103,6 +103,9 @@ void cmd_doLogin(gentity_t *ent, qboolean silent) {
 				logEntry(ADMLOG, log);
 		}
 
+		// Let them know about their commands..
+		CP("print \"^3Info^7: Type !commands to see the list of all commands your level can use.\n\"");
+
 		// Make sure logged in user bypasses any spec lock instantly.
 		ent->client->sess.specInvited = 3;
 
@@ -189,6 +192,36 @@ void cmd_custom(gentity_t *ent) {
 
 		return;
 	}
+}
+
+/*
+===========
+Commands List
+===========
+*/
+void cmd_getCommands(gentity_t *ent, qboolean fParam) {
+	int level = ent->client->sess.admin;
+	char *cmds = "";
+
+	if (level == ADMIN_1) {
+		cmds = va("%s", a1_cmds.string);
+	} else if (level == ADMIN_2) {
+		cmds = va("%s", a2_cmds.string);
+	} else if (level == ADMIN_3) {
+		cmds = va("%s", a3_cmds.string);
+	} else if (level == ADMIN_4) {
+		cmds = va("%s", a4_cmds.string);
+	}
+	else if (level == ADMIN_5) {
+		if (a5_allowAll.integer)
+			cmds = va("%s\n\n^3Additional Commands\n^7----------------------------\n^7%s", adminCommandsList(), a5_cmds.string);
+		else
+			cmds = va("%s", a5_cmds.string);
+	}
+
+	CP(va("print \"\n^3Commands for your level are:\n^7----------------------------\n^7%s\n\"", cmds));
+	CP("print \"\n^3Usage\n^7----------------------------\n^7!COMMAND - Executes command / ?COMMAND - Prints description\n\n\"");
+	return;
 }
 
 /*
