@@ -219,6 +219,9 @@ void cmd_getCommands(gentity_t *ent, qboolean fParam) {
 			cmds = va("%s", a5_cmds.string);
 	}
 
+	// Print something if there's nothing..
+	cmds = (strlen(cmds) < 1 ? "There are no commands set for your level! :<\nBut HEY! You at least have a fancy tag. *crossed fingers*" : cmds);
+
 	CP(va("print \"\n^3Commands for your level are:\n^7----------------------------\n^7%s\n\"", cmds));
 	CP("print \"\n^3Usage\n^7----------------------------\n^7!COMMAND - Executes command / ?COMMAND - Prints description\n\n\"");
 	return;

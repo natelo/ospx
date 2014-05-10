@@ -333,25 +333,28 @@ qboolean cmds_admin(gentity_t *ent, qboolean dHelp) {
 
 	admCmds(ent->client->pers.cmd1, alt, cmd, dHelp);
 
-	// Allow ?help at any time..
-	if (Q_stricmp(cmd, "help") == 0) {
-		return userCommands(ent, cmd, qtrue);
+	// Allow ?help and !commands at any time..
+	if (Q_stricmp(cmd, "help") == 0 || Q_stricmp(cmd, "commands") == 0) {
+		return userCommands(ent, cmd, dHelp);
 	}	
 	// a5_allowAll enabled allows for client to execute 
 	// any existing command while a5_cmds can then be used
 	// for any server related commands (e.g. g_allowvote..)
-	else if (ent->client->sess.admin == ADMIN_5	&& a5_allowAll.integer)
-	{		
-		// Admin feature is not meant to work as rcon (full access) so if it's not
-		// in a5_cmds string and not in Admin structure, it's either a typo or not allowed. 
-		if (!userCommands(ent, cmd, dHelp))
-			CP(va("print \"^1Error^7: Command ^1%s ^7is either not found or not allowed for your level!\n\"", cmd));
+	else if (ent->client->sess.admin == ADMIN_5	&& a5_allowAll.integer)	{	
 
+		// Check the structure first.. 
+		if (!userCommands(ent, cmd, dHelp)) {
+			// If Not found..check the a5_cmds string..
+			if (canUse(ent, dHelp))
+				cmd_custom(ent);
+			else
+				CP(va("print \"^1Error^7: Command %s %s.\n\"", cmd, (dHelp ? "has no description" : "not found or allowed for your level")));
+		}
 		return qtrue;
 	}
 	// Command is allowed (found in a*_cmds string..)
-	else if (canUse(ent, dHelp))
-	{
+	else if (canUse(ent, dHelp)) {
+
 		// Command was not in Admin structure
 		if (!userCommands(ent, cmd, dHelp))
 			// Chances are that it's a default (e.g. g_speed) 
@@ -364,7 +367,7 @@ qboolean cmds_admin(gentity_t *ent, qboolean dHelp) {
 	else
 	{
 		// Was not found due typo, insufficient level..whatever just bail out
-		CP(va("print \"^1Error^7: Command ^1%s ^7is either not found or not allowed for your level!\n\"", cmd));
+		CP(va("print \"^1Error^7: Command %s %s.\n\"", cmd, (dHelp ? "has no description" : "not found or allowed for your level")));
 	}
 	return qfalse;
 }
