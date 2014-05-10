@@ -1401,6 +1401,7 @@ extern vmCvar_t g_showFlags;
 extern vmCvar_t g_allowSoftKill;
 extern vmCvar_t server_autoconfig;
 extern vmCvar_t g_fixedphysics;
+extern vmCvar_t g_hitsounds;
 
 extern vmCvar_t vote_limit;
 extern vmCvar_t vote_percent;

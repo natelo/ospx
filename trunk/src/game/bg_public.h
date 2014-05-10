@@ -399,7 +399,11 @@ typedef enum {
 	// Rafael - mg42		// (SA) I don't understand these here.  can someone explain?
 	PERS_HWEAPON_USE,
 	// Rafael wolfkick
-	PERS_WOLFKICK
+	PERS_WOLFKICK,
+
+	// OSPx
+	PERS_HITHEAD,
+	PERS_HITBODY
 } persEnum_t;
 
 

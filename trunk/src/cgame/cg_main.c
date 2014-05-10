@@ -315,6 +315,7 @@ vmCvar_t cg_autoAction;
 vmCvar_t cg_useScreenshotJPEG;
 vmCvar_t cg_instantTapout;
 vmCvar_t cg_forceTapout;
+vmCvar_t cg_hitsounds;
 vmCvar_t cg_uinfo;
 
 // Stats - Font scale
@@ -559,6 +560,7 @@ cvarTable_t cvarTable[] = {
 	{ &cg_useScreenshotJPEG, "cg_useScreenshotJPEG", "1", CVAR_ARCHIVE },
 	{ &cg_instantTapout, "cg_instantTapout", "0", CVAR_ARCHIVE },
 	{ &cg_forceTapout, "cg_forceTapout", "0", CVAR_ARCHIVE },
+	{ &cg_hitsounds, "cg_hitsounds", "0", CVAR_ARCHIVE },
 	{ &cg_uinfo, "cg_uinfo", "0", CVAR_ROM | CVAR_USERINFO },
 
 	{ &cf_wstats, "cf_wstats", "1.2", CVAR_ARCHIVE },
@@ -1223,6 +1225,12 @@ static void CG_RegisterSounds( void ) {
 	trap_S_RegisterSound( "sound/Loogie/spit.wav" );
 	trap_S_RegisterSound( "sound/Loogie/sizzle.wav" );
 */
+
+// OSPx
+	// Hitsounds
+	cgs.media.headShot = trap_S_RegisterSound("sound/game/hitsounds/hithead.wav");
+	cgs.media.bodyShot = trap_S_RegisterSound("sound/game/hitsounds/hit.wav");
+	cgs.media.teamShot = trap_S_RegisterSound("sound/game/hitsounds/hitteam.wav");
 }
 
 

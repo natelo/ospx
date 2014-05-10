@@ -1120,6 +1120,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			&& attacker->client->sess.sessionTeam != targ->client->sess.sessionTeam) {
 			G_addStatsHeadShot(attacker, mod);
 		}
+
+		// OSPx - Hitsounds
+		attacker->client->ps.persistant[PERS_HITHEAD]++;
 	}
 
 	if ( g_debugDamage.integer ) {
@@ -1147,6 +1150,16 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			VectorCopy( targ->r.currentOrigin, client->damage_from );
 			client->damage_fromWorld = qtrue;
 		}
+	}
+
+	// OSPx - Hitsounds
+	if (attacker->client && targ->client && targ != attacker && g_hitsounds.integer) {
+		qboolean onSameTeam = OnSameTeam(targ, attacker);
+
+		if (onSameTeam)
+			attacker->client->ps.persistant[PERS_HITBODY] -= damage;
+		else
+			attacker->client->ps.persistant[PERS_HITBODY] += damage;
 	}
 
 	// See if it's the player hurting the emeny flag carrier

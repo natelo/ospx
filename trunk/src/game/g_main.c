@@ -190,6 +190,7 @@ vmCvar_t g_showFlags;
 vmCvar_t g_allowSoftKill;
 vmCvar_t server_autoconfig;
 vmCvar_t g_fixedphysics;
+vmCvar_t g_hitsounds;
 
 vmCvar_t vote_limit;
 vmCvar_t vote_percent;
@@ -370,6 +371,7 @@ cvarTable_t gameCvarTable[] = {
 	{ &g_allowSoftKill, "g_allowSoftKill", "0", CVAR_ARCHIVE, 0, qfalse, qfalse },
 	{ &server_autoconfig, "server_autoconfig", "0", 0, 0, qfalse, qfalse },
 	{ &g_fixedphysics, "g_fixedphysics", "1", CVAR_ARCHIVE | CVAR_SERVERINFO, qfalse, qfalse },
+	{ &g_hitsounds, "g_hitsounds", "0", 0 },
 
 	{ &vote_limit, "vote_limit", "3", CVAR_ARCHIVE, qfalse, qfalse },
 	{ &vote_percent, "vote_percent", "50", CVAR_ARCHIVE, qfalse, qfalse },

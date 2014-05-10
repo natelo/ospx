@@ -1664,9 +1664,15 @@ typedef struct {
 	qhandle_t selectCursor;
 	qhandle_t sizeCursor;
 
-	// OSPx - Country Flags
+// OSPx
+	// Country Flags
 	qhandle_t countryFlags;
 
+	// Hitsounds
+	sfxHandle_t	headShot;
+	sfxHandle_t	bodyShot;
+	sfxHandle_t	teamShot;
+// -OSPx
 } cgMedia_t;
 
 // OSPx - Pause states
@@ -2018,6 +2024,7 @@ extern vmCvar_t cg_autoAction;
 extern vmCvar_t cg_useScreenshotJPEG;
 extern vmCvar_t cg_instantTapout;
 extern vmCvar_t cg_forceTapout;
+extern vmCvar_t cg_hitsounds;
 extern vmCvar_t cg_uinfo;
 
 extern vmCvar_t cf_wstats;
