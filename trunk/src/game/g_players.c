@@ -267,8 +267,6 @@ void pCmd_getstatus(gentity_t *ent, qboolean fParam) {
 ===================
 READY / NOTREADY
 
-Sets a player's "ready" status.
-
 Tardo - rewrote this because the parameter handling to the function is different in rtcw.
 ===================
 */
@@ -284,6 +282,10 @@ void pCmd_ready(gentity_t *ent, qboolean state) {
 	}
 	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
 		CP(va("print \"Specs cannot use ^3%s ^7command.\n\"", status[state]));
+		return;
+	}
+	if (level.readyTeam[ent->client->sess.sessionTeam] == qtrue && !state) { // Doesn't cope with unreadyteam but it's out anyway..
+		CP(va("print \"%s ^7ignored. Your team has issued ^3TEAM READY ^7command..\n\"", status[state]));
 		return;
 	}
 
@@ -306,6 +308,60 @@ void pCmd_ready(gentity_t *ent, qboolean state) {
 			// Doesn't rly matter..score tab will show slow ones..
 			AP(va("popin \"%s ^7is %s%s!\n\"", ent->client->pers.netname, (state ? "^n" : "^z"), status[state]));
 		}
+	}
+}
+
+/*
+===================
+TEAM-READY / NOTREADY
+===================
+*/
+void pCmd_teamReady(gentity_t *ent, qboolean ready) {
+	char *status[2] = { "NOT READY", "READY" };	
+	int i, p = { 0 };
+	int team = ent->client->sess.sessionTeam;
+	gentity_t *cl;
+
+	if (!g_doWarmup.integer) {
+		return;
+	}
+	if (team_nocontrols.integer) {
+		CP("print \"Team commands are not enabled on this server.\n\"");
+		return;
+	}
+	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
+		CP("print \"Specs cannot use ^3TEAM ^7commands.\n\"");
+		return;
+	}
+	if (!ready && g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
+		CP("print \"Countdown started, ^3notready^7 ignored.\n\"");
+		return;
+	}
+
+	for (i = 0; i < level.numConnectedClients; i++) {
+		cl = g_entities + level.sortedClients[i];
+
+		if (!cl->inuse) {
+			continue;
+		}
+
+		if (cl->client->sess.sessionTeam != team) {
+			continue;
+		}
+
+		if ((cl->client->pers.ready != ready) && !level.intermissiontime) {
+			cl->client->pers.ready = ready;
+			cl->client->ps.powerups[PW_READY] = (ready ? INT_MAX : 0);
+			++p;
+		}
+	}
+
+	if (!p) {
+		CP(va("print \"Your team is already ^3%s^7!\n\"", status[ready]));
+	}
+	else {	
+		AP(va("popin \"%s ^7team is %s%s!\n\"", aTeams[team], (ready ? "^n" : "^z"), status[ready]));
+		level.readyTeam[team] = ready;
 	}
 }
 
@@ -562,6 +618,8 @@ static const pCmd_reference_t pCmd[] = {					// Properties..
 	{ "getstatus",			pCmd_getstatus,		qfalse,		qfalse,	qfalse,	qfalse },
 	{ "ready",				pCmd_ready,			qtrue,		qfalse,	qtrue,	qtrue },
 	{ "notready",			pCmd_ready,			qfalse,		qfalse,	qtrue,	qtrue },
+	{ "readyteam",			pCmd_teamReady,		qtrue,		qfalse,	qtrue,	qtrue },
+	//{ "unreadyteam",		pCmd_teamReady,		qfalse,		qfalse,	qtrue,	qtrue }, // It's there if needed..
 	{ "speclock",			pCmd_speclock,		qtrue,		qfalse,	qfalse,	qtrue },
 	{ "specunlock",			pCmd_speclock,		qfalse,		qfalse,	qfalse,	qtrue },
 	{ "specinvite",			pCmd_specInvite,	qtrue,		qfalse,	qfalse,	qtrue },

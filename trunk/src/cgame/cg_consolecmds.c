@@ -901,6 +901,12 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand("timein");
 	trap_AddCommand("timeout");
 
+	// Ready
+	trap_AddCommand("ready");
+	trap_AddCommand("notready");
+	trap_AddCommand("readyteam");
+	//trap_AddCommand("unreadyteam");
+
 	// Misc
 	trap_AddCommand("time");
 	trap_AddCommand("currenttime");

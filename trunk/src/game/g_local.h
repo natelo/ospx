@@ -852,6 +852,7 @@ typedef struct {
 	// Ready
 	qboolean readyAll;
 	qboolean readyPrint;
+	qboolean readyTeam[TEAM_NUM_TEAMS];
 
 	// Track players
 	int alliedPlayers;
