@@ -687,7 +687,7 @@ qboolean IsHeadShot( gentity_t *targ, qboolean isAICharacter, vec3_t dir, vec3_t
 		VectorCopy( targ->r.currentAngles, head->s.angles );
 		VectorCopy( head->s.angles, head->s.apos.trBase );
 		VectorCopy( head->s.angles, head->s.apos.trDelta );
-		VectorSet( head->r.mins, -6, -6, -2 ); // JPW NERVE changed this z from -12 to -6 for crouching, also removed standing offset
+		VectorSet( head->r.mins, -6, -6, -4 ); // OSPx - Changed crouch headbox to -4 (was -2) so it aligns better.
 		VectorSet( head->r.maxs, 6, 6, 10 ); // changed this z from 0 to 6
 		head->clipmask = CONTENTS_SOLID;
 		head->r.contents = CONTENTS_SOLID;
